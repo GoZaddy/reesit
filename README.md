@@ -3,7 +3,9 @@ Original App Design Project - README Template
 
 # App Ideas
 1. Receipt scanner app
-2.
+2. Travel app to get most picture-worthy locations
+3. Social media app - close knit friends - volunteer to help with stuff
+4. Business app, get daily offers and discounts from businesses close to you
 
 # Receipt Scanner
 
@@ -95,10 +97,6 @@ Uses your phone camera to scan physical receipts and save them for future record
 ## Wireframes
 ![](https://i.imgur.com/NGMEbof.jpg)
 ![](https://i.imgur.com/1W8W7S8.jpg)
-
-
-[Add picture of your hand sketched wireframes in this section]
-<img src="YOUR_WIREFRAME_IMAGE_URL" width=600>
 
 ### [BONUS] Digital Wireframes & Mockups
 
