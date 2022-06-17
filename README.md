@@ -56,7 +56,15 @@ Uses your phone camera to scan physical receipts and save them for future record
     * User gets quick onboarding of what the app can do
     * Navigates to login screen / register screen
 * Login screen / Register screen
+    * user logs in or creates account here
+    * will be two acitivities not one. or one activity with two fragments
+* Receipt Creation/update Screen
+    * user takes picture of receipt here
+    * user also edits receipts here
+    * Should have a button to take pictures(probably a floating action button)
+    * user creates receipts here
 * List of receipts screen (Main Screen)
+    * Should contain a floating action button that you can use to create a receipt
     * User can categorize receipts according to date, merchant, total price etc
     * User can make search queries for receipts - using item name, merchant name - using search bar
 * Receipt details screen
@@ -74,9 +82,10 @@ Uses your phone camera to scan physical receipts and save them for future record
     * Shows user email
     * Shows categories e.g reimbursements
     * Has button to go to settings screen
+* Create Custom categories screen
+    * To create custom categories
 
 ### 3. Navigation
-
 
 **Flow Navigation** (Screen to Screen)
 
@@ -84,11 +93,14 @@ Uses your phone camera to scan physical receipts and save them for future record
     * navigate to Login Screen after click through splash screen pages
 * Login Screen
     * navigate to Main screen(list of receipts)
+    * navigate to Register screen if user has no account
 * Main screen
     * navigate to Settings screen
     * navigate to Receipt Details screen
     * navigate to Login screen after log out
     * navigate to Filter screen
+    * navigate to Create Custom categories screen
+    * navigate to Receipt creation screen
 
 * Settings Screen
     * Go back to main screen!
@@ -106,7 +118,113 @@ Uses your phone camera to scan physical receipts and save them for future record
 [This section will be completed in Unit 9]
 ### Models
 [Add table of models]
+#### User
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the user |
+   | email        | String | user's email |
+   | password         | String     | user's password |
+   | createdAt     | DateTime | date when user is created (default field) |
+   | updatedAt     | DateTime | date when user is last updated (default field) |
+
+#### Receipt
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the receipt (default field) |
+   | userId        | Pointer to User| receipt owner |
+   | merchantId      | Pointer to Merchant  | merchant issuing receipt |
+   | total       | Number   | total amount paid(plus tax) |
+   | savings       | Number   | total amount saved |
+   | tags       | Array of Pointers to ReceiptTag  | tags for this receipt |
+   | referenceNumber | String   | reference number of receipt(if available) |
+   | createdAt     | DateTime | date when receipt is created (default field) |
+   | updatedAt     | DateTime | date when receipt is last updated (default field) |
+   
+  #### Item
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for item on receipt (default field) |
+   | userId        | Pointer to User| receipt owner |
+   | receiptId     | Pointer to Receipt | receipt that this item belongs to |
+   | itemCount     | Number   | count for this item |
+   | pricePerItem  | Number   | how much a singular item costs |
+   | totalAmountPaid | Number   | how much was paid for this item |
+   | createdAt     | DateTime | date when item is created (default field) |
+   | updatedAt     | DateTime | date when item is last updated (default field) | 
+   
+#### Merchant
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the merchant (default field) |
+   | name          | String   | name of merchant  |
+   | logo          | String     | logo of merchant(not required) |
+   | createdAt     | DateTime | date when merchant is created (default field) |
+   | updatedAt     | DateTime | date when merchant is last updated (default field) |    
+   
+#### CustomCategory
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for custom category (default field) |
+   | name        | String| name of custom category |
+   | filters        | Array     | Array of filter objects defined in json |
+   | userId       | Pointer to User   | user who created this custom category |
+   | createdAt     | DateTime | date when post is created (default field) |
+   | updatedAt     | DateTime | date when post is last updated (default field) |   
+   
+   #### Receipt Tag
+
+   | Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for receipt tag (default field) |
+   | name        | String| name of receipt tag |
+   | createdAt     | DateTime | date when receipt tag is created (default field) |
+   | updatedAt     | DateTime | date when receipt tag is last updated (default field) |   
+   
+   
 ### Networking
 - [Add list of network requests by screen ]
 - [Create basic snippets for each Parse network request]
 - [OPTIONAL: List endpoints if using existing API such as Yelp]
+
+#### List of network requests by screen
+- Main Screen
+  - (Read/GET) Query all receipts where user is an owner (have a load more button to load more receipts)
+     ```swift
+     let query = PFQuery(className:"Receipt")
+     query.whereKey("author", equalTo: currentUser)
+     query.order(byDescending: "createdAt")
+     query.findObjectsInBackground { (receipts: [PFObject]?, error: Error?) in
+        if let error = error { 
+           print(error.localizedDescription)
+        } else if let receipts = receipts {
+           print("Successfully retrieved \(receipts.count) receipts.")
+       // TODO: Do something with receipts...
+        }
+     }
+     ```
+  - (Read/GET) Get Custom Categories
+
+- Receipt creation/edition screen
+    - (Create/POST) Create new receipt
+    - (Update/PUT) Update new receipt
+    - (Delete/DELETE) Delete receipt
+    - (Read/GET) Get all receipt tags that have been added by user so we can add them to dropdown
+
+- Settings screen
+    - (Read/GET) Get user settings
+    - (Create/ POST) Update user settings
+
+-  Register Screen
+    -  (Create/POST) Create new user
+-  Login Screen
+    -  (Read/GET) Get user information to authenticate user
+- Create Custom Categories screen
+    - (Create/POST) Create Custom Categories
+
+     
+  
