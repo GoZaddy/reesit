@@ -95,12 +95,12 @@ public class LoginFragment extends Fragment {
                             unsetFormStateLoading();
                             startActivity(intent);
                         } else {
-                            Toast.makeText(getContext(), "Error logging in: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), getString(R.string.login_fragment_error_occurred_during_log_in, e.getMessage()), Toast.LENGTH_SHORT).show();
                             unsetFormStateLoading();
                         }
                     });
                 } else {
-                    Toast.makeText(getContext(), "Invalid email address!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.login_fragment_invalid_email), Toast.LENGTH_SHORT).show();
                     unsetFormStateLoading();
                 }
 
