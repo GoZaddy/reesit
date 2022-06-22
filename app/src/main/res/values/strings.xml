@@ -34,4 +34,8 @@
 
     <string name="login_fragment_invalid_email">Invalid email address!</string>
     <string name="login_fragment_error_occurred_during_log_in">Error occurred while logging in: %1$s</string>
+    <string name="receipt_creation_take_picture_title">Take picture of receipt</string>
+    <string name="receipt_creation_choose_receipt_title">Choose picture of receipt from gallery</string>
+    <string name="receipt_creation_no_picture_or">or</string>
+    <string name="receipts_creation_no_picture_title">Add Receipt</string>
 </resources>

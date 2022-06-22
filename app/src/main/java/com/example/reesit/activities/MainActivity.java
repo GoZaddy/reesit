@@ -19,6 +19,7 @@ import com.example.reesit.R;
 import com.example.reesit.databinding.ActivityMainBinding;
 import com.example.reesit.fragments.ReceiptsFragment;
 import com.example.reesit.services.UserService;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActionBarDrawerToggle drawerToggle;
 
+
     private final static String TAG = "MainActivity";
 
     @Override
@@ -54,7 +56,11 @@ public class MainActivity extends AppCompatActivity {
         toolbar = activityMainBinding.toolbar.getRoot();
         setSupportActionBar(toolbar);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24);
+        }
 
         drawer = activityMainBinding.drawerLayout;
 
