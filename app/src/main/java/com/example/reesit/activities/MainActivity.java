@@ -61,31 +61,6 @@ public class MainActivity extends AppCompatActivity {
         nvDrawer = activityMainBinding.navigationView;
 
         setupDrawerContent(nvDrawer);
-
-//        final Fragment settingsFragment = new UserSettings();
-//        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-//            @Override
-//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-//                Fragment fragment;
-//                switch(item.getItemId()){
-//                    case R.id.list_menu_item:
-//                        fragment = receiptsFragment;
-//                        break;
-//                    case R.id.settings_menu_item:
-//                        fragment = settingsFragment;
-//                        break;
-//                    default:
-//                        fragment = receiptsFragment;
-//                        break;
-//                }
-//
-//                fragmentManager.beginTransaction().replace(R.id.content, fragment).commit();
-//                return true;
-//            }
-//        });
-//
-//        bottomNavigationView.setSelectedItemId(R.id.list_menu_item);
-
     }
 
 
