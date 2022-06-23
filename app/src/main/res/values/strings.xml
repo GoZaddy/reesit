@@ -38,4 +38,9 @@
     <string name="receipt_creation_choose_receipt_title">Choose picture of receipt from gallery</string>
     <string name="receipt_creation_no_picture_or">or</string>
     <string name="receipts_creation_no_picture_title">Add Receipt</string>
+    <string name="receipts_picture_taken_retake_prompt">Retake or reselect picture of receipt</string>
+    <string name="receipts_picture_taken_retake_picture_button_text">Retake picture of receipt</string>
+    <string name="receipts_picture_taken_rechoose_picture_button_text">Reselect picture of receipt from gallery</string>
+    <string name="receipts_picture_taken_process_receipt_button_text">Process Receipt</string>
+    <string name="receipt_picture_taken_image_content_description">Picture of receipt</string>
 </resources>

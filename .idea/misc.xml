@@ -14,11 +14,13 @@
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.29270163342642375" />
         <entry key="app/src/main/res/layout/fragment_receipts.xml" value="0.24616088867187502" />
         <entry key="app/src/main/res/layout/fragment_receipts_creation_no_picture.xml" value="0.3113299162491508" />
+        <entry key="app/src/main/res/layout/fragment_receipts_picture_taken.xml" value="0.37376765498408565" />
         <entry key="app/src/main/res/layout/fragment_register.xml" value="0.3399871826171875" />
         <entry key="app/src/main/res/layout/fragment_user_settings.xml" value="0.30326232910156253" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.23233695652173914" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.359375" />
         <entry key="app/src/main/res/menu/menu_drawer_list_receipts.xml" value="0.4331253051757813" />
+        <entry key="app/src/main/res/xml/file_paths.xml" value="0.16203703703703703" />
       </map>
     </option>
   </component>

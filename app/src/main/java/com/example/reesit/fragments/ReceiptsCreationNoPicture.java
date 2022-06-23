@@ -2,7 +2,9 @@ package com.example.reesit.fragments;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +25,8 @@ import android.widget.ImageButton;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsCreationNoPictureBinding;
+import com.example.reesit.misc.UriAndSource;
+import com.example.reesit.providers.ReesitFileProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,11 +46,11 @@ public class ReceiptsCreationNoPicture extends Fragment {
     private ImageButton takePictureButton;
     private ImageButton choosePictureButton;
 
-    private ActivityResultLauncher<Uri> pictureLauncher;
+    private ActivityResultLauncher<Uri> takePhotoLauncher;
+    private ActivityResultLauncher<String> selectPhotoLauncher;
 
     private static final String TAG = "ReceiptsCreationNoPicture";
     private static final String JPEG_MIME_TYPE = "image/jpeg";
-    private static final String IMAGE_SUBDIRECTORY = "Reesit";
 
 
 
@@ -83,6 +87,16 @@ public class ReceiptsCreationNoPicture extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        takePhotoLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), new ActivityResultCallback<Boolean>() {
+            @Override
+            public void onActivityResult(Boolean result) {
+                if (result){
+                    // switch to ReceiptCreationPictureTaken fragment
+                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromCamera(takenPictureURI))).commit();
+                }
+
+            }
+        });
         takePictureButton = fragmentReceiptsCreationNoPictureBinding.takePicture;
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,18 +104,22 @@ public class ReceiptsCreationNoPicture extends Fragment {
                 launchCamera();
             }
         });
-        pictureLauncher = registerForActivityResult(new ActivityResultContracts.TakePicture(), new ActivityResultCallback<Boolean>() {
+
+        selectPhotoLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
             @Override
-            public void onActivityResult(Boolean result) {
-                if (result){
-                   // switch to ReceiptCreationPictureTaken fragment
-
-                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(takenPictureURI)).commit();
-
-                }
-
+            public void onActivityResult(Uri result) {
+                getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
             }
         });
+
+        choosePictureButton = fragmentReceiptsCreationNoPictureBinding.choosePicture;
+        choosePictureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectPhotoLauncher.launch("image/*");
+            }
+        });
+
 
     }
 
@@ -127,10 +145,11 @@ public class ReceiptsCreationNoPicture extends Fragment {
 
 
             takenPictureURI = resolver.insert(imageCollection, newImageDetails);
+
             intent.putExtra(MediaStore.EXTRA_OUTPUT, takenPictureURI);
 
             if (intent.resolveActivity(getContext().getPackageManager()) != null){
-                pictureLauncher.launch(takenPictureURI);
+                takePhotoLauncher.launch(takenPictureURI);
             }
         } else {
             Log.e(TAG, "getContext() returned null while trying to get content resolver");
@@ -138,4 +157,6 @@ public class ReceiptsCreationNoPicture extends Fragment {
 
 
     }
+
+
 }
