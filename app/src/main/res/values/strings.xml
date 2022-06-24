@@ -27,13 +27,12 @@
     <string name="authentication_log_in_link">Log in here</string>
     <string name="authentication_sign_up_title">Sign up for Reesit</string>
     <string name="authentication_log_in_title">Log in to Reesit</string>
-
     <string name="register_fragment_passwords_not_match_error_message">Passwords do not match</string>
     <string name="register_fragment_error_occurred_during_sign_up">Error occurred while creating account: %1$s</string>
     <string name="register_fragment_invalid_email">Invalid email address!</string>
-
     <string name="login_fragment_invalid_email">Invalid email address!</string>
     <string name="login_fragment_error_occurred_during_log_in">Error occurred while logging in: %1$s</string>
+
     <string name="receipt_creation_take_picture_title">Take picture of receipt</string>
     <string name="receipt_creation_choose_receipt_title">Choose picture of receipt from gallery</string>
     <string name="receipt_creation_no_picture_or">or</string>
@@ -43,4 +42,5 @@
     <string name="receipts_picture_taken_rechoose_picture_button_text">Reselect picture of receipt from gallery</string>
     <string name="receipts_picture_taken_process_receipt_button_text">Process Receipt</string>
     <string name="receipt_picture_taken_image_content_description">Picture of receipt</string>
+    <string name="settings_page_temp_title">Settings page</string>
 </resources>
