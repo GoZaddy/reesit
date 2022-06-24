@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/categories_menu_item"
+        android:title="@string/drawer_categories_group_title"
+    >
+        <menu
+            android:id="@+id/categories_menu"
+        >
+            <group
+                android:id="@+id/categories_group"
+            >
+                <item android:title="@string/reimbursement_category_title" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/settings_menu_item"
+        android:title="@string/drawer_settings_item_title"
+    />
+    <item
+        android:id="@+id/logout_menu_item"
+        android:title="@string/drawer_log_out_menu_item"
+        />
+</menu>
