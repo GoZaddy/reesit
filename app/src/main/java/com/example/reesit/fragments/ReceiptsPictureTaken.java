@@ -131,6 +131,15 @@ public class ReceiptsPictureTaken extends Fragment {
                                         @Override
                                         public void onSuccess(Text visionText) {
                                             // parse visionText
+                                            for (Text.TextBlock block : visionText.getTextBlocks()) {
+                                                System.out.println("----------- Block Start --------------");
+                                                for (Text.Line line: block.getLines()){
+                                                    System.out.println("----------- Line Start --------------");
+                                                    System.out.println(line.getText());
+                                                    System.out.println("----------- Line End --------------");
+                                                }
+                                                System.out.println("----------- Block End --------------");
+                                            }
                                         }
                                     })
                                     .addOnFailureListener(
