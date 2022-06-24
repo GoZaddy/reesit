@@ -170,8 +170,10 @@ public class ReceiptsPictureTaken extends Fragment {
         reselectPhotoLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
             @Override
             public void onActivityResult(Uri result) {
-                takenPictureURI = UriAndSource.fromGallery(result);
-                renderImageOnPreview(getContext(), takenPictureURI);
+                if (result != null){
+                    takenPictureURI = UriAndSource.fromGallery(result);
+                    renderImageOnPreview(getContext(), takenPictureURI);
+                }
             }
         });
         requestStoragePermissionLauncher =
