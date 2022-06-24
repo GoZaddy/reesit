@@ -43,4 +43,8 @@
     <string name="receipts_picture_taken_process_receipt_button_text">Process Receipt</string>
     <string name="receipt_picture_taken_image_content_description">Picture of receipt</string>
     <string name="settings_page_temp_title">Settings page</string>
+    <string name="media_access_permissions_message">This app needs access to your phone\'s media to use receipt pictures from your gallery. Please try again and grant permissions</string>
+    <string name="media_access_permissions_dialog_title">Media access permissions</string>
+    <string name="media_access_permissions_dialog_cancel_text">Cancel</string>
+    <string name="media_access_permissions_dialog_grant_permission_button">Grant permission</string>
 </resources>

@@ -1,9 +1,13 @@
 package com.example.reesit.fragments;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -22,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsCreationNoPictureBinding;
@@ -48,6 +54,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
 
     private ActivityResultLauncher<Uri> takePhotoLauncher;
     private ActivityResultLauncher<String> selectPhotoLauncher;
+    private ActivityResultLauncher<String> requestStoragePermissionLauncher;
 
     private static final String TAG = "ReceiptsCreationNoPicture";
     private static final String JPEG_MIME_TYPE = "image/jpeg";
@@ -97,6 +104,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
 
             }
         });
+
         takePictureButton = fragmentReceiptsCreationNoPictureBinding.takePicture;
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,15 +116,44 @@ public class ReceiptsCreationNoPicture extends Fragment {
         selectPhotoLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
             @Override
             public void onActivityResult(Uri result) {
-                getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
+                if (result != null){
+                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
+                }
             }
         });
 
+        requestStoragePermissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                    if (isGranted) {
+                        selectPhotoLauncher.launch("image/*");
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.media_access_permissions_message), Toast.LENGTH_SHORT).show();
+                    }
+                });
         choosePictureButton = fragmentReceiptsCreationNoPictureBinding.choosePicture;
         choosePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectPhotoLauncher.launch("image/*");
+                // request storage access permissions
+                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    selectPhotoLauncher.launch("image/*");
+                }
+                else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage(getString(R.string.media_access_permissions_message)).setTitle(getString(R.string.media_access_permissions_dialog_title));
+                    builder.setNegativeButton(R.string.media_access_permissions_dialog_cancel_text, null);
+                    builder.setPositiveButton(R.string.media_access_permissions_dialog_grant_permission_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                else {
+                    requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+                }
             }
         });
 
