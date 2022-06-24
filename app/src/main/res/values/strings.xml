@@ -27,4 +27,5 @@
     <string name="authentication_log_in_link">Log in here</string>
     <string name="authentication_sign_up_title">Sign up for Reesit</string>
     <string name="authentication_log_in_title">Log in to Reesit</string>
+    <string name="settings_page_temp_title">Settings page</string>
 </resources>
