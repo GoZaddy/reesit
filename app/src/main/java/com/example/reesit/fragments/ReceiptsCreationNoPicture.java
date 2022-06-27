@@ -33,6 +33,8 @@ import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsCreationNoPictureBinding;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.providers.ReesitFileProvider;
+import com.example.reesit.utils.ReesitCallable;
+import com.example.reesit.utils.RuntimePermissions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -135,29 +137,14 @@ public class ReceiptsCreationNoPicture extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    selectPhotoLauncher.launch("image/*");
-                }
-                else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage(getString(R.string.media_access_permissions_message)).setTitle(getString(R.string.media_access_permissions_dialog_title));
-                    builder.setNegativeButton(R.string.media_access_permissions_dialog_cancel_text, null);
-                    builder.setPositiveButton(R.string.media_access_permissions_dialog_grant_permission_button, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                else {
-                    requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-                }
+                RuntimePermissions.requestStoragePermissions(ReceiptsCreationNoPicture.this, getContext(), requestStoragePermissionLauncher, new ReesitCallable() {
+                    @Override
+                    public void run() {
+                        selectPhotoLauncher.launch("image/*");
+                    }
+                });
             }
         });
-
-
     }
 
     private void launchCamera(){

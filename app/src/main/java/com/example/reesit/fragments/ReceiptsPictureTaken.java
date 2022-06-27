@@ -37,6 +37,8 @@ import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsPictureTakenBinding;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.utils.BitmapUtils;
+import com.example.reesit.utils.ReesitCallable;
+import com.example.reesit.utils.RuntimePermissions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -53,6 +55,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+
+import javax.crypto.interfaces.PBEKey;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -137,6 +141,15 @@ public class ReceiptsPictureTaken extends Fragment {
                                         @Override
                                         public void onSuccess(Text visionText) {
                                             // parse visionText
+                                            for (Text.TextBlock block : visionText.getTextBlocks()) {
+//                                                System.out.println("----------- Block Start --------------");
+                                                for (Text.Line line: block.getLines()){
+//                                                    System.out.println("----------- Line Start --------------");
+                                                    System.out.println(line.getText());
+//                                                    System.out.println("----------- Line End --------------");
+                                                }
+//                                                System.out.println("----------- Block End --------------");
+                                            }
                                         }
                                     })
                                     .addOnFailureListener(
@@ -151,6 +164,8 @@ public class ReceiptsPictureTaken extends Fragment {
                 } catch(IOException exception){
                     Log.e(TAG, "Error creating InputImage from URI", exception);
                 }
+
+
 
             }
         });
@@ -209,25 +224,12 @@ public class ReceiptsPictureTaken extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                    reselectPhotoLauncher.launch("image/*");
-                }
-                else if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setMessage(getString(R.string.media_access_permissions_message)).setTitle(getString(R.string.media_access_permissions_dialog_title));
-                    builder.setNegativeButton(R.string.media_access_permissions_dialog_cancel_text, null);
-                    builder.setPositiveButton(R.string.media_access_permissions_dialog_grant_permission_button, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                else {
-                    requestStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-                }
+                RuntimePermissions.requestStoragePermissions(ReceiptsPictureTaken.this, getContext(), requestStoragePermissionLauncher, new ReesitCallable() {
+                    @Override
+                    public void run() {
+                        reselectPhotoLauncher.launch("image/*");
+                    }
+                });
             }
         });
 
