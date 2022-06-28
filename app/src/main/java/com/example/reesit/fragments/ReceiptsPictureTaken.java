@@ -35,8 +35,12 @@ import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsPictureTakenBinding;
+import com.example.reesit.exceptions.ReceiptParsingException;
 import com.example.reesit.misc.UriAndSource;
+import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
+import com.example.reesit.utils.ReceiptParseCallback;
+import com.example.reesit.utils.ReceiptTextParser;
 import com.example.reesit.utils.ReesitCallable;
 import com.example.reesit.utils.RuntimePermissions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -141,15 +145,22 @@ public class ReceiptsPictureTaken extends Fragment {
                                         @Override
                                         public void onSuccess(Text visionText) {
                                             // parse visionText
-                                            for (Text.TextBlock block : visionText.getTextBlocks()) {
-//                                                System.out.println("----------- Block Start --------------");
-                                                for (Text.Line line: block.getLines()){
-//                                                    System.out.println("----------- Line Start --------------");
-                                                    System.out.println(line.getText());
-//                                                    System.out.println("----------- Line End --------------");
+                                            ReceiptTextParser.parseReceiptText(visionText, new ReceiptParseCallback() {
+                                                @Override
+                                                public void onSuccess(Receipt receipt) {
+                                                    if (receipt != null){
+                                                        System.out.println("receipt parse successful!");
+                                                        System.out.println(receipt.toString());
+                                                    }
                                                 }
-//                                                System.out.println("----------- Block End --------------");
-                                            }
+
+                                                @Override
+                                                public void onFailure(ReceiptParsingException e) {
+                                                    if (e != null){
+                                                        Log.e(TAG, "Error!", e);
+                                                    }
+                                                }
+                                            });
                                         }
                                     })
                                     .addOnFailureListener(
