@@ -11,6 +11,8 @@ import com.example.reesit.R;
 import com.example.reesit.databinding.ActivityReceiptCreationBinding;
 import com.example.reesit.fragments.ReceiptsCreationNoPicture;
 
+import java.util.Objects;
+
 public class ReceiptCreationActivity extends AppCompatActivity {
 
     private ActivityReceiptCreationBinding activityReceiptCreationBinding;
@@ -30,5 +32,11 @@ public class ReceiptCreationActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction().replace(activityReceiptCreationBinding.receiptsCreationFragmentContainer.getId(), noPictureTakenFragment).commit();
 
 
+    }
+
+    public void changeToolbarTitle(String newTitle){
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle(newTitle);
+        }
     }
 }

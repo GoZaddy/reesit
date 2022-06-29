@@ -31,6 +31,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.reesit.R;
@@ -76,6 +77,7 @@ public class ReceiptsPictureTaken extends Fragment {
     private Button processReceiptButton;
     private ImageButton retakePictureButton;
     private ImageButton rechoosePictureButton;
+    private ProgressBar progressBar;
 
     private FragmentReceiptsPictureTakenBinding fragmentReceiptsPictureTakenBinding;
 
@@ -129,6 +131,8 @@ public class ReceiptsPictureTaken extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        progressBar = fragmentReceiptsPictureTakenBinding.receiptsPictureTakenProgressBar;
+
         receiptImageView = fragmentReceiptsPictureTakenBinding.receiptImageView;
         renderImageOnPreview(getContext(), takenPictureURI);
 
@@ -136,7 +140,9 @@ public class ReceiptsPictureTaken extends Fragment {
         processReceiptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setPageStateLoading();
                 try{
+
                     TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
                     InputImage inputImage = InputImage.fromFilePath(getContext(), takenPictureURI.getUri());
                     Task<Text> result =
@@ -149,15 +155,19 @@ public class ReceiptsPictureTaken extends Fragment {
                                                 @Override
                                                 public void onSuccess(Receipt receipt) {
                                                     if (receipt != null){
-                                                        System.out.println("receipt parse successful!");
                                                         System.out.println(receipt.toString());
+                                                        setPageStateNotLoading();
+                                                        getParentFragmentManager().beginTransaction().
+                                                                replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(receipt)).commit();
                                                     }
                                                 }
 
                                                 @Override
                                                 public void onFailure(ReceiptParsingException e) {
                                                     if (e != null){
-                                                        Log.e(TAG, "Error!", e);
+                                                        Toast.makeText(getContext(), getString(R.string.receipt_picture_taken_process_receipt_error_message), Toast.LENGTH_SHORT).show();
+                                                        Log.e(TAG, "Error parsing receipt!", e);
+                                                        setPageStateNotLoading();
                                                     }
                                                 }
                                             });
@@ -314,5 +324,20 @@ public class ReceiptsPictureTaken extends Fragment {
         File file = new File(getImagePathFromURI(context, photoURI));
         Bitmap bitmap = BitmapUtils.rotateBitmapOrientation(file.getAbsolutePath());
         receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
+    }
+
+    public void setPageStateLoading(){
+        progressBar.setVisibility(View.VISIBLE);
+        rechoosePictureButton.setEnabled(false);
+        retakePictureButton.setEnabled(false);
+        processReceiptButton.setEnabled(false);
+    }
+
+
+    public void setPageStateNotLoading(){
+        progressBar.setVisibility(View.INVISIBLE);
+        rechoosePictureButton.setEnabled(true);
+        retakePictureButton.setEnabled(true);
+        processReceiptButton.setEnabled(true);
     }
 }

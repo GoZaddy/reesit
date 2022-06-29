@@ -113,6 +113,7 @@ public class ReceiptTextParser {
                                                             receipt.setAmount(extractedFloat);
                                                         } else {
                                                             // check previous and next blocks
+                                                            // FIXME: possible out of bounds exception due to lineIndex
                                                             Text.Line matchingLineOnPreviousBlock = receiptText.getTextBlocks().get(blockIndex - 1).getLines().get(lineIndex);
                                                             Text.Line matchingLineOnNextBlock = receiptText.getTextBlocks().get(blockIndex + 1).getLines().get(lineIndex);
                                                             extractedFloat = RegexHelpers.extractFloat(matchingLineOnNextBlock.getText().trim());

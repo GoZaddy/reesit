@@ -12,12 +12,12 @@ import java.util.Date;
 
 @Parcel
 public class Receipt {
-    public String id;
-    public Merchant merchant;
-    public String receiptText;
-    public String amount;
-    public String referenceNumber;
-    public String dateTimestamp;
+    private String id;
+    private Merchant merchant;
+    private String receiptText;
+    private String amount;
+    private String referenceNumber;
+    private String dateTimestamp;
 
     public Receipt() {
     }
