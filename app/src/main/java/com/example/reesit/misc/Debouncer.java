@@ -21,8 +21,6 @@ public class Debouncer {
             prev = delayedMap.putIfAbsent(key, task);
             // if there was no task in the map before - schedule one
             if (prev == null) {
-                System.out.println("no previous task, creating new one");
-                System.out.println("hash table id: "+ Integer.toString(delayedMap.hashCode()) );
                 sched.schedule(task, interval, TimeUnit.MILLISECONDS);
             }
             // if there was a task, extend it and if it wasn't extended successfully, schedule a new one

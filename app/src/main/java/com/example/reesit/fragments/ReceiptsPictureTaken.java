@@ -149,7 +149,6 @@ public class ReceiptsPictureTaken extends Fragment {
                                                 @Override
                                                 public void onSuccess(Receipt receipt) {
                                                     if (receipt != null){
-                                                        System.out.println(receipt.toString());
                                                         setPageStateNotLoading();
                                                         getParentFragmentManager().beginTransaction().
                                                                 replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(new ReceiptWithImage(receipt, takenPictureURI))).commit();

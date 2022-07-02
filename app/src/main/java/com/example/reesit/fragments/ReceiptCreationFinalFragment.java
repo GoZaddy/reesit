@@ -319,13 +319,10 @@ public class ReceiptCreationFinalFragment extends Fragment{
     }
 
     private void fetchMerchantSuggestions(String merchantName){
-        System.out.println("fetching merchant suggestions");
-        System.out.println("chip group child count: "+Integer.toString(chipGroup.getChildCount()));
         MerchantService.getSuggestedMerchants(merchantName, new GetMerchantsCallback() {
             @Override
             public void done(List<Merchant> merchants, ParseException e) {
                 if (e == null){
-                    System.out.println(merchants.size());
                     for(Merchant suggestedMerchant: merchants){
                         Chip chip = new Chip(getContext());
                         chip.setText(suggestedMerchant.getName());
