@@ -63,9 +63,14 @@
     <string name="receipt_creation_final_ref_description">This is a number or alphanumeric series of characters used to uniquely identify your receipt</string>
     <string name="receipt_creation_final_invalid_merchant_error_message">Merchant cannot be empty!</string>
     <string name="dollar_sign">$</string>
+    <string name="dollar_sign_format">$ %1$s</string>
     <string name="receipt_creation_final_add_receipt_button_text">Add Receipt</string>
     <string name="receipt_creation_final_get_merchant_suggestions_message">Retrieving merchant suggestions</string>
     <string name="receipt_creation_final_edit_receipt_date_content_desc">Edit receipt date</string>
     <string name="receipt_creation_edit_receipt_time_content_desc">Edit receipt time</string>
-    <string name="receipt_creation_final_add_receipt_error_message">\"Error saving receipt. Please try again!\"</string>
+    <string name="receipt_creation_final_add_receipt_error_message">Error saving receipt. Please try again!</string>
+    <string name="receipts_sort_by_button_text">Sort by</string>
+    <string name="receipts_filter_button_text">Filter</string>
+    <string name="receipts_get_receipts_error_message">Error encountered while trying to get receipts. Please try again</string>
+    <string name="receipt_card_ref_format">Reference #: %1$s</string>
 </resources>

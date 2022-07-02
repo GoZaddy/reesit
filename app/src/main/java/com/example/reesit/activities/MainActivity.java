@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
-        final Fragment receiptsFragment = new ReceiptsFragment();
+        final Fragment receiptsFragment = ReceiptsFragment.newInstance(null);
         fragmentManager.beginTransaction().replace(R.id.content, receiptsFragment).commit();
 
         toolbar = activityMainBinding.toolbar.getRoot();

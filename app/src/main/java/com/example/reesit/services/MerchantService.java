@@ -44,6 +44,7 @@ public class MerchantService {
                         if (merchants.size() == 0){
                             ParseObject object = new ParseObject(Merchant.PARSE_CLASS_NAME);
                             object.put(Merchant.KEY_NAME, merchant.getName());
+                            object.put(Merchant.KEY_SLUG, merchant.getSlug());
                             object.saveInBackground(callback);
                         }
                         callback.done(null);

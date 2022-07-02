@@ -6,17 +6,34 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.example.reesit.R;
 import com.example.reesit.activities.ReceiptCreationActivity;
+import com.example.reesit.adapters.ReceiptsAdapter;
 import com.example.reesit.databinding.FragmentReceiptsBinding;
 import com.example.reesit.misc.Filter;
+import com.example.reesit.models.Receipt;
+import com.example.reesit.models.User;
+import com.example.reesit.services.ReceiptService;
+import com.example.reesit.utils.GetReceiptsCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import org.parceler.Parcels;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,10 +43,16 @@ import org.parceler.Parcels;
 public class ReceiptsFragment extends Fragment {
 
     private FloatingActionButton fab;
+    private RecyclerView recyclerView;
+    private Button sortButton;
+    private Button filterButton;
+    private ProgressBar pageProgressBar;
 
 
     private static final String ARG_PARAM1 = "filter";
     private static final String TAG = "ReceiptsFragment";
+
+    private List<Receipt> receipts;
 
     private Filter filter;
 
@@ -75,6 +98,8 @@ public class ReceiptsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
+
         fab = fragmentReceiptsBinding.addReceiptFab;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,5 +108,45 @@ public class ReceiptsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        filterButton = fragmentReceiptsBinding.filterButton;
+        sortButton = fragmentReceiptsBinding.sortButton;
+
+        recyclerView = fragmentReceiptsBinding.recyclerView;
+        receipts = new ArrayList<>();
+
+        ReceiptsAdapter adapter = new ReceiptsAdapter(getContext(), receipts);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
+
+        setPageStateLoading();
+        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), 0, new GetReceiptsCallback() {
+            @Override
+            public void done(List<Receipt> receiptsResult, ParseException e) {
+                if (e == null){
+                    receipts.addAll(receiptsResult);
+                    adapter.notifyDataSetChanged();
+                    setPageStateNotLoading();
+                } else {
+                    Toast.makeText(getContext(), R.string.receipts_get_receipts_error_message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error getting receipts", e);
+                }
+            }
+        });
+
+
+
+    }
+
+    private void setPageStateLoading(){
+        pageProgressBar.setVisibility(View.VISIBLE);
+        sortButton.setEnabled(false);
+        filterButton.setEnabled(false);
+    }
+
+    private void setPageStateNotLoading(){
+        pageProgressBar.setVisibility(View.INVISIBLE);
+        sortButton.setEnabled(true);
+        filterButton.setEnabled(true);
     }
 }
