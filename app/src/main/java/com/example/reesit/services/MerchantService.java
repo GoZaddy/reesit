@@ -59,13 +59,11 @@ public class MerchantService {
     public static void getSuggestedMerchants(String merchantName, GetMerchantsCallback callback){
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Merchant.PARSE_CLASS_NAME);
         query.whereFullText(Merchant.KEY_SLUG, Merchant.getSlugFromString(merchantName));
-        System.out.println("slugg: "+Merchant.getSlugFromString(merchantName));
         List<Merchant> merchants = new ArrayList<>();
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null){
-                    System.out.println("getting merchants name doneeeee");
                     for(ParseObject object: objects){
                         merchants.add(Merchant.fromParseObject(object));
                     }
