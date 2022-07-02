@@ -11,11 +11,11 @@ import java.io.File;
 @Parcel
 public class ReceiptWithImage {
     public Receipt receipt;
-    public Uri imageFile;
+    public UriAndSource imageFile;
 
     public ReceiptWithImage(){}
 
-    public ReceiptWithImage(Receipt receipt, Uri imageFile, String imageURL){
+    public ReceiptWithImage(Receipt receipt, UriAndSource imageFile){
         this.receipt = receipt;
         this.imageFile = imageFile;
     }
@@ -28,11 +28,11 @@ public class ReceiptWithImage {
         this.receipt = receipt;
     }
 
-    public Uri getImageFile() {
+    public UriAndSource getImageFile() {
         return imageFile;
     }
 
-    public void setImageFile(Uri imageFile) {
+    public void setImageFile(UriAndSource imageFile) {
         this.imageFile = imageFile;
     }
 }

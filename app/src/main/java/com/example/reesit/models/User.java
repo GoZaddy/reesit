@@ -15,4 +15,6 @@ public class User {
         return parseUser != null;
     }
 
+    public ParseUser getParseUser(){ return parseUser; }
+
 }
