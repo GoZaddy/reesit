@@ -1,5 +1,6 @@
 package com.example.reesit.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -36,6 +37,7 @@ import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.services.MerchantService;
 import com.example.reesit.services.ReceiptService;
+import com.example.reesit.utils.AddReceiptCallback;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.FileUtils;
 import com.example.reesit.utils.GetMerchantsCallback;
@@ -60,6 +62,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class ReceiptCreationFinalFragment extends Fragment{
+    public static final String NEW_RECEIPT_RESULT_KEY = "NEW_RECEIPT";
     private static final String ARG_PARAM1 = "param1";
     private static final String TAG = "ReceiptCreationFinalFragment";
     private static final String DEBOUNCE_MERCHANT_NAME_KEY = "DEBOUNCE_MERCHANT_NAME";
@@ -294,14 +297,26 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
                 if (receiptWithImage.getImageFile() != null){
                     setPageStateLoading();
-                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), receiptWithImage.getImageFile(), TAG)), new SaveCallback() {
+                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), receiptWithImage.getImageFile(), TAG)), new AddReceiptCallback() {
                         @Override
-                        public void done(ParseException e) {
+                        public void done(Receipt newReceipt, ParseException e) {
                             setPageStateNotLoading();
                             if (e == null){
                                 if (getContext() != null){
-                                    ((ReceiptCreationActivity) getContext()).startActivity(new Intent(getContext(), MainActivity.class));
-                                    ((ReceiptCreationActivity) getContext()).finish();
+                                    Intent intent = new Intent();
+                                    intent.putExtra(NEW_RECEIPT_RESULT_KEY, Parcels.wrap(newReceipt));
+                                    if (getActivity() != null){
+
+                                        // TODO: COMPLETE THIS, GET NEW RECEIPT FROM DB AND RETURN TO PREVIOUS ACTIVITY
+                                        getActivity().setResult(Activity.RESULT_OK, intent);
+                                        getActivity().finish();
+//                                        ((ReceiptCreationActivity) getContext()).startActivity(new Intent(getContext(), MainActivity.class));
+//                                        ((ReceiptCreationActivity) getContext()).finish();
+                                    } else {
+                                        Toast.makeText(getContext(), getText(R.string.generic_error_message), Toast.LENGTH_SHORT).show();
+                                        Log.e(TAG, "getActivity() returned null");
+                                    }
+
                                 }
                             } else {
                                 Toast.makeText(getContext(), getText(R.string.receipt_creation_final_add_receipt_error_message), Toast.LENGTH_SHORT).show();

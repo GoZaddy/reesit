@@ -1,8 +1,13 @@
 package com.example.reesit.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.example.reesit.R;
@@ -48,6 +54,7 @@ public class ReceiptsFragment extends Fragment {
     private Button filterButton;
     private ProgressBar pageProgressBar;
     private Button loadMoreButton;
+    private SearchView searchView;
 
     private ReceiptsAdapter adapter;
 
@@ -60,6 +67,8 @@ public class ReceiptsFragment extends Fragment {
     private Filter filter;
 
     private FragmentReceiptsBinding fragmentReceiptsBinding;
+
+    private ActivityResultLauncher<Intent> receiptCreationLauncher;
 
     private Integer skip = 0;
 
@@ -103,17 +112,8 @@ public class ReceiptsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
-
-
-        fab = fragmentReceiptsBinding.addReceiptFab;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ReceiptCreationActivity.class);
-                startActivity(intent);
-            }
-        });
 
         filterButton = fragmentReceiptsBinding.filterButton;
         sortButton = fragmentReceiptsBinding.sortButton;
@@ -132,10 +132,43 @@ public class ReceiptsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
+        receiptCreationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK){
+                    if (result.getData() != null){
+                        Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptCreationFinalFragment.NEW_RECEIPT_RESULT_KEY));
+                        receipts.add(0, newReceipt);
+                        adapter.notifyItemInserted(0);
+                        recyclerView.smoothScrollToPosition(0);
+                        skip += 1;
+                    }
+                }
+            }
+        });
+
+        fab = fragmentReceiptsBinding.addReceiptFab;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                receiptCreationLauncher.launch(new Intent(getContext(), ReceiptCreationActivity.class));
+            }
+        });
+
         fetchReceipts(true);
 
+        searchView = fragmentReceiptsBinding.searchView;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
-
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private void setPageStateLoading(){

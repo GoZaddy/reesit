@@ -7,6 +7,7 @@ import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
+import com.example.reesit.utils.AddReceiptCallback;
 import com.example.reesit.utils.GetMerchantsCallback;
 import com.example.reesit.utils.GetReceiptsCallback;
 import com.parse.CountCallback;
@@ -68,7 +69,7 @@ public class ReceiptService {
     public static void getReceiptsWithFilter(String userID, GetReceiptsCallback callback){
     }
 
-    public static void addReceipt(Receipt receipt, File receiptImage, SaveCallback callback){
+    public static void addReceipt(Receipt receipt, File receiptImage, AddReceiptCallback callback){
         ParseObject receiptObj = new ParseObject(Receipt.PARSE_CLASS_NAME);
         receiptObj.put(Receipt.KEY_RECEIPT_TEXT, receipt.getReceiptText());
         receiptObj.put(Receipt.KEY_USER, ParseUser.getCurrentUser());
@@ -88,12 +89,21 @@ public class ReceiptService {
                             public void done(List<Merchant> merchants, ParseException e) {
                                 if (e == null){
                                     receiptObj.put(Receipt.KEY_MERCHANT, merchants.get(0).getParseObject());
-                                    receiptObj.saveInBackground(callback);
+                                    receiptObj.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null){
+                                                callback.done(Receipt.fromParseObject(receiptObj), null);
+                                            } else {
+                                                callback.done(null, e);
+                                            }
+                                        }
+                                    });
                                 }
                             }
                         });
                     } else {
-                        callback.done(e);
+                        callback.done(null, e);
                     }
                 }
             });
