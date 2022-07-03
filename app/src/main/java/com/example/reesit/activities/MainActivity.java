@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.ActivityMainBinding;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         final Fragment receiptsFragment = ReceiptsFragment.newInstance(null);
         fragmentManager.beginTransaction().replace(R.id.content, receiptsFragment).commit();
 
-        toolbar = activityMainBinding.toolbar.getRoot();
+        toolbar = activityMainBinding.toolbar.toolbarElement;
         setSupportActionBar(toolbar);
 
 

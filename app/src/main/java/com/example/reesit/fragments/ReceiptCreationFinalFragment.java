@@ -271,7 +271,6 @@ public class ReceiptCreationFinalFragment extends Fragment{
         addReceiptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Debouncer.terminate();
                 if (characteristicAmountTF.getEditText() != null && mantissaAmountTF.getEditText() != null){
                     String characteristic = characteristicAmountTF.getEditText().getText().toString();
                     String mantissa = mantissaAmountTF.getEditText().getText().toString();

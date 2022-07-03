@@ -1,5 +1,7 @@
 package com.example.reesit.services;
 
+import androidx.annotation.NonNull;
+
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.models.Merchant;
@@ -7,6 +9,7 @@ import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
 import com.example.reesit.utils.GetMerchantsCallback;
 import com.example.reesit.utils.GetReceiptsCallback;
+import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -21,31 +24,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReceiptService {
-    private static final Integer PAGE_LIMIT = 20;
-    public static void getAllReceipts(User user, Integer skip, GetReceiptsCallback callback){
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-        query.setLimit(20);
-        if(skip != null){
-            query.setSkip(skip);
-        }
-
-        query.include(Receipt.KEY_MERCHANT);
-        query.addDescendingOrder("dateTimestamp");
-        query.whereEqualTo("user", user.getParseUser());
-
-        List<Receipt> receipts = new ArrayList<>();
-
-        query.findInBackground(new FindCallback<ParseObject>() {
+    private static final Integer GET_PAGE_LIMIT = 20;
+    public static void getAllReceipts(User user, @NonNull Integer skip, GetReceiptsCallback callback){
+        // use this to check if there are more pages to be fetched
+        ParseQuery<ParseObject> getCountQuery = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+        getCountQuery.countInBackground(new CountCallback() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null){
-                    for(ParseObject object: objects){
-                        receipts.add(Receipt.fromParseObject(object));
-                    }
-                    callback.done(receipts, null);
+            public void done(int count, ParseException countException) {
+                if (countException == null){
+                    ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+                    query.setLimit(GET_PAGE_LIMIT);
+                    query.setSkip(skip);
+
+                    query.include(Receipt.KEY_MERCHANT);
+                    query.addDescendingOrder("dateTimestamp");
+                    query.whereEqualTo("user", user.getParseUser());
+
+                    List<Receipt> receipts = new ArrayList<>();
+
+                    query.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(List<ParseObject> objects, ParseException findException) {
+                            if (findException == null){
+                                for(ParseObject object: objects){
+                                    receipts.add(Receipt.fromParseObject(object));
+                                }
+                                boolean isLastPage = skip+receipts.size() >= count;
+                                callback.done(receipts, isLastPage ,null);
+                            } else {
+                                callback.done(null, null, findException);
+                            }
+                        }
+                    });
                 } else {
-                    callback.done(null, e);
+                    callback.done(null, null, new ParseException(new Exception("Error getting count of receipts", countException)));
                 }
+
             }
         });
     }

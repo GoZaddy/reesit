@@ -47,6 +47,9 @@ public class ReceiptsFragment extends Fragment {
     private Button sortButton;
     private Button filterButton;
     private ProgressBar pageProgressBar;
+    private Button loadMoreButton;
+
+    private ReceiptsAdapter adapter;
 
 
     private static final String ARG_PARAM1 = "filter";
@@ -57,6 +60,8 @@ public class ReceiptsFragment extends Fragment {
     private Filter filter;
 
     private FragmentReceiptsBinding fragmentReceiptsBinding;
+
+    private Integer skip = 0;
 
     public ReceiptsFragment() {
         // Required empty public constructor
@@ -100,6 +105,7 @@ public class ReceiptsFragment extends Fragment {
 
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
 
+
         fab = fragmentReceiptsBinding.addReceiptFab;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,28 +117,22 @@ public class ReceiptsFragment extends Fragment {
 
         filterButton = fragmentReceiptsBinding.filterButton;
         sortButton = fragmentReceiptsBinding.sortButton;
+        loadMoreButton = fragmentReceiptsBinding.loadMoreButton;
+        loadMoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchReceipts(false);
+            }
+        });
 
         recyclerView = fragmentReceiptsBinding.recyclerView;
         receipts = new ArrayList<>();
 
-        ReceiptsAdapter adapter = new ReceiptsAdapter(getContext(), receipts);
+        adapter = new ReceiptsAdapter(getContext(), receipts);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
-        setPageStateLoading();
-        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), 0, new GetReceiptsCallback() {
-            @Override
-            public void done(List<Receipt> receiptsResult, ParseException e) {
-                if (e == null){
-                    receipts.addAll(receiptsResult);
-                    adapter.notifyDataSetChanged();
-                    setPageStateNotLoading();
-                } else {
-                    Toast.makeText(getContext(), R.string.receipts_get_receipts_error_message, Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error getting receipts", e);
-                }
-            }
-        });
+        fetchReceipts(true);
 
 
 
@@ -148,5 +148,37 @@ public class ReceiptsFragment extends Fragment {
         pageProgressBar.setVisibility(View.INVISIBLE);
         sortButton.setEnabled(true);
         filterButton.setEnabled(true);
+    }
+
+    private void fetchReceipts(Boolean overwrite){
+        setPageStateLoading();
+        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, new GetReceiptsCallback() {
+            @Override
+            public void done(List<Receipt> receiptsResult, Boolean isLastPage, ParseException e) {
+                if (e == null){
+                    if (overwrite){
+                        receipts.clear();
+                        receipts.addAll(receiptsResult);
+                        adapter.notifyDataSetChanged();
+                        skip = receiptsResult.size();
+                    } else {
+                        int oldEndingPosition = receipts.size();
+                        receipts.addAll(receiptsResult);
+                        adapter.notifyItemRangeInserted(oldEndingPosition, receiptsResult.size());
+                        skip += receiptsResult.size();
+                    }
+
+                    if (!isLastPage){
+                        loadMoreButton.setVisibility(View.VISIBLE);
+                    } else {
+                        loadMoreButton.setVisibility(View.GONE);
+                    }
+                    setPageStateNotLoading();
+                } else {
+                    Toast.makeText(getContext(), R.string.receipts_get_receipts_error_message, Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error getting receipts", e);
+                }
+            }
+        });
     }
 }

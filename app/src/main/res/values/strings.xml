@@ -73,4 +73,5 @@
     <string name="receipts_filter_button_text">Filter</string>
     <string name="receipts_get_receipts_error_message">Error encountered while trying to get receipts. Please try again</string>
     <string name="receipt_card_ref_format">Reference #: %1$s</string>
+    <string name="receipts_search_view_hint">Search through receipts</string>
 </resources>
