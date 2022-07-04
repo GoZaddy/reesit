@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -30,13 +29,11 @@ import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsPictureTakenBinding;
-import com.example.reesit.exceptions.ReceiptParsingException;
 import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
 import com.example.reesit.utils.FileUtils;
-import com.example.reesit.utils.ReceiptParseCallback;
 import com.example.reesit.utils.ReceiptTextParser;
 import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.RuntimePermissions;
@@ -145,7 +142,7 @@ public class ReceiptsPictureTaken extends Fragment {
                                         @Override
                                         public void onSuccess(Text visionText) {
                                             // parse visionText
-                                            ReceiptTextParser.parseReceiptText(visionText, new ReceiptParseCallback() {
+                                            ReceiptTextParser.parseReceiptText(visionText, new ReceiptTextParser.ReceiptParseCallback() {
                                                 @Override
                                                 public void onSuccess(Receipt receipt) {
                                                     if (receipt != null){
@@ -156,7 +153,7 @@ public class ReceiptsPictureTaken extends Fragment {
                                                 }
 
                                                 @Override
-                                                public void onFailure(ReceiptParsingException e) {
+                                                public void onFailure(ReceiptTextParser.ReceiptParsingException e) {
                                                     if (e != null){
                                                         Toast.makeText(getContext(), getString(R.string.receipt_picture_taken_process_receipt_error_message), Toast.LENGTH_SHORT).show();
                                                         Log.e(TAG, "Error parsing receipt!", e);
