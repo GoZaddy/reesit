@@ -24,7 +24,7 @@ public class Debouncer {
                 sched.schedule(task, interval, TimeUnit.MILLISECONDS);
             }
             // if there was a task, extend it and if it wasn't extended successfully, schedule a new one
-        } while (prev != null && !prev.extend()); // Exit only if new task was added to map, or existing task was extended successfully
+        } while (prev != null && !prev.extend(c)); // Exit only if new task was added to map, or existing task was extended successfully
     }
 
     public static void terminate() {
@@ -35,7 +35,7 @@ public class Debouncer {
     private static class TimerTask implements Runnable {
         private final String key;
         private long dueTime;
-        private final ReesitCallback callback;
+        private ReesitCallback callback;
         private final int interval;
         private final Object lock = new Object();
 
@@ -43,14 +43,17 @@ public class Debouncer {
             this.key = key;
             this.callback = c;
             this.interval = interval;
-            extend();
+            extend(null);
         }
 
         // returns true is task's time was successfully extended
-        public boolean extend() {
+        public boolean extend(ReesitCallback callback) {
             synchronized (lock) {
                 if (dueTime < 0) // Task has been shutdown
                     return false;
+                if (callback != null){
+                    this.callback = callback;
+                }
                 dueTime = System.currentTimeMillis() + interval;
                 return true;
             }
