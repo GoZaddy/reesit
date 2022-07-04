@@ -2,14 +2,12 @@ package com.example.reesit.fragments;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
@@ -20,15 +18,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.reesit.R;
-import com.example.reesit.activities.MainActivity;
 import com.example.reesit.activities.ReceiptCreationActivity;
 import com.example.reesit.databinding.FragmentReceiptCreationFinalBinding;
 import com.example.reesit.misc.Debouncer;
@@ -37,23 +32,18 @@ import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.services.MerchantService;
 import com.example.reesit.services.ReceiptService;
-import com.example.reesit.utils.AddReceiptCallback;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.FileUtils;
-import com.example.reesit.utils.GetMerchantsCallback;
 import com.example.reesit.utils.ReesitCallback;
-import com.example.reesit.utils.Utils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
 import com.parse.ParseException;
-import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -297,9 +287,9 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
                 if (receiptWithImage.getImageFile() != null){
                     setPageStateLoading();
-                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), receiptWithImage.getImageFile(), TAG)), new AddReceiptCallback() {
+                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), receiptWithImage.getImageFile(), TAG)), new ReceiptService.AddReceiptCallback() {
                         @Override
-                        public void done(Receipt newReceipt, ParseException e) {
+                        public void done(Receipt newReceipt, Exception e) {
                             setPageStateNotLoading();
                             if (e == null){
                                 if (getContext() != null){
@@ -333,9 +323,9 @@ public class ReceiptCreationFinalFragment extends Fragment{
     }
 
     private void fetchMerchantSuggestions(String merchantName){
-        MerchantService.getSuggestedMerchants(merchantName, new GetMerchantsCallback() {
+        MerchantService.getSuggestedMerchants(merchantName, new MerchantService.GetMerchantsCallback() {
             @Override
-            public void done(List<Merchant> merchants, ParseException e) {
+            public void done(List<Merchant> merchants, Exception e) {
                 if (e == null){
                     for(Merchant suggestedMerchant: merchants){
                         Chip chip = new Chip(getContext());
