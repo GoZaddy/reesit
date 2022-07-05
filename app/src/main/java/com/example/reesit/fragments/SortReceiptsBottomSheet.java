@@ -47,6 +47,8 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
 
     private Integer currentOptionIndex;
 
+    private Integer defaultCurrentOptionIndex;
+
 
 
     public SortReceiptsBottomSheet() {
@@ -85,6 +87,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
             }
 
             currentOptionIndex = getArguments().getInt(ARG_PARAM2);
+            defaultCurrentOptionIndex = currentOptionIndex;
 
         }
     }
@@ -141,6 +144,14 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
         if (currentOptionIndex != null && radioGroup.getCheckedRadioButtonId() == -1){
             radioGroup.check(currentOptionIndex);
         }
+
+        resetButton = binding.resetButton;
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                radioGroup.check(0);
+            }
+        });
 
     }
 }
