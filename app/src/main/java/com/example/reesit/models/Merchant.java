@@ -6,8 +6,8 @@ import org.parceler.Parcel;
 
 @Parcel
 public class Merchant {
-    public String id;
-    public String name;
+    private String id;
+    private String name;
 
     public Merchant(){}
 
