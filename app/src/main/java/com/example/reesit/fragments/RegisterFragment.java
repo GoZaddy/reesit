@@ -87,7 +87,7 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!passwordField.getText().toString().equals(confirmPasswordField.getText().toString())){
-                    Toast.makeText(getContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getString(R.string.register_fragment_passwords_not_match_error_message), Toast.LENGTH_SHORT).show();
                 } else {
                     // check if email is valid
                     if (Validator.isValidEmail(emailField.getText().toString())){
@@ -100,14 +100,14 @@ public class RegisterFragment extends Fragment {
                                     unsetFormStateLoading();
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(getContext(), "Error occurred while creating account: "+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), getString(R.string.register_fragment_error_occurred_during_sign_up, e.getMessage()), Toast.LENGTH_SHORT).show();
                                     unsetFormStateLoading();
                                 }
 
                             }
                         });
                     } else {
-                        Toast.makeText(getContext(), "Invalid email address!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), getString(R.string.register_fragment_invalid_email), Toast.LENGTH_SHORT).show();
                     }
 
 

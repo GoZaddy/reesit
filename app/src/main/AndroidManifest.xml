@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.reesit">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.CAMERA"
+        android:required="true" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage"
+        />
 
     <application
         android:name=".App"
@@ -17,6 +25,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reesit"
         tools:targetApi="31">
+        <provider
+            android:name="com.example.reesit.providers.ReesitFileProvider"
+            android:authorities="com.example.reesit.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
         <activity
             android:name=".activities.AuthenticationActivity"
             android:exported="true">
@@ -32,6 +49,9 @@
         <activity
             android:name=".activities.MainActivity"
             android:exported="false" />
+        <activity
+            android:name=".activities.ReceiptCreationActivity"
+            android:exported="false" />
 
         <!-- Download ML model immediately app is installed from play store -->
         <meta-data
@@ -46,6 +66,7 @@
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/back4app_client_key" />
-    </application>
 
+
+    </application>
 </manifest>

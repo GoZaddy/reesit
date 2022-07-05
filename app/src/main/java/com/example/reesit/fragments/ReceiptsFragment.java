@@ -1,14 +1,22 @@
 package com.example.reesit.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.reesit.R;
+import com.example.reesit.activities.ReceiptCreationActivity;
+import com.example.reesit.databinding.FragmentReceiptsBinding;
+import com.example.reesit.misc.Filter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.parceler.Parcels;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,14 +25,15 @@ import com.example.reesit.R;
  */
 public class ReceiptsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private FloatingActionButton fab;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+
+    private static final String ARG_PARAM1 = "filter";
+    private static final String TAG = "ReceiptsFragment";
+
+    private Filter filter;
+
+    private FragmentReceiptsBinding fragmentReceiptsBinding;
 
     public ReceiptsFragment() {
         // Required empty public constructor
@@ -34,16 +43,14 @@ public class ReceiptsFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param filter Filter to be applied to receipts.
      * @return A new instance of fragment ReceiptsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static ReceiptsFragment newInstance(String param1, String param2) {
+
+    public static ReceiptsFragment newInstance(Filter filter) {
         ReceiptsFragment fragment = new ReceiptsFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putParcelable(ARG_PARAM1, Parcels.wrap(filter));
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,8 +59,7 @@ public class ReceiptsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            filter = (Filter) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
         }
     }
 
@@ -61,6 +67,21 @@ public class ReceiptsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_receipts, container, false);
+        fragmentReceiptsBinding = FragmentReceiptsBinding.inflate(inflater, container, false);
+        return fragmentReceiptsBinding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        fab = fragmentReceiptsBinding.addReceiptFab;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ReceiptCreationActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

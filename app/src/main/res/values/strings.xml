@@ -27,5 +27,36 @@
     <string name="authentication_log_in_link">Log in here</string>
     <string name="authentication_sign_up_title">Sign up for Reesit</string>
     <string name="authentication_log_in_title">Log in to Reesit</string>
+    <string name="register_fragment_passwords_not_match_error_message">Passwords do not match</string>
+    <string name="register_fragment_error_occurred_during_sign_up">Error occurred while creating account: %1$s</string>
+    <string name="register_fragment_invalid_email">Invalid email address!</string>
+    <string name="login_fragment_invalid_email">Invalid email address!</string>
+    <string name="login_fragment_error_occurred_during_log_in">Error occurred while logging in: %1$s</string>
+
+    <string name="receipt_creation_take_picture_title">Take picture of receipt</string>
+    <string name="receipt_creation_choose_receipt_title">Choose picture of receipt from gallery</string>
+    <string name="receipt_creation_no_picture_or">or</string>
+    <string name="receipts_creation_no_picture_title">Add Receipt</string>
+    <string name="receipts_picture_taken_retake_prompt">Retake or reselect picture of receipt</string>
+    <string name="receipts_picture_taken_retake_picture_button_text">Retake picture of receipt</string>
+    <string name="receipts_picture_taken_rechoose_picture_button_text">Reselect picture of receipt from gallery</string>
+    <string name="receipts_picture_taken_process_receipt_button_text">Process Receipt</string>
+    <string name="receipt_picture_taken_image_content_description">Picture of receipt</string>
+    <string name="receipt_picture_taken_process_receipt_error_message">Error processing receipt. Please try again!</string>
     <string name="settings_page_temp_title">Settings page</string>
+    <string name="media_access_permissions_message">This app needs access to your phone\'s media to use receipt pictures from your gallery. Please try again and grant permissions</string>
+    <string name="media_access_permissions_dialog_title">Media access permissions</string>
+    <string name="media_access_permissions_dialog_cancel_text">Cancel</string>
+    <string name="media_access_permissions_dialog_grant_permission_button">Grant permission</string>
+
+
+    <string name="receipt_creation_final_fragment_toolbar_title">Confirm Receipt Information</string>
+    <string name="receipt_creation_final_merchant_edit_text_hint">Merchant name</string>
+    <string name="receipt_creation_final_sub_title">Please confirm that the following information from your receipt is correct</string>
+    <string name="receipt_creation_final_ref_edit_text_hint">Reference Number</string>
+    <string name="center_dot">·</string>
+    <string name="receipt_creation_final_date_text_default">Please set date for receipt</string>
+    <string name="receipt_creation_final_time_text_default">Please set time for receipt</string>
+    <string name="receipt_creation_final_total_amount_field_label">Total amount for receipt</string>
+    <string name="receipt_creation_final_date_field_label">Date and time</string>
 </resources>

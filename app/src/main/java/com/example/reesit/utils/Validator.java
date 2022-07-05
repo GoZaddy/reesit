@@ -6,4 +6,15 @@ public class Validator {
 
         return email.length() > 0 && email.matches(emailPattern);
     }
+
+
+    public static boolean isValidFloat(String floatValue){
+        floatValue = floatValue.replaceAll("\\$", "");
+        try{
+            Double.valueOf(floatValue);
+            return true;
+        } catch (NumberFormatException e){
+            return false;
+        }
+    }
 }
