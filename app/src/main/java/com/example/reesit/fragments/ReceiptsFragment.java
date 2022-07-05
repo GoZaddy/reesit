@@ -131,7 +131,7 @@ public class ReceiptsFragment extends Fragment {
         sortOptions.add(new SortReceiptOption(Receipt.KEY_DATE_TIME_STAMP, SortReceiptOption.SortOrder.ASCENDING, "Date on Receipt - Earliest to Latest"));
         sortOptions.add(new SortReceiptOption(Receipt.KEY_AMOUNT, SortReceiptOption.SortOrder.DESCENDING, "Total amount on Receipt - Highest to Lowest"));
         sortOptions.add(new SortReceiptOption(Receipt.KEY_AMOUNT, SortReceiptOption.SortOrder.ASCENDING, "Total amount on Receipt - Lowest to Highest"));
-        SortReceiptsBottomSheet sortReceiptsBottomSheet = SortReceiptsBottomSheet.newInstance(sortOptions);
+        SortReceiptsBottomSheet sortReceiptsBottomSheet = SortReceiptsBottomSheet.newInstance(sortOptions, 0);
         getParentFragmentManager().setFragmentResultListener(SortReceiptsBottomSheet.FRAGMENT_RESULT_KEY, ReceiptsFragment.this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {

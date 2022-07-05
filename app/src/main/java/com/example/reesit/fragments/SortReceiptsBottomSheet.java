@@ -36,6 +36,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
     public static final String FRAGMENT_RESULT_CHECKED_OPTION_KEY = "FRAGMENT_RESULT_CHECKED_OPTION_KEY";
     public static final String TAG = "SortReceiptsBottomSheet";
     public static final String FRAGMENT_RESULT_KEY = "SORT_RECEIPTS_KEY";
+    private static final String ARG_PARAM2 = "param2";
 
     private ArrayList<SortReceiptOption> sortOptions;
 
@@ -45,8 +46,6 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
     private Button resetButton;
 
     private Integer currentOptionIndex;
-
-
 
 
 
@@ -61,7 +60,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
      * @param sortOptions List of sorting options.
      * @return A new instance of fragment SortReceiptsBottomSheet.
      */
-    public static SortReceiptsBottomSheet newInstance(ArrayList<SortReceiptOption> sortOptions) {
+    public static SortReceiptsBottomSheet newInstance(ArrayList<SortReceiptOption> sortOptions, int currentSortOptionIndex) {
         SortReceiptsBottomSheet fragment = new SortReceiptsBottomSheet();
         Bundle args = new Bundle();
 
@@ -70,6 +69,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
             parcelableList.add(Parcels.wrap(option));
         }
         args.putParcelableArrayList(ARG_PARAM1, parcelableList);
+        args.putInt(ARG_PARAM2, currentSortOptionIndex);
         fragment.setArguments(args);
         return fragment;
     }
@@ -83,6 +83,8 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
             for(Parcelable parcelable: parcelableList){
                 sortOptions.add(Parcels.unwrap(parcelable));
             }
+
+            currentOptionIndex = getArguments().getInt(ARG_PARAM2);
 
         }
     }
@@ -100,6 +102,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
         super.onViewCreated(view, savedInstanceState);
 
         radioGroup = binding.radioGroup;
+
         resetButton = binding.resetButton;
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -133,6 +136,10 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
             radioButton.setText(option.getTitle());
 
             radioGroup.addView(radioButton);
+        }
+
+        if (currentOptionIndex != null && radioGroup.getCheckedRadioButtonId() == -1){
+            radioGroup.check(currentOptionIndex);
         }
 
     }
