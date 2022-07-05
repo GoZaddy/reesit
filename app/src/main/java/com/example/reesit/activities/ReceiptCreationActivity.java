@@ -23,7 +23,7 @@ public class ReceiptCreationActivity extends AppCompatActivity {
         activityReceiptCreationBinding = ActivityReceiptCreationBinding.inflate(LayoutInflater.from(this));
 
         Toolbar toolbar = activityReceiptCreationBinding.toolbar.getRoot();
-        toolbar.setTitle(com.example.reesit.R.string.receipts_creation_no_picture_title);
+        toolbar.setTitle(R.string.receipts_creation_no_picture_title);
         setSupportActionBar(toolbar);
         setContentView(activityReceiptCreationBinding.getRoot());
 

@@ -33,6 +33,7 @@ import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsCreationNoPictureBinding;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.providers.ReesitFileProvider;
+import com.example.reesit.utils.CameraUtils;
 import com.example.reesit.utils.ReesitCallable;
 import com.example.reesit.utils.RuntimePermissions;
 
@@ -49,7 +50,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
 
     private FragmentReceiptsCreationNoPictureBinding fragmentReceiptsCreationNoPictureBinding;
 
-    private Uri takenPictureURI;
+    private UriAndSource takenPictureURI;
 
     private ImageButton takePictureButton;
     private ImageButton choosePictureButton;
@@ -101,7 +102,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
             public void onActivityResult(Boolean result) {
                 if (result){
                     // switch to ReceiptCreationPictureTaken fragment
-                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromCamera(takenPictureURI))).commit();
+                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(takenPictureURI)).commit();
                 }
 
             }
@@ -111,7 +112,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                launchCamera();
+                takenPictureURI = CameraUtils.launchCamera(getContext(), takePhotoLauncher);
             }
         });
 
@@ -146,41 +147,4 @@ public class ReceiptsCreationNoPicture extends Fragment {
             }
         });
     }
-
-    private void launchCamera(){
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Uri imageCollection;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            imageCollection = MediaStore.Images.Media
-                    .getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        } else {
-            imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
-
-        if (getContext() != null){
-            ContentResolver resolver = getContext().getContentResolver();
-            ContentValues newImageDetails = new ContentValues();
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName);
-            newImageDetails.put(MediaStore.Images.Media.MIME_TYPE, JPEG_MIME_TYPE);
-
-
-
-            takenPictureURI = resolver.insert(imageCollection, newImageDetails);
-
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, takenPictureURI);
-
-            if (intent.resolveActivity(getContext().getPackageManager()) != null){
-                takePhotoLauncher.launch(takenPictureURI);
-            }
-        } else {
-            Log.e(TAG, "getContext() returned null while trying to get content resolver");
-        }
-
-
-    }
-
-
 }
