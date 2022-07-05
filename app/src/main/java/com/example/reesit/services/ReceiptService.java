@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.reesit.misc.Filter;
 import com.example.reesit.misc.ReceiptWithImage;
+import com.example.reesit.misc.SortReceiptOption;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
@@ -26,10 +27,6 @@ import java.util.Objects;
 public class ReceiptService {
     private static final Integer GET_PAGE_LIMIT = 20;
 
-    public enum SortOrder {
-        ASCENDING,
-        DESCENDING
-    }
 
     public static class ReceiptServiceException extends Exception{
         public ReceiptServiceException(String message, Throwable e){ super(message, e); }
@@ -77,32 +74,44 @@ public class ReceiptService {
         });
     }
 
-    private static void applySortPropertiesToQuery(ParseQuery<ParseObject> query, String keyToSortBy, SortOrder order) throws ReceiptServiceException {
+    private static void applySortPropertiesToQuery(ParseQuery<ParseObject> query, SortReceiptOption sortReceiptOption) throws ReceiptServiceException {
+        String keyToSortBy = sortReceiptOption.getKeyToSort();
+        SortReceiptOption.SortOrder order = sortReceiptOption.getSortOrder();
         if (keyToSortBy == null){
             if (order == null){
                 query.addDescendingOrder(Receipt.KEY_DATE_TIME_STAMP);
             } else {
-                if (order == SortOrder.ASCENDING){
+                if (order == SortReceiptOption.SortOrder.ASCENDING){
                     query.addAscendingOrder(Receipt.KEY_DATE_TIME_STAMP);
                 } else {
                     query.addDescendingOrder(Receipt.KEY_DATE_TIME_STAMP);
                 }
             }
         } else if (order != null){
-            if (Objects.equals(keyToSortBy, Receipt.KEY_AMOUNT)){
-                if (order == SortOrder.ASCENDING){
-                    query.addAscendingOrder(Receipt.KEY_AMOUNT);
-                } else {
-                    query.addDescendingOrder(Receipt.KEY_AMOUNT);
-                }
-            } else if (Objects.equals(keyToSortBy, Receipt.KEY_MERCHANT)){
-                if (order == SortOrder.ASCENDING){
-                    query.addAscendingOrder(Receipt.KEY_MERCHANT+"."+Merchant.KEY_NAME);
-                } else {
-                    query.addDescendingOrder(Receipt.KEY_MERCHANT+"."+Merchant.KEY_NAME);
-                }
-            } else {
-                throw new ReceiptServiceException("keyToSortBy value: "+keyToSortBy+", is invalid", null);
+            switch (keyToSortBy) {
+                case Receipt.KEY_AMOUNT:
+                    if (order == SortReceiptOption.SortOrder.ASCENDING) {
+                        query.addAscendingOrder(Receipt.KEY_AMOUNT);
+                    } else {
+                        query.addDescendingOrder(Receipt.KEY_AMOUNT);
+                    }
+                    break;
+                case Receipt.KEY_MERCHANT:
+                    if (order == SortReceiptOption.SortOrder.ASCENDING) {
+                        query.addAscendingOrder(Receipt.KEY_MERCHANT);
+                    } else {
+                        query.addDescendingOrder(Receipt.KEY_MERCHANT);
+                    }
+                    break;
+                case Receipt.KEY_DATE_TIME_STAMP:
+                    if (order == SortReceiptOption.SortOrder.ASCENDING) {
+                        query.addAscendingOrder(Receipt.KEY_DATE_TIME_STAMP);
+                    } else {
+                        query.addDescendingOrder(Receipt.KEY_DATE_TIME_STAMP);
+                    }
+                    break;
+                default:
+                    throw new ReceiptServiceException("keyToSortBy value: " + keyToSortBy + ", is invalid", null);
             }
         } else{
             throw new ReceiptServiceException("keyToSortBy is not null but order is null", null);
@@ -112,54 +121,24 @@ public class ReceiptService {
     }
 
 
-    public static void getAllReceipts(User user, @NonNull Integer skip, String keyToSortBy, SortOrder order, GetReceiptsCallback callback){
+    public static void getAllReceipts(User user, @NonNull Integer skip, SortReceiptOption sortReceiptOption, GetReceiptsCallback callback){
         // use this to check if there are more pages to be fetched
-        ParseQuery<ParseObject> getCountQuery = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-        getCountQuery.countInBackground(new CountCallback() {
-            @Override
-            public void done(int count, ParseException countException) {
-                if (countException == null){
-                    ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-                    query.setLimit(GET_PAGE_LIMIT);
-                    query.setSkip(skip);
 
-                    query.include(Receipt.KEY_MERCHANT);
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+        query.whereEqualTo("user", user.getParseUser());
+        query.include(Receipt.KEY_MERCHANT);
+        // add query parameters for sorting
+        try{
+            applySortPropertiesToQuery(query, sortReceiptOption);
 
-                    // add query parameters for sorting
-                    try{
-                        applySortPropertiesToQuery(query, keyToSortBy, order);
-                    } catch(ReceiptServiceException e){
-                        callback.done(null, null, e);
-                    }
-
-                    query.whereEqualTo("user", user.getParseUser());
-
-                    List<Receipt> receipts = new ArrayList<>();
-
-                    query.findInBackground(new FindCallback<ParseObject>() {
-                        @Override
-                        public void done(List<ParseObject> objects, ParseException findException) {
-                            if (findException == null){
-                                for(ParseObject object: objects){
-                                    receipts.add(Receipt.fromParseObject(object));
-                                }
-                                boolean isLastPage = skip+receipts.size() >= count;
-                                callback.done(receipts, isLastPage ,null);
-                            } else {
-                                callback.done(null, null, findException);
-                            }
-                        }
-                    });
-                } else {
-                    callback.done(null, null, new ParseException(new Exception("Error getting count of receipts", countException)));
-                }
-
-            }
-        });
+        } catch(ReceiptServiceException e){
+            callback.done(null, null, e);
+        }
+        getReceiptsWithPaginationHelper(query, skip, callback);
     }
 
     // second parameter should be a filter object or something
-    public static void getReceiptsWithFilter(Filter filter, User user, @NonNull Integer skip, String keyToSortBy, SortOrder order, GetReceiptsCallback callback){
+    public static void getReceiptsWithFilter(Filter filter, User user, @NonNull Integer skip, SortReceiptOption sortReceiptOption, GetReceiptsCallback callback){
         ParseQuery<ParseObject> query;
         try{
             query = filter.getParseQuery();
@@ -172,12 +151,13 @@ public class ReceiptService {
         query.whereEqualTo("user", user.getParseUser());
         // add query parameters for sorting
         try{
-            applySortPropertiesToQuery(query, keyToSortBy, order);
+            applySortPropertiesToQuery(query, sortReceiptOption);
         } catch(ReceiptServiceException e){
             callback.done(null, null, e);
         }
         getReceiptsWithPaginationHelper(query, skip, callback);
     }
+
 
     public static void addReceipt(Receipt receipt, File receiptImage, AddReceiptCallback callback){
         ParseObject receiptObj = new ParseObject(Receipt.PARSE_CLASS_NAME);
