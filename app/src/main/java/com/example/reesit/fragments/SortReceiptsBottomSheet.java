@@ -149,7 +149,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                radioGroup.check(0);
+                radioGroup.check(defaultCurrentOptionIndex);
             }
         });
 
