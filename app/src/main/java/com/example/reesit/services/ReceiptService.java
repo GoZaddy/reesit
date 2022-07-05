@@ -212,30 +212,6 @@ public class ReceiptService {
         });
     }
 
-    public static void getReceiptsSorted(String keyToSortBy, SortOrder order, User user, @NonNull Integer skip, GetReceiptsCallback callback){
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-        query.whereEqualTo("user", user.getParseUser());
-        if (Objects.equals(keyToSortBy, Receipt.KEY_AMOUNT)){
-            if (order == SortOrder.ASCENDING){
-                query.addAscendingOrder(Receipt.KEY_AMOUNT);
-            } else {
-                query.addDescendingOrder(Receipt.KEY_AMOUNT);
-            }
-        } else if (Objects.equals(keyToSortBy, Receipt.KEY_MERCHANT)){
-            if (order == SortOrder.ASCENDING){
-                query.addAscendingOrder(Receipt.KEY_MERCHANT+"."+Merchant.KEY_NAME);
-            } else {
-                query.addDescendingOrder(Receipt.KEY_MERCHANT+"."+Merchant.KEY_NAME);
-            }
-        } else {
-            callback.done(null, null, new ReceiptServiceException("keyToSortBy value: "+keyToSortBy+", is invalid", null));
-            return;
-        }
-
-        getReceiptsWithPaginationHelper(query, skip, callback);
-
-    }
-
 
 
     public static void deleteReceipt(String receiptID){
