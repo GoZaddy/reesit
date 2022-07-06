@@ -8,6 +8,7 @@ import com.example.reesit.R;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
+import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.Utils;
 import com.parse.ParseObject;
@@ -100,11 +101,11 @@ public class Filter {
         }
         String amountLine = "";
         if (greaterThanAmount != null && lessThanAmount != null){
-            amountLine = context.getString(R.string.filter_tostring_amount_format, Utils.integerToCurrency(greaterThanAmount), Utils.integerToCurrency(lessThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_format, CurrencyUtils.integerToCurrency(greaterThanAmount), CurrencyUtils.integerToCurrency(lessThanAmount));
         } else if (greaterThanAmount != null){
-            amountLine = context.getString(R.string.filter_tostring_amount_greater_format, Utils.integerToCurrency(greaterThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_greater_format, CurrencyUtils.integerToCurrency(greaterThanAmount));
         } else if (lessThanAmount != null) {
-            amountLine = context.getString(R.string.filter_tostring_amount_less_format, Utils.integerToCurrency(lessThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_less_format, CurrencyUtils.integerToCurrency(lessThanAmount));
         }
         result += amountLine + "\n";
 
