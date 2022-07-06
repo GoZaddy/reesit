@@ -2,7 +2,9 @@ package com.example.reesit.models;
 
 import androidx.annotation.NonNull;
 
+import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
+import com.example.reesit.utils.Utils;
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -21,7 +23,7 @@ public class Receipt {
     private Merchant merchant;
     private String receiptImage;
     private String receiptText;
-    private String amount;
+    private Integer amount;
     private String referenceNumber;
     private String dateTimestamp;
     private ParseObject parseObject;
@@ -39,7 +41,7 @@ public class Receipt {
     public Receipt() {
     }
 
-    public Receipt(Merchant merchant, String receiptText, String amount, String referenceNumber, String dateTimestamp) {
+    public Receipt(Merchant merchant, String receiptText, Integer amount, String referenceNumber, String dateTimestamp) {
         this.id = null;
         this.merchant = merchant;
         this.receiptText = receiptText;
@@ -53,7 +55,7 @@ public class Receipt {
         Receipt receipt = new Receipt(
                 Merchant.fromParseObject(object.getParseObject(KEY_MERCHANT)),
                 object.getString(KEY_RECEIPT_TEXT).toLowerCase(Locale.ROOT),
-                object.getString(KEY_AMOUNT),
+                object.getInt(KEY_AMOUNT),
                 object.getString(KEY_REFERENCE_NUMBER),
                 object.getString(KEY_DATE_TIME_STAMP)
         );
@@ -80,11 +82,11 @@ public class Receipt {
         this.receiptText = receiptText.toLowerCase(Locale.ROOT);
     }
 
-    public String getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
@@ -115,7 +117,7 @@ public class Receipt {
     @NonNull
     @Override
     public String toString() {
-        return merchant.getName().toLowerCase(Locale.ROOT) + " " + amount.toLowerCase(Locale.ROOT) + " "
+        return merchant.getName().toLowerCase(Locale.ROOT) + " " + CurrencyUtils.integerToCurrency(amount) + " "
                 + referenceNumber.toLowerCase(Locale.ROOT) + " " + DateTimeUtils.getDateAndTimeReceiptCard(dateTimestamp).toLowerCase(Locale.ROOT);
     }
 

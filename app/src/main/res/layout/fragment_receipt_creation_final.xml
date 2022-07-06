@@ -84,69 +84,28 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/characteristic_amount_text_view"
+            android:id="@+id/amount_edittext"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="120dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="16dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:ems="10"
             android:textAlignment="center"
-            app:layout_constraintStart_toEndOf="@+id/textView18"
-            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            app:layout_constraintEnd_toEndOf="@+id/ref_number_edittext"
+            app:layout_constraintStart_toStartOf="@+id/ref_number_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/ref_number_edittext"
+            android:hint="@string/receipt_creation_final_amount_edit_text_hint"
+            app:startIconDrawable="@drawable/ic_baseline_attach_money_24"
             tools:text="10">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                tools:text="10" />
+                android:inputType="numberDecimal"
+                tools:text="10.23" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <TextView
-            android:id="@+id/textView13"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/center_dot"
-            android:textSize="32sp"
-            app:layout_constraintBottom_toBottomOf="@+id/characteristic_amount_text_view"
-            app:layout_constraintStart_toEndOf="@+id/characteristic_amount_text_view"
-            app:layout_constraintTop_toTopOf="@+id/characteristic_amount_text_view" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:id="@+id/mantissa_amount_text_view"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:ems="10"
-            android:textAlignment="center"
-            app:layout_constraintBottom_toBottomOf="@+id/textView13"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@+id/textView13"
-            app:layout_constraintTop_toTopOf="@+id/textView13" >
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                tools:text="23" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <TextView
-            android:id="@+id/textView14"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/receipt_creation_final_total_amount_field_label"
-            app:layout_constraintStart_toStartOf="@+id/ref_number_edittext"
-            app:layout_constraintTop_toBottomOf="@+id/ref_number_edittext" />
 
         <TextView
             android:id="@+id/textView15"
@@ -154,8 +113,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="@string/receipt_creation_final_date_field_label"
-            app:layout_constraintStart_toStartOf="@+id/textView18"
-            app:layout_constraintTop_toBottomOf="@+id/characteristic_amount_text_view" />
+            app:layout_constraintStart_toStartOf="@+id/amount_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/amount_edittext" />
 
         <TextView
             android:id="@+id/date_text_view"
@@ -222,16 +181,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/add_receipt_button" />
-
-        <TextView
-            android:id="@+id/textView18"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/dollar_sign"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="@+id/characteristic_amount_text_view"
-            app:layout_constraintStart_toStartOf="@+id/textView14"
-            app:layout_constraintTop_toTopOf="@+id/characteristic_amount_text_view" />
 
         <ProgressBar
             android:id="@+id/progressBarSuggestionChips"

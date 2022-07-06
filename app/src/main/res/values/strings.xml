@@ -89,4 +89,6 @@
     <string name="receipts_no_receipts_message">No receipts!</string>
     <string name="receipts_no_receipt_matching_filter_message">You have no receipts containing the search query: %1$s</string>
     <string name="sort_modal_bottom_sheet_reset_button">Reset</string>
+    <string name="receipt_creation_final_amount_edit_text_hint">Total amount on receipt</string>
+    <string name="receipt_creation_final_amount_two_dp_error">Currency values should not have more than two decimal places</string>
 </resources>
