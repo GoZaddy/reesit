@@ -175,6 +175,7 @@ public class ReceiptsFragment extends Fragment {
                 if (result.getResultCode() == Activity.RESULT_OK){
                     if (result.getData() != null){
                         Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptCreationFinalFragment.NEW_RECEIPT_RESULT_KEY));
+                        noReceiptsMessage.setVisibility(View.GONE);
                         receipts.add(0, newReceipt);
                         adapter.notifyItemInserted(0);
                         recyclerView.smoothScrollToPosition(0);
