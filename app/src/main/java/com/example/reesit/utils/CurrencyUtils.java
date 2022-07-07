@@ -26,16 +26,21 @@ public class CurrencyUtils {
         try{
             doubleVal = Double.valueOf(input);
         } catch(NumberFormatException e){
-            throw new CurrencyUtilsException("invalid input", null);
+            throw new CurrencyUtilsException("Invalid input", null);
         }
 
         // check that a decimal point exists, add 00 if it doesnt
         if (input.contains(".")){
             String[] parts = input.split("\\.");
-            String mantissa = parts[1];
-            if (mantissa.length() == 0){
+            String mantissa;
+            try{
+                mantissa = parts[1];
+            } catch (ArrayIndexOutOfBoundsException e){
                 convertedString = parts[0] + "00";
-            } else if (mantissa.length() == 1){
+                return Integer.parseInt(convertedString);
+            }
+
+           if (mantissa.length() == 1){
                 convertedString = parts[0]+mantissa+"0";
             } else if (mantissa.length() == 2){
                 convertedString = input.replaceAll("\\.", "");
