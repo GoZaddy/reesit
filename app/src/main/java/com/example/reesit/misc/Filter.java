@@ -30,12 +30,21 @@ public class Filter {
     private String beforeDateTimestamp;
     private String afterDateTimestamp;
 
-    public class FilterGenerateQueryException extends Exception{
+    public static class FilterGenerateQueryException extends Exception{
         public FilterGenerateQueryException(String message){
             super(message);
         }
+        public FilterGenerateQueryException(Throwable e){
+            super(e);
+        }
         public FilterGenerateQueryException(String message, Throwable err){
             super(message, err);
+        }
+    }
+
+    public static class FilterValidationException extends Exception{
+        public FilterValidationException(String message){
+            super(message);
         }
     }
 
@@ -55,7 +64,7 @@ public class Filter {
 
         if (greaterThanAmount != null && lessThanAmount != null){
             if (greaterThanAmount > lessThanAmount){
-                throw new FilterGenerateQueryException("greaterThanAmount value cannot be greater than lessThanAmount value");
+                throw new FilterGenerateQueryException(new FilterValidationException("greaterThanAmount value cannot be greater than lessThanAmount value"));
             }
             query.whereGreaterThanOrEqualTo(Receipt.KEY_AMOUNT, greaterThanAmount);
             query.whereLessThanOrEqualTo(Receipt.KEY_AMOUNT, lessThanAmount);
@@ -68,7 +77,7 @@ public class Filter {
         // add tag support
 
 
-        if (merchants != null){
+        if (merchants != null && merchants.size() != 0){
             List<ParseObject> merchantParseObjects = new ArrayList<>();
             for(Merchant merchant: merchants){
                 if (merchant.getParseObject() != null){
@@ -80,7 +89,7 @@ public class Filter {
 
         if (beforeDateTimestamp != null && afterDateTimestamp != null){
             if (Long.parseLong(afterDateTimestamp) > Long.parseLong(beforeDateTimestamp)){
-                throw new FilterGenerateQueryException("afterDateTimestamp cannot be greater than beforeDateTimestamp");
+                throw new FilterGenerateQueryException(new FilterValidationException("afterDateTimestamp cannot be greater than beforeDateTimestamp"));
             }
             query.whereGreaterThanOrEqualTo(Receipt.KEY_DATE_TIME_STAMP, afterDateTimestamp);
             query.whereLessThanOrEqualTo(Receipt.KEY_DATE_TIME_STAMP, beforeDateTimestamp);
@@ -202,5 +211,44 @@ public class Filter {
 
     public void setAfterDateTimestamp(String afterDateTimestamp) {
         this.afterDateTimestamp = afterDateTimestamp;
+    }
+
+
+    /** Performs validation on the fields of the Filter object. Can be used to generate user-facing error messages as long as a Context object is passed
+     * @param context Context object
+     * @throws FilterValidationException throws a FilterValidationException when the Filter object fails validation
+     */
+    public void validate(Context context) throws FilterValidationException {
+        if (beforeDateTimestamp != null && afterDateTimestamp != null){
+            if (Long.parseLong(afterDateTimestamp) > Long.parseLong(beforeDateTimestamp)){
+                if (context != null && context.getString(R.string.filter_invalid_before_after_date_error_message) != null){
+                    throw new FilterValidationException(context.getString(R.string.filter_invalid_before_after_date_error_message));
+                } else {
+                    throw new FilterValidationException("afterDateTimestamp cannot be greater than beforeDateTimestamp");
+                }
+            }
+        }
+        if (greaterThanAmount != null && lessThanAmount != null){
+            if (greaterThanAmount > lessThanAmount){
+                if (context != null && context.getString(R.string.filter_invalid_greater_less_amount_error_message) != null){
+                    throw new FilterValidationException(context.getString(R.string.filter_invalid_greater_less_amount_error_message));
+                } else {
+                    throw new FilterValidationException("greaterThanAmount value cannot be greater than lessThanAmount value");
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets all filter fields to null
+     */
+    public void reset(){
+        searchQuery = null;
+        greaterThanAmount = null;
+        lessThanAmount = null;
+        tags = null;
+        merchants = null;
+        beforeDateTimestamp = null;
+        afterDateTimestamp = null;
     }
 }
