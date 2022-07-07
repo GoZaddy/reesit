@@ -50,7 +50,7 @@
 
 
         <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroup"
+            android:id="@+id/merchant_suggestions_chip_group"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -69,13 +69,13 @@
             android:layout_marginTop="24dp"
             android:ems="10"
             android:hint="@string/receipt_creation_final_ref_edit_text_hint"
-            android:inputType="textPersonName"
+            android:inputType="text"
             app:helperText="@string/receipt_creation_final_ref_description"
             app:helperTextEnabled="true"
             app:layout_constraintEnd_toEndOf="@+id/merchant_name_edittext"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/merchant_name_edittext"
-            app:layout_constraintTop_toBottomOf="@+id/chipGroup">
+            app:layout_constraintTop_toBottomOf="@+id/merchant_suggestions_chip_group">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"

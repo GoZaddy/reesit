@@ -143,7 +143,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
         progressBar = binding.pageProgressBar;
         progressBarSuggestionChips = binding.progressBarSuggestionChips;
         merchantSuggestionsMessage = binding.merchantSuggestionsMessage;
-        chipGroup = binding.chipGroup;
+        chipGroup = binding.merchantSuggestionsChipGroup;
 
 
 
