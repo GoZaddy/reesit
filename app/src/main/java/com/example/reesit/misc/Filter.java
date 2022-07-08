@@ -25,7 +25,7 @@ public class Filter {
     private String searchQuery;
     private Integer greaterThanAmount;
     private Integer lessThanAmount;
-    private List<Tag> tags;
+    private Tag tag;
     private List<Merchant> merchants;
     private String beforeDateTimestamp;
     private String afterDateTimestamp;
@@ -75,6 +75,11 @@ public class Filter {
         }
 
         // add tag support
+        if (tag != null){
+            List<ParseObject> queryHelperListOfTags = new ArrayList<>();
+            queryHelperListOfTags.add(tag.getParseObject());
+            query.whereContainsAll(Receipt.KEY_TAGS, queryHelperListOfTags);
+        }
 
 
         if (merchants != null && merchants.size() != 0){
@@ -118,14 +123,8 @@ public class Filter {
         }
         result += amountLine + "\n";
 
-        if (tags.size() > 0){
-            StringBuilder tagsLine = new StringBuilder();
-            for(Tag tag: tags){
-                tagsLine.append(tag.getName()).append(", ");
-            }
-            // remove trailing ", "
-            tagsLine.delete(tagsLine.length()-2, tagsLine.length());
-            result += context.getString(R.string.filter_tostring_tags_format, tagsLine.toString()+"\n");
+        if (tag != null){
+            result += "Tag: "+tag.getName()+"\n";
         }
 
         if (merchants.size() > 0){
@@ -181,12 +180,12 @@ public class Filter {
         this.lessThanAmount = lessThanAmount;
     }
 
-    public List<Tag> getTags() {
-        return tags;
+    public Tag getTag() {
+        return tag;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public void setTag(Tag tag) {
+        this.tag = tag;
     }
 
     public List<Merchant> getMerchants() {
@@ -246,7 +245,7 @@ public class Filter {
         searchQuery = null;
         greaterThanAmount = null;
         lessThanAmount = null;
-        tags = null;
+        tag = null;
         merchants = null;
         beforeDateTimestamp = null;
         afterDateTimestamp = null;
