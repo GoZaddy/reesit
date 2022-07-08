@@ -112,19 +112,43 @@ public class ReceiptTextParser {
                                                         if (extractedFloat != null) {
                                                             receipt.setAmount(extractedFloat);
                                                         } else {
-                                                            // check previous and next blocks
-                                                            // FIXME: possible out of bounds exception due to lineIndex
-                                                            Text.Line matchingLineOnPreviousBlock = receiptText.getTextBlocks().get(blockIndex - 1).getLines().get(lineIndex);
-                                                            Text.Line matchingLineOnNextBlock = receiptText.getTextBlocks().get(blockIndex + 1).getLines().get(lineIndex);
-                                                            extractedFloat = RegexHelpers.extractFloat(matchingLineOnNextBlock.getText().trim());
-                                                            if (extractedFloat != null) {
-                                                                receipt.setAmount(extractedFloat);
-                                                            } else {
-                                                                extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
+
+                                                            // check previous and next blocks on the same line index
+                                                            Text.Line matchingLineOnPreviousBlock;
+                                                            Text.Line matchingLineOnNextBlock;
+                                                            try {
+                                                                matchingLineOnPreviousBlock = receiptText.getTextBlocks().get(blockIndex - 1).getLines().get(lineIndex);
+                                                            } catch (IndexOutOfBoundsException e){
+                                                                matchingLineOnPreviousBlock = null;
+                                                            }
+
+                                                            try{
+                                                                matchingLineOnNextBlock = receiptText.getTextBlocks().get(blockIndex + 1).getLines().get(lineIndex);
+                                                            } catch(IndexOutOfBoundsException e){
+                                                                matchingLineOnNextBlock = null;
+                                                            }
+
+                                                            if (matchingLineOnNextBlock != null){
+                                                                extractedFloat = RegexHelpers.extractFloat(matchingLineOnNextBlock.getText().trim());
                                                                 if (extractedFloat != null) {
                                                                     receipt.setAmount(extractedFloat);
+                                                                } else {
+                                                                    if (matchingLineOnPreviousBlock != null){
+                                                                        extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
+                                                                        if (extractedFloat != null) {
+                                                                            receipt.setAmount(extractedFloat);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                if (matchingLineOnPreviousBlock != null){
+                                                                    extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
+                                                                    if (extractedFloat != null) {
+                                                                        receipt.setAmount(extractedFloat);
+                                                                    }
                                                                 }
                                                             }
+
                                                         }
                                                     }
                                                 }

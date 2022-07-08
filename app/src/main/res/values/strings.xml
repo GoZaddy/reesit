@@ -59,4 +59,13 @@
     <string name="receipt_creation_final_time_text_default">Please set time for receipt</string>
     <string name="receipt_creation_final_total_amount_field_label">Total amount for receipt</string>
     <string name="receipt_creation_final_date_field_label">Date and time</string>
+    <string name="receipt_creation_final_invalid_amount_error_message">Invalid total amount!</string>
+    <string name="receipt_creation_final_ref_description">This is a number or alphanumeric series of characters used to uniquely identify your receipt</string>
+    <string name="receipt_creation_final_invalid_merchant_error_message">Merchant cannot be empty!</string>
+    <string name="dollar_sign">$</string>
+    <string name="receipt_creation_final_add_receipt_button_text">Add Receipt</string>
+    <string name="receipt_creation_final_get_merchant_suggestions_message">Retrieving merchant suggestions</string>
+    <string name="receipt_creation_final_edit_receipt_date_content_desc">Edit receipt date</string>
+    <string name="receipt_creation_edit_receipt_time_content_desc">Edit receipt time</string>
+    <string name="receipt_creation_final_add_receipt_error_message">\"Error saving receipt. Please try again!\"</string>
 </resources>

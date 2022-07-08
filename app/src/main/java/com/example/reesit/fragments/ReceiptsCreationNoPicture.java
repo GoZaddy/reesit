@@ -1,14 +1,8 @@
 package com.example.reesit.fragments;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -32,14 +25,12 @@ import android.widget.Toast;
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsCreationNoPictureBinding;
 import com.example.reesit.misc.UriAndSource;
-import com.example.reesit.providers.ReesitFileProvider;
+import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.CameraUtils;
-import com.example.reesit.utils.ReesitCallable;
 import com.example.reesit.utils.RuntimePermissions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -138,7 +129,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                RuntimePermissions.requestStoragePermissions(ReceiptsCreationNoPicture.this, getContext(), requestStoragePermissionLauncher, new ReesitCallable() {
+                RuntimePermissions.requestStoragePermissions(ReceiptsCreationNoPicture.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
                     @Override
                     public void run() {
                         selectPhotoLauncher.launch("image/*");

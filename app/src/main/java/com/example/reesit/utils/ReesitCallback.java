@@ -1,5 +1,5 @@
 package com.example.reesit.utils;
 
-public interface ReesitCallable {
+public interface ReesitCallback {
     public void run();
 }

@@ -1,16 +1,11 @@
 package com.example.reesit.fragments;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,7 +15,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
@@ -37,13 +31,15 @@ import android.widget.Toast;
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsPictureTakenBinding;
 import com.example.reesit.exceptions.ReceiptParsingException;
+import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
+import com.example.reesit.utils.FileUtils;
 import com.example.reesit.utils.CameraUtils;
 import com.example.reesit.utils.ReceiptParseCallback;
 import com.example.reesit.utils.ReceiptTextParser;
-import com.example.reesit.utils.ReesitCallable;
+import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.RuntimePermissions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -61,8 +57,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-
-import javax.crypto.interfaces.PBEKey;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -156,10 +150,9 @@ public class ReceiptsPictureTaken extends Fragment {
                                                 @Override
                                                 public void onSuccess(Receipt receipt) {
                                                     if (receipt != null){
-                                                        System.out.println(receipt.toString());
                                                         setPageStateNotLoading();
                                                         getParentFragmentManager().beginTransaction().
-                                                                replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(receipt)).commit();
+                                                                replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(new ReceiptWithImage(receipt, takenPictureURI))).commit();
                                                     }
                                                 }
 
@@ -247,7 +240,7 @@ public class ReceiptsPictureTaken extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                RuntimePermissions.requestStoragePermissions(ReceiptsPictureTaken.this, getContext(), requestStoragePermissionLauncher, new ReesitCallable() {
+                RuntimePermissions.requestStoragePermissions(ReceiptsPictureTaken.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
                     @Override
                     public void run() {
                         reselectPhotoLauncher.launch("image/*");
@@ -258,37 +251,10 @@ public class ReceiptsPictureTaken extends Fragment {
 
     }
 
-    private String getImagePathFromURI(Context context, UriAndSource contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            String selection;
-            Uri uriToQuery;
-            if (Objects.equals(contentUri.getSource(), UriAndSource.GALLERY)){
-                selection = MediaStore.Images.Media._ID + " = " + contentUri.getUri().getLastPathSegment().split(":")[1];
-                uriToQuery = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-            } else {
-                selection = null;
-                uriToQuery = contentUri.getUri();
-            }
-
-            cursor = context.getContentResolver().query(uriToQuery,  proj, selection, null, null);
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } catch (Exception e) {
-            Log.e(TAG, "getRealPathFromURI Exception : " + e.toString());
-            return "";
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
 
 
     private void renderImageOnPreview(Context context, UriAndSource photoURI){
-        File file = new File(getImagePathFromURI(context, photoURI));
+        File file = new File(FileUtils.getImagePathFromURI(context, photoURI, TAG));
         Bitmap bitmap = BitmapUtils.rotateBitmapOrientation(file.getAbsolutePath());
         receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
     }

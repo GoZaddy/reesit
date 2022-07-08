@@ -9,14 +9,11 @@ import android.content.pm.PackageManager;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import com.example.reesit.R;
 
-import java.util.concurrent.Callable;
-
 public class RuntimePermissions {
-    public static void requestStoragePermissions(Fragment fragment, Context context, ActivityResultLauncher<String> requestStoragePermissionLauncher, ReesitCallable action){
+    public static void requestStoragePermissions(Fragment fragment, Context context, ActivityResultLauncher<String> requestStoragePermissionLauncher, ReesitCallback action){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             action.run();
         }
