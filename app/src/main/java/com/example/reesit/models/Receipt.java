@@ -1,5 +1,7 @@
 package com.example.reesit.models;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import com.example.reesit.utils.CurrencyUtils;
@@ -7,12 +9,15 @@ import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.Utils;
 import com.parse.Parse;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -27,6 +32,7 @@ public class Receipt {
     private String referenceNumber;
     private String dateTimestamp;
     private ParseObject parseObject;
+    private List<Tag> tags;
 
     public static final String KEY_USER = "user";
     public static final String KEY_MERCHANT = "merchant";
@@ -35,7 +41,9 @@ public class Receipt {
     public static final String KEY_AMOUNT = "amount";
     public static final String KEY_REFERENCE_NUMBER = "referenceNumber";
     public static final String KEY_DATE_TIME_STAMP = "dateTimestamp";
+    public static final String KEY_TAGS = "tags";
     public static final String PARSE_CLASS_NAME = "Receipt";
+    private static final String TAG = "Receipt";
 
 
     public Receipt() {
@@ -51,7 +59,6 @@ public class Receipt {
     }
 
     public static Receipt fromParseObject(ParseObject object) {
-        // todo: write this
         Receipt receipt = new Receipt(
                 Merchant.fromParseObject(object.getParseObject(KEY_MERCHANT)),
                 object.getString(KEY_RECEIPT_TEXT).toLowerCase(Locale.ROOT),
@@ -63,6 +70,20 @@ public class Receipt {
         receipt.userID = object.getParseUser(KEY_USER).getObjectId();
         receipt.id = object.getObjectId();
         receipt.receiptImage = object.getParseFile(KEY_RECEIPT_IMAGE).getUrl();
+        List<ParseObject> tagsParseObject = object.getList(KEY_TAGS);
+        if (tagsParseObject != null){
+            for(ParseObject tagParseObject: tagsParseObject){
+                try {
+                    if(receipt.tags == null){
+                        receipt.tags = new ArrayList<>();
+                    }
+                    receipt.tags.add(Tag.fromParseObject(tagParseObject.fetchIfNeeded()));
+                } catch(ParseException e){
+                    Log.e(TAG, "ParseException throw while fetching receipt tags", e);
+                }
+            }
+        }
+
         return receipt;
     }
 
@@ -135,6 +156,14 @@ public class Receipt {
 
     public void setReceiptImage(String receiptImage) {
         this.receiptImage = receiptImage;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     public ParseObject getParseObject(){
