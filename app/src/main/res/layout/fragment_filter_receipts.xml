@@ -8,7 +8,50 @@ android:layout_height="match_parent"
 tools:context=".fragments.FilterReceiptsFragment"
 android:padding="0dp">
 
-<ImageButton
+    <TextView
+        android:id="@+id/tag_suggestions_loading_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/filter_fragment_tags_suggestions_loading_mesage"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/progress_bar_tag_suggestions"
+        app:layout_constraintStart_toEndOf="@+id/progress_bar_tag_suggestions"
+        app:layout_constraintTop_toTopOf="@+id/progress_bar_tag_suggestions" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar_tag_suggestions"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="@+id/tag_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/tag_edit_text" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tag_edit_text"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ems="10"
+        android:inputType="text"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/merchants_edit_text"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/merchants_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/tag_section_title">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
     android:id="@+id/before_date_button"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -20,18 +63,18 @@ android:padding="0dp">
     app:layout_constraintVertical_bias="0.0"
     android:contentDescription="@string/filter_modal_edit_before_date" />
 
-<View
-    android:id="@+id/divider4"
-    android:layout_width="0dp"
-    android:layout_height="1dp"
-    android:layout_marginTop="24dp"
-    android:background="?android:attr/listDivider"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.0"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/selectedMerchantsChipGroup" />
+    <View
+        android:id="@+id/divider4"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="32dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tag_suggestions_chip_group" />
 
-<com.google.android.material.chip.ChipGroup
+    <com.google.android.material.chip.ChipGroup
     android:id="@+id/merchant_suggestions_chip_group"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
@@ -167,7 +210,7 @@ android:padding="0dp">
     android:layout_height="wrap_content"
     android:layout_marginTop="16dp"
     android:ems="10"
-    android:inputType="textPersonName"
+    android:inputType="text"
     android:textSize="14sp"
     app:layout_constraintEnd_toEndOf="@+id/less_than_edittext"
     app:layout_constraintHorizontal_bias="0.0"
@@ -279,5 +322,37 @@ android:padding="0dp">
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider5"
         app:layout_constraintVertical_bias="0" />
+
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="24dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/selectedMerchantsChipGroup" />
+
+    <TextView
+        android:id="@+id/tag_section_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/filter_fragment_receipt_tag_section_title"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/textView17"
+        app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/tag_suggestions_chip_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/tag_edit_text"
+        app:layout_constraintStart_toStartOf="@+id/tag_edit_text"
+        app:layout_constraintTop_toBottomOf="@+id/tag_edit_text">
+
+    </com.google.android.material.chip.ChipGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,7 +30,10 @@ import com.example.reesit.databinding.FragmentFilterReceiptsBinding;
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.Filter;
 import com.example.reesit.models.Merchant;
+import com.example.reesit.models.Tag;
+import com.example.reesit.models.User;
 import com.example.reesit.services.MerchantService;
+import com.example.reesit.services.TagService;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.ReesitCallback;
@@ -57,6 +62,8 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
     public static final String TAG = "FilterReceiptsBottomSheet";
     private static final String DEBOUNCE_MERCHANT_NAME_KEY = "FILTER_DEBOUNCE_MERCHANT_NAME_KEY";
     private static final Integer DEBOUNCE_MERCHANT_NAME_INTERVAL = 1000;
+    private static final String DEBOUNCE_TAG_NAME_KEY = "FILTER_DEBOUNCE_TAG_NAME_KEY";
+    private static final Integer DEBOUNCE_TAG_NAME_INTERVAL = 1000;
     private static final int MAX_NUMBER_OF_MERCHANT_FILTER = 5;
 
     private Filter filter;
@@ -75,6 +82,11 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
     private ImageButton editAfterDateButton;
     private ImageButton editBeforeDateButton;
     private Button applyFilterButton;
+    private TextInputLayout tagsEditText;
+    private ProgressBar tagsSuggestionsProgressBar;
+    private TextView tagsSuggestionsLoadingMessage;
+    private ChipGroup tagsSuggestionsChipGroup;
+
 
     public FilterReceiptsFragment() {
         // Required empty public constructor
@@ -132,6 +144,13 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         merchantSuggestionsChipGroup = binding.merchantSuggestionsChipGroup;
         selectedMerchantsChipGroup = binding.selectedMerchantsChipGroup;
 
+        tagsSuggestionsProgressBar = binding.progressBarTagSuggestions;
+        tagsSuggestionsLoadingMessage = binding.tagSuggestionsLoadingMessage;
+        tagsSuggestionsChipGroup = binding.tagSuggestionsChipGroup;
+        tagsEditText = binding.tagEditText;
+
+        tagsSuggestionsChipGroup.setSingleSelection(true);
+
         // listen to changes to the filter object
         getParentFragmentManager().setFragmentResultListener(FilterActivity.FILTER_CHANGE_FRAGMENT_RESULT_KEY, this, new FragmentResultListener() {
             @Override
@@ -147,36 +166,61 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
 
 
         // functionality for merchants section
-        if (merchantsEditText.getEditText() != null){
-            merchantsEditText.getEditText().addTextChangedListener(
-                    new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        Objects.requireNonNull(merchantsEditText.getEditText()).addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            merchantSuggestionsChipGroup.clearCheck();
-                            if (merchantSuggestionsChipGroup.getChildCount() > 0){
-                                merchantSuggestionsChipGroup.removeAllViews();
-                            }
-
-                            setMerchantsSuggestionLoading();
-                            Debouncer.call(DEBOUNCE_MERCHANT_NAME_KEY, new ReesitCallback() {
-                                public void run() {
-                                    fetchMerchantSuggestions(s.toString());
-                                }
-                            }, DEBOUNCE_MERCHANT_NAME_INTERVAL);
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-
-                        }
                     }
-            );
-        }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (merchantSuggestionsChipGroup.getChildCount() > 0){
+                            merchantSuggestionsChipGroup.removeAllViews();
+                        }
+
+                        setMerchantsSuggestionLoading();
+                        Debouncer.call(DEBOUNCE_MERCHANT_NAME_KEY, new ReesitCallback() {
+                            public void run() {
+                                fetchMerchantSuggestions(s.toString());
+                            }
+                        }, DEBOUNCE_MERCHANT_NAME_INTERVAL);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                }
+        );
+
+        // functionality for tag section
+        Objects.requireNonNull(tagsEditText.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                tagsSuggestionsChipGroup.clearCheck();
+                if (tagsSuggestionsChipGroup.getChildCount() > 0){
+                    tagsSuggestionsChipGroup.removeAllViews();
+                }
+
+                setTagSuggestionsLoading();
+                Debouncer.call(DEBOUNCE_TAG_NAME_KEY, new ReesitCallback() {
+                    public void run() {
+                        fetchTagSuggestions(s.toString());
+                    }
+                }, DEBOUNCE_TAG_NAME_INTERVAL);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         // functionality for date-time section
         editBeforeDateButton.setOnClickListener(new View.OnClickListener() {
@@ -189,7 +233,6 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
                 }
                 datePickerFragment.setTimeSetListener((view, year, month, dayOfMonth) -> {
                     Calendar cal = Calendar.getInstance();
-//                    cal.setTimeInMillis(Long.parseLong(receipt.getDateTimestamp()));
                     cal.set(Calendar.YEAR, year);
                     cal.set(Calendar.MONTH, month);
                     cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -277,16 +320,9 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
                         Toast.makeText(getContext(), getText(R.string.generic_error_message), Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "getActivity() returned null");
                     }
-
                 }
-
-                Bundle result = new Bundle();
-                result.putParcelable(FRAGMENT_RESULT_NEW_FILTER_KEY, Parcels.wrap(filter));
-                getParentFragmentManager().setFragmentResult(FRAGMENT_RESULT_KEY, result);
-                FilterReceiptsFragment.this.dismiss();
             }
         });
-
 
 
     }
@@ -405,7 +441,7 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         if (filter.getMerchants() != null){
             for(int i = 0; i < filter.getMerchants().size(); ++i){
                 Merchant merchant = filter.getMerchants().get(i);
-                Chip chip  = new Chip(getContext());
+                Chip chip  = new Chip(requireContext());
                 chip.setText(merchant.getName());
                 chip.setCheckable(true);
                 int finalI = i;
@@ -422,5 +458,116 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         } else {
             selectedMerchantsChipGroup.removeAllViews();
         }
+
+        if (filter.getTag() != null){
+            if (tagsSuggestionsChipGroup.getChildCount() > 0){
+                tagsSuggestionsChipGroup.removeAllViews();
+            }
+            tagsSuggestionsChipGroup.clearCheck();
+            Chip chip = new Chip(requireContext());
+            chip.setText(filter.getTag().getName());
+            chip.setCheckable(true);
+            chip.setChecked(true);
+            chip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (!isChecked){
+                        filter.setTag(null);
+                        tagsSuggestionsChipGroup.removeAllViews();
+                        setTagSuggestionsLoading();
+                        fetchTags();
+                    }
+                }
+            });
+            tagsSuggestionsChipGroup.addView(chip);
+        } else {
+            setTagSuggestionsLoading();
+            fetchTags();
+        }
+    }
+
+    private void fetchTags(){
+        TagService.getTags(Objects.requireNonNull(User.getCurrentUser()), new TagService.GetTagsCallback() {
+            @Override
+            public void done(List<Tag> tags, Exception e) {
+                setTagSuggestionsNotLoading();
+                if (e == null){
+                    if (tagsSuggestionsChipGroup.getChildCount() > 0){
+                        tagsSuggestionsChipGroup.clearCheck();
+                        tagsSuggestionsChipGroup.removeAllViews();
+                    }
+                    for(Tag tag: tags){
+                        Chip chip = new Chip(requireContext());
+                        chip.setText(tag.getName());
+                        chip.setCheckable(true);
+                        chip.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (tagsSuggestionsChipGroup.getCheckedChipId() == View.NO_ID){
+                                    // enable text field so users can get suggestions
+                                    filter.setTag(null);
+                                    tagsEditText.setEnabled(true);
+                                } else {
+                                    filter.setTag(tag);
+                                    tagsEditText.setEnabled(false);
+                                }
+                            }
+                        });
+                        tagsSuggestionsChipGroup.addView(chip);
+                    }
+                } else {
+                    Log.e(TAG, "Error fetching tags", e);
+                }
+
+            }
+        });
+    }
+    private void fetchTagSuggestions(String input){
+        TagService.getSuggestedTags(input, Objects.requireNonNull(User.getCurrentUser()), new TagService.GetTagsCallback() {
+            @Override
+            public void done(List<Tag> tags, Exception e) {
+                setTagSuggestionsNotLoading();
+                if (e == null){
+                    if (tags.size() > 0){
+                        for(Tag tag: tags){
+                            Chip chip = new Chip(requireContext());
+                            chip.setText(tag.getName());
+                            chip.setCheckable(true);
+                            chip.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if (tagsSuggestionsChipGroup.getCheckedChipId() == View.NO_ID){
+                                        // enable text field so users can get suggestions
+                                        filter.setTag(null);
+                                        tagsEditText.setEnabled(true);
+                                    } else {
+                                        filter.setTag(tag);
+                                        tagsEditText.setEnabled(false);
+                                    }
+                                }
+                            });
+                            tagsSuggestionsChipGroup.addView(chip);
+                        }
+                    } else {
+                        // if there are no suggestions just get the tags they've added
+                        setTagSuggestionsLoading();
+                        fetchTags();
+                    }
+                } else {
+                    Log.e(TAG, "Error fetching tag suggestions", e);
+                }
+
+            }
+        });
+    }
+
+    private void setTagSuggestionsLoading(){
+        tagsSuggestionsProgressBar.setVisibility(View.VISIBLE);
+        tagsSuggestionsLoadingMessage.setVisibility(View.VISIBLE);
+    }
+
+    private void setTagSuggestionsNotLoading(){
+        tagsSuggestionsProgressBar.setVisibility(View.INVISIBLE);
+        tagsSuggestionsLoadingMessage.setVisibility(View.INVISIBLE);
     }
 }

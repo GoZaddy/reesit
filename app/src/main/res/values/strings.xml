@@ -112,4 +112,9 @@
     <string name="filter_activity_title">Filter receipts</string>
     <string name="filter_activity_create_category_menu_text">Create category using filter</string>
     <string name="filter_activity_reset_filters_menu_text">Reset filters</string>
+    <string name="receipt_creation_final_tag_edit_text_hint">Receipt tag</string>
+    <string name="receipt_creation_final_tags_loading_message_text">Loading tags</string>
+    <string name="receipt_creation_final_too_many_tags_error_message">A receipt cannot have more than %1$d tags</string>
+    <string name="filter_fragment_tags_suggestions_loading_mesage">Retrieving tags</string>
+    <string name="filter_fragment_receipt_tag_section_title">Receipt tag</string>
 </resources>
