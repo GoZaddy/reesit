@@ -50,7 +50,6 @@ public class RegisterFragment extends Fragment {
      *
      * @return A new instance of fragment RegisterFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static RegisterFragment newInstance(String param1, String param2) {
         return new RegisterFragment();
     }
