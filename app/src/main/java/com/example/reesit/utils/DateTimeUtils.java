@@ -44,4 +44,18 @@ public class DateTimeUtils {
     }
 
 
+    public static String getDateAndTimeReceiptCard(String unixTimestamp){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(Long.parseLong(unixTimestamp));
+        String result = cal.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+                + " " + Utils.padStringLeft(Integer.toString(cal.get(Calendar.DAY_OF_MONTH)), "0", 2)
+                +", "
+                + Integer.toString(cal.get(Calendar.YEAR)) + ". " + getTime(cal);
+
+
+
+        return result;
+    }
+
+
 }
