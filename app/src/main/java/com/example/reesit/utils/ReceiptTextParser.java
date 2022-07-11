@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.reesit.exceptions.ReceiptParsingException;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +25,18 @@ import java.util.Locale;
 
 public class ReceiptTextParser {
     private static final String TAG = "ReceiptTextParser";
+
+    public static class ReceiptParsingException extends Exception{
+        public ReceiptParsingException(String message, Throwable err){
+            super(message, err);
+        }
+    }
+
+    public interface ReceiptParseCallback{
+        public void onSuccess(Receipt receipt);
+
+        public void onFailure(ReceiptParsingException e);
+    }
 
     public static void parseReceiptText(Text receiptText, ReceiptParseCallback callback) {
         Receipt receipt = new Receipt();

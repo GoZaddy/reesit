@@ -93,5 +93,18 @@
         app:barrierDirection="top"
         app:constraint_referenced_ids="loadMoreButton" />
 
+    <TextView
+        android:id="@+id/no_receipts_text"
+        android:layout_width="288dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/receipts_no_receipts_message"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sort_button" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

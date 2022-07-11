@@ -24,4 +24,9 @@ public class Utils {
         }
         return input;
     }
+
+    public static String integerToCurrency(Integer input){
+        String stringVal = input.toString();
+        return stringVal.substring(0, stringVal.length()-2)+"."+stringVal.substring(stringVal.length()-2);
+    }
 }

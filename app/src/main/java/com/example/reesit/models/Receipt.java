@@ -2,6 +2,7 @@ package com.example.reesit.models;
 
 import androidx.annotation.NonNull;
 
+import com.example.reesit.utils.DateTimeUtils;
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -10,6 +11,7 @@ import com.parse.ParseObject;
 import org.parceler.Parcel;
 
 import java.util.Date;
+import java.util.Locale;
 
 
 @Parcel
@@ -50,7 +52,7 @@ public class Receipt {
         // todo: write this
         Receipt receipt = new Receipt(
                 Merchant.fromParseObject(object.getParseObject(KEY_MERCHANT)),
-                object.getString(KEY_RECEIPT_TEXT),
+                object.getString(KEY_RECEIPT_TEXT).toLowerCase(Locale.ROOT),
                 object.getString(KEY_AMOUNT),
                 object.getString(KEY_REFERENCE_NUMBER),
                 object.getString(KEY_DATE_TIME_STAMP)
@@ -75,7 +77,7 @@ public class Receipt {
     }
 
     public void setReceiptText(String receiptText) {
-        this.receiptText = receiptText;
+        this.receiptText = receiptText.toLowerCase(Locale.ROOT);
     }
 
     public String getAmount() {
@@ -113,9 +115,8 @@ public class Receipt {
     @NonNull
     @Override
     public String toString() {
-        return "Merchant name: " + merchant.getName() + "\n" + "Amount: " + amount + "\n" + "Ref: "
-                + referenceNumber + "\n" + "DateTime: " + dateTimestamp
-                + "\n" + "Receipt body: " + receiptText;
+        return merchant.getName().toLowerCase(Locale.ROOT) + " " + amount.toLowerCase(Locale.ROOT) + " "
+                + referenceNumber.toLowerCase(Locale.ROOT) + " " + DateTimeUtils.getDateAndTimeReceiptCard(dateTimestamp).toLowerCase(Locale.ROOT);
     }
 
     public String getReceiptImage(){
