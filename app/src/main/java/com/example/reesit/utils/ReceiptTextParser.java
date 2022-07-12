@@ -113,7 +113,7 @@ public class ReceiptTextParser {
                                                 }
 
                                                 // check for total amount
-                                                if (receipt.getAmount() == null || !Validator.isValidFloat(receipt.getAmount())) {
+                                                if (receipt.getAmount() == null || !Validator.isValidFloat(CurrencyUtils.integerToCurrency(receipt.getAmount()))) {
                                                     receipt.setAmount(null);
                                                     // check if block
                                                     String formattedText = lineText.toLowerCase(Locale.ROOT).replaceAll(":", "");
@@ -121,7 +121,11 @@ public class ReceiptTextParser {
                                                     if (RegexHelpers.findWholeWord(formattedText, "total")) {
                                                         String extractedFloat = RegexHelpers.extractFloat(formattedText);
                                                         if (extractedFloat != null) {
-                                                            receipt.setAmount(extractedFloat);
+                                                            try {
+                                                                receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                Log.e(TAG, e.getMessage(), e);
+                                                            }
                                                         } else {
 
                                                             // check previous and next blocks on the same line index
@@ -142,12 +146,20 @@ public class ReceiptTextParser {
                                                             if (matchingLineOnNextBlock != null){
                                                                 extractedFloat = RegexHelpers.extractFloat(matchingLineOnNextBlock.getText().trim());
                                                                 if (extractedFloat != null) {
-                                                                    receipt.setAmount(extractedFloat);
+                                                                    try {
+                                                                        receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                    } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                        Log.e(TAG, e.getMessage(), e);
+                                                                    }
                                                                 } else {
                                                                     if (matchingLineOnPreviousBlock != null){
                                                                         extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
                                                                         if (extractedFloat != null) {
-                                                                            receipt.setAmount(extractedFloat);
+                                                                            try {
+                                                                                receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                                Log.e(TAG, e.getMessage(), e);
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -155,7 +167,11 @@ public class ReceiptTextParser {
                                                                 if (matchingLineOnPreviousBlock != null){
                                                                     extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
                                                                     if (extractedFloat != null) {
-                                                                        receipt.setAmount(extractedFloat);
+                                                                        try {
+                                                                            receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                        } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                            Log.e(TAG, e.getMessage(), e);
+                                                                        }
                                                                     }
                                                                 }
                                                             }

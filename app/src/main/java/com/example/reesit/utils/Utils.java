@@ -1,5 +1,9 @@
 package com.example.reesit.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.util.TypedValue;
+
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Locale;
@@ -25,8 +29,15 @@ public class Utils {
         return input;
     }
 
-    public static String integerToCurrency(Integer input){
-        String stringVal = input.toString();
-        return stringVal.substring(0, stringVal.length()-2)+"."+stringVal.substring(stringVal.length()-2);
+
+
+    public static int convertDPToPixels(Context context, int dpValue){
+        Resources r = context.getResources();
+
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                dpValue,
+                r.getDisplayMetrics()
+        );
     }
 }

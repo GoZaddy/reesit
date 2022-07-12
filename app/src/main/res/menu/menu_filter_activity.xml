@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/filter_activity_save_category"
+        android:title="@string/filter_activity_create_category_menu_text"
+        />
+    <item
+        android:id="@+id/filter_activity_reset_filters"
+        android:title="@string/filter_activity_reset_filters_menu_text"
+        />
+
+</menu>

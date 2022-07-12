@@ -18,6 +18,16 @@ public class DateTimeUtils {
                 + Integer.toString(cal.get(Calendar.YEAR));
     }
 
+    public static String getDateWithLongMonth(String unixTimestamp){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(Long.parseLong(unixTimestamp));
+
+        return cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+                + " " + Utils.padStringLeft(Integer.toString(cal.get(Calendar.DAY_OF_MONTH)), "0", 2)
+                +", "
+                + Integer.toString(cal.get(Calendar.YEAR));
+    }
+
     // returns the hour of day and minute (in that order) in an int array
     public static int[] getTime(String unixTimestamp){
         Calendar cal = Calendar.getInstance();

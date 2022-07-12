@@ -62,7 +62,12 @@ public class MerchantService {
                             object.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
-                                    callback.done(Merchant.fromParseObject(object), e);
+                                    if (e == null){
+                                        callback.done(Merchant.fromParseObject(object), null);
+                                    } else {
+                                        callback.done(null, e);
+                                    }
+
                                 }
                             });
                         } else {

@@ -8,6 +8,7 @@ import com.example.reesit.R;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
+import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.Utils;
 import com.parse.ParseObject;
@@ -24,17 +25,26 @@ public class Filter {
     private String searchQuery;
     private Integer greaterThanAmount;
     private Integer lessThanAmount;
-    private List<Tag> tags;
+    private Tag tag;
     private List<Merchant> merchants;
     private String beforeDateTimestamp;
     private String afterDateTimestamp;
 
-    public class FilterGenerateQueryException extends Exception{
+    public static class FilterGenerateQueryException extends Exception{
         public FilterGenerateQueryException(String message){
             super(message);
         }
+        public FilterGenerateQueryException(Throwable e){
+            super(e);
+        }
         public FilterGenerateQueryException(String message, Throwable err){
             super(message, err);
+        }
+    }
+
+    public static class FilterValidationException extends Exception{
+        public FilterValidationException(String message){
+            super(message);
         }
     }
 
@@ -54,7 +64,7 @@ public class Filter {
 
         if (greaterThanAmount != null && lessThanAmount != null){
             if (greaterThanAmount > lessThanAmount){
-                throw new FilterGenerateQueryException("greaterThanAmount value cannot be greater than lessThanAmount value");
+                throw new FilterGenerateQueryException(new FilterValidationException("greaterThanAmount value cannot be greater than lessThanAmount value"));
             }
             query.whereGreaterThanOrEqualTo(Receipt.KEY_AMOUNT, greaterThanAmount);
             query.whereLessThanOrEqualTo(Receipt.KEY_AMOUNT, lessThanAmount);
@@ -65,9 +75,14 @@ public class Filter {
         }
 
         // add tag support
+        if (tag != null){
+            List<ParseObject> queryHelperListOfTags = new ArrayList<>();
+            queryHelperListOfTags.add(tag.getParseObject());
+            query.whereContainsAll(Receipt.KEY_TAGS, queryHelperListOfTags);
+        }
 
 
-        if (merchants != null){
+        if (merchants != null && merchants.size() != 0){
             List<ParseObject> merchantParseObjects = new ArrayList<>();
             for(Merchant merchant: merchants){
                 if (merchant.getParseObject() != null){
@@ -79,7 +94,7 @@ public class Filter {
 
         if (beforeDateTimestamp != null && afterDateTimestamp != null){
             if (Long.parseLong(afterDateTimestamp) > Long.parseLong(beforeDateTimestamp)){
-                throw new FilterGenerateQueryException("afterDateTimestamp cannot be greater than beforeDateTimestamp");
+                throw new FilterGenerateQueryException(new FilterValidationException("afterDateTimestamp cannot be greater than beforeDateTimestamp"));
             }
             query.whereGreaterThanOrEqualTo(Receipt.KEY_DATE_TIME_STAMP, afterDateTimestamp);
             query.whereLessThanOrEqualTo(Receipt.KEY_DATE_TIME_STAMP, beforeDateTimestamp);
@@ -100,32 +115,27 @@ public class Filter {
         }
         String amountLine = "";
         if (greaterThanAmount != null && lessThanAmount != null){
-            amountLine = context.getString(R.string.filter_tostring_amount_format, Utils.integerToCurrency(greaterThanAmount), Utils.integerToCurrency(lessThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_format, CurrencyUtils.integerToCurrency(greaterThanAmount), CurrencyUtils.integerToCurrency(lessThanAmount));
         } else if (greaterThanAmount != null){
-            amountLine = context.getString(R.string.filter_tostring_amount_greater_format, Utils.integerToCurrency(greaterThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_greater_format, CurrencyUtils.integerToCurrency(greaterThanAmount));
         } else if (lessThanAmount != null) {
-            amountLine = context.getString(R.string.filter_tostring_amount_less_format, Utils.integerToCurrency(lessThanAmount));
+            amountLine = context.getString(R.string.filter_tostring_amount_less_format, CurrencyUtils.integerToCurrency(lessThanAmount));
         }
         result += amountLine + "\n";
 
-        if (tags.size() > 0){
-            StringBuilder tagsLine = new StringBuilder();
-            for(Tag tag: tags){
-                tagsLine.append(tag.getName()).append(", ");
-            }
-            // remove trailing ", "
-            tagsLine.delete(tagsLine.length()-2, tagsLine.length());
-            result += context.getString(R.string.filter_tostring_tags_format, tagsLine.toString()+"\n");
+        if (tag != null){
+            result += "Tag: "+tag.getName()+"\n";
         }
-
-        if (merchants.size() > 0){
-            StringBuilder merchantsLine = new StringBuilder();
-            for(Merchant merchant: merchants){
-                merchantsLine.append(merchant.getName()).append(", ");
+        if (merchants != null){
+            if (merchants.size() > 0){
+                StringBuilder merchantsLine = new StringBuilder();
+                for(Merchant merchant: merchants){
+                    merchantsLine.append(merchant.getName()).append(", ");
+                }
+                // remove trailing ", "
+                merchantsLine.delete(merchantsLine.length()-2, merchantsLine.length());
+                result += context.getString(R.string.filter_tostring_merchants_format, merchantsLine.toString()+"\n");
             }
-            // remove trailing ", "
-            merchantsLine.delete(merchantsLine.length()-2, merchantsLine.length());
-            result += context.getString(R.string.filter_tostring_merchants_format, merchantsLine.toString()+"\n");
         }
 
         String dateLine = "";
@@ -144,7 +154,7 @@ public class Filter {
         result += dateLine;
 
 
-        return result;
+        return result.trim();
     }
 
     public String getSearchQuery() {
@@ -171,12 +181,12 @@ public class Filter {
         this.lessThanAmount = lessThanAmount;
     }
 
-    public List<Tag> getTags() {
-        return tags;
+    public Tag getTag() {
+        return tag;
     }
 
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
+    public void setTag(Tag tag) {
+        this.tag = tag;
     }
 
     public List<Merchant> getMerchants() {
@@ -201,5 +211,44 @@ public class Filter {
 
     public void setAfterDateTimestamp(String afterDateTimestamp) {
         this.afterDateTimestamp = afterDateTimestamp;
+    }
+
+
+    /** Performs validation on the fields of the Filter object. Can be used to generate user-facing error messages as long as a Context object is passed
+     * @param context Context object
+     * @throws FilterValidationException throws a FilterValidationException when the Filter object fails validation
+     */
+    public void validate(Context context) throws FilterValidationException {
+        if (beforeDateTimestamp != null && afterDateTimestamp != null){
+            if (Long.parseLong(afterDateTimestamp) > Long.parseLong(beforeDateTimestamp)){
+                if (context != null && context.getString(R.string.filter_invalid_before_after_date_error_message) != null){
+                    throw new FilterValidationException(context.getString(R.string.filter_invalid_before_after_date_error_message));
+                } else {
+                    throw new FilterValidationException("afterDateTimestamp cannot be greater than beforeDateTimestamp");
+                }
+            }
+        }
+        if (greaterThanAmount != null && lessThanAmount != null){
+            if (greaterThanAmount > lessThanAmount){
+                if (context != null && context.getString(R.string.filter_invalid_greater_less_amount_error_message) != null){
+                    throw new FilterValidationException(context.getString(R.string.filter_invalid_greater_less_amount_error_message));
+                } else {
+                    throw new FilterValidationException("greaterThanAmount value cannot be greater than lessThanAmount value");
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets all filter fields to null
+     */
+    public void reset(){
+        searchQuery = null;
+        greaterThanAmount = null;
+        lessThanAmount = null;
+        tag = null;
+        merchants = null;
+        beforeDateTimestamp = null;
+        afterDateTimestamp = null;
     }
 }
