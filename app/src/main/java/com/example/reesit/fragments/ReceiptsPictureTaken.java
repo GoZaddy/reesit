@@ -34,6 +34,7 @@ import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
 import com.example.reesit.utils.FileUtils;
+import com.example.reesit.utils.CameraUtils;
 import com.example.reesit.utils.ReceiptTextParser;
 import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.RuntimePermissions;
@@ -225,7 +226,8 @@ public class ReceiptsPictureTaken extends Fragment {
                 }
 
                 // launch camera
-                launchCamera();
+                takenPictureURI = CameraUtils.launchCamera(getContext(), retakePhotoLauncher);
+
             }
         });
 
@@ -246,41 +248,6 @@ public class ReceiptsPictureTaken extends Fragment {
 
     }
 
-
-    private void launchCamera(){
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        Uri imageCollection;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            imageCollection = MediaStore.Images.Media
-                    .getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-        } else {
-            imageCollection = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        }
-
-        if (getContext() != null){
-            ContentResolver resolver = getContext().getContentResolver();
-            ContentValues newImageDetails = new ContentValues();
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            newImageDetails.put(MediaStore.Images.Media.DISPLAY_NAME, imageFileName);
-            newImageDetails.put(MediaStore.Images.Media.MIME_TYPE, JPEG_MIME_TYPE);
-
-
-
-            takenPictureURI = UriAndSource.fromCamera(resolver.insert(imageCollection, newImageDetails));
-
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, takenPictureURI.getUri());
-
-            if (intent.resolveActivity(getContext().getPackageManager()) != null){
-                retakePhotoLauncher.launch(takenPictureURI.getUri());
-            }
-        } else {
-            Log.e(TAG, "getContext() returned null while trying to get content resolver");
-        }
-
-
-    }
 
 
     private void renderImageOnPreview(Context context, UriAndSource photoURI){

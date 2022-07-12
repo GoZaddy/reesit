@@ -8,8 +8,8 @@ import java.util.Locale;
 
 @Parcel
 public class Merchant {
-    public String id;
-    public String name;
+    private String id;
+    private String name;
     private ParseObject parseObject;
     // slugs help to ensure that merchants are unique
     private String slug;

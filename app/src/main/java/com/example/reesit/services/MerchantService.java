@@ -51,7 +51,7 @@ public class MerchantService {
         // merchants should be unique
         if (merchant.getId() == null){
             // check that a merchant with the same slug doesn't exist
-            getMerchant(merchant.name, new GetMerchantsCallback() {
+            getMerchant(merchant.getName(), new GetMerchantsCallback() {
                 @Override
                 public void done(List<Merchant> merchants, Exception e) {
                     if (e == null){
