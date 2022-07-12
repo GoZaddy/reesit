@@ -30,6 +30,7 @@ import com.example.reesit.databinding.FragmentFilterReceiptsBinding;
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.Filter;
 import com.example.reesit.models.Merchant;
+import com.example.reesit.models.ReceiptCategory;
 import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.example.reesit.services.MerchantService;
@@ -86,6 +87,8 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
     private ProgressBar tagsSuggestionsProgressBar;
     private TextView tagsSuggestionsLoadingMessage;
     private ChipGroup tagsSuggestionsChipGroup;
+
+
 
 
     public FilterReceiptsFragment() {
@@ -152,10 +155,10 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         tagsSuggestionsChipGroup.setSingleSelection(true);
 
         // listen to changes to the filter object
-        getParentFragmentManager().setFragmentResultListener(FilterActivity.FILTER_CHANGE_FRAGMENT_RESULT_KEY, this, new FragmentResultListener() {
+        getParentFragmentManager().setFragmentResultListener(FilterActivity.RESET_FILTER_FRAGMENT_RESULT_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                filter = (Filter) Parcels.unwrap(result.getParcelable(FilterActivity.FILTER_CHANGE_FRAGMENT_NEW_FRAGMENT_RESULT_KEY));
+                filter.reset();
                 setFieldValues();
             }
         });
@@ -275,31 +278,7 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 // set greaterThanAmount and lessThanAmount
-                if (greaterThanEditText.getEditText() != null){
-                    if (greaterThanEditText.getEditText().getText().toString().length() != 0){
-                        try {
-                            filter.setGreaterThanAmount(CurrencyUtils.stringToCurrency(greaterThanEditText.getEditText().getText().toString()));
-                        } catch (CurrencyUtils.CurrencyUtilsException e) {
-                            greaterThanEditText.setError(e.getMessage());
-                            return;
-                        }
-                    } else {
-                        filter.setGreaterThanAmount(null);
-                    }
-                }
-
-                if (lessThanEditText.getEditText() != null){
-                    if (lessThanEditText.getEditText().getText().toString().length() != 0){
-                        try {
-                            filter.setLessThanAmount(CurrencyUtils.stringToCurrency(lessThanEditText.getEditText().getText().toString()));
-                        } catch (CurrencyUtils.CurrencyUtilsException e) {
-                            lessThanEditText.setError(e.getMessage());
-                            return;
-                        }
-                    } else {
-                        filter.setLessThanAmount(null);
-                    }
-                }
+                setGreaterThanLessThanInFilter();
 
                 // validate beforeDateTimestamp and afterDateTimestamp
                 try {
@@ -312,13 +291,11 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
                 if (getContext() != null){
                     Intent intent = new Intent();
                     intent.putExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY, Parcels.wrap(filter));
-                    if (getActivity() != null){
-                        getActivity().setResult(Activity.RESULT_OK, intent);
-                        getActivity().finish();
-
+                    if (requireActivity() instanceof FilterActivity){
+                        ((FilterActivity) requireActivity()).onApplyFilter(filter);
                     } else {
-                        Toast.makeText(getContext(), getText(R.string.generic_error_message), Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "getActivity() returned null");
+                        requireActivity().setResult(Activity.RESULT_OK, intent);
+                        requireActivity().finish();
                     }
                 }
             }
@@ -336,6 +313,7 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         merchantSuggestionsProgressBar.setVisibility(View.INVISIBLE);
         merchantSuggestionsLoadingText.setVisibility(View.INVISIBLE);
     }
+
     private void fetchMerchantSuggestions(String merchantName){
         MerchantService.getSuggestedMerchants(merchantName, new MerchantService.GetMerchantsCallback() {
             @Override
@@ -522,6 +500,7 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
             }
         });
     }
+
     private void fetchTagSuggestions(String input){
         TagService.getSuggestedTags(input, Objects.requireNonNull(User.getCurrentUser()), new TagService.GetTagsCallback() {
             @Override
@@ -569,5 +548,28 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
     private void setTagSuggestionsNotLoading(){
         tagsSuggestionsProgressBar.setVisibility(View.INVISIBLE);
         tagsSuggestionsLoadingMessage.setVisibility(View.INVISIBLE);
+    }
+
+    public void setGreaterThanLessThanInFilter(){
+        if (Objects.requireNonNull(greaterThanEditText.getEditText()).getText().toString().length() != 0){
+            try {
+                filter.setGreaterThanAmount(CurrencyUtils.stringToCurrency(greaterThanEditText.getEditText().getText().toString()));
+            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                greaterThanEditText.setError(e.getMessage());
+                return;
+            }
+        } else {
+            filter.setGreaterThanAmount(null);
+        }
+
+        if (Objects.requireNonNull(lessThanEditText.getEditText()).getText().toString().length() != 0){
+            try {
+                filter.setLessThanAmount(CurrencyUtils.stringToCurrency(lessThanEditText.getEditText().getText().toString()));
+            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                lessThanEditText.setError(e.getMessage());
+            }
+        } else {
+            filter.setLessThanAmount(null);
+        }
     }
 }
