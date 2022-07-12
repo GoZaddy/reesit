@@ -2,7 +2,10 @@ package com.example.reesit.models;
 
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
+
 // User is a wrapper class that simply wraps around ParseUser to reduce amount of redundant code used by clients
+@Parcel
 public class User {
     private ParseUser parseUser;
     public static User fromParseUser(ParseUser user){
