@@ -28,7 +28,7 @@
         android:theme="@style/Theme.Reesit"
         tools:targetApi="31">
         <activity
-            android:name="com.example.reesit.activities.FilterActivity"
+            android:name=".activities.FilterActivity"
             android:exported="false" />
 
         <provider

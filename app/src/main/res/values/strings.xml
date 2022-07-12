@@ -117,4 +117,22 @@
     <string name="receipt_creation_final_too_many_tags_error_message">A receipt cannot have more than %1$d tags</string>
     <string name="filter_fragment_tags_suggestions_loading_mesage">Retrieving tags</string>
     <string name="filter_fragment_receipt_tag_section_title">Receipt tag</string>
+    <string name="category_creation_dialog_ok">Create category</string>
+    <string name="category_creation_dialog_cancel">Cancel</string>
+    <string name="add_new_category_dialog_title">Add a new category</string>
+    <string name="add_new_category_category_name_prompt">What do you want to call this category?</string>
+    <string name="add_new_category_category_name_edit_text_hint">e.g Food</string>
+    <string name="add_new_category_confirm_category_prompt">Confirm that you want to create the following category:</string>
+    <string name="add_new_category_confirm_category_filters_title">Filters:</string>
+    <string name="add_new_category_dialog_category_name_negative_button_text">Cancel</string>
+    <string name="add_new_category_dialog_category_name_positive_button_text">Add</string>
+    <string name="add_new_category_confirm_category_category_name_format">Category name: %1$s</string>
+    <string name="add_new_category_dialog_confirm_positive_button_text">Confirm</string>
+    <string name="add_new_category_error_message">"An error occurred while creating new category"</string>
+    <string name="add_new_category_error_message_format">An error occurred while creating new category: %1$s</string>
+    <string name="add_new_category_success_message">New category \'%1$s\' successfully created!</string>
+    <string name="add_new_category_dialog_confirm_negative_button_text">Cancel</string>
+    <string name="add_new_category_loading_text">Creating category...</string>
+    <string name="add_category_category_name_title">Category name:</string>
+    <string name="drawer_all_receipts_menu_item_title">All receipts</string>
 </resources>
