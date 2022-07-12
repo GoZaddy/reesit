@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.reesit.R;
 import com.example.reesit.databinding.ItemReceiptBinding;
 import com.example.reesit.models.Receipt;
+import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
 
         public void bind(Receipt receipt){
             receiptMerchant.setText(receipt.getMerchant().getName());
-            receiptAmount.setText(context.getString(R.string.dollar_sign_format, receipt.getAmount()));
+            receiptAmount.setText(context.getString(R.string.dollar_sign_format, CurrencyUtils.integerToCurrency(receipt.getAmount())));
             if (receipt.getReferenceNumber().length() > 0){
                 referenceNumber.setText(context.getString(R.string.receipt_card_ref_format, receipt.getReferenceNumber()));
             } else{

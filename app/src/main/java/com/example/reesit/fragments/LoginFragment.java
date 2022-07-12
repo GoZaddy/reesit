@@ -48,7 +48,6 @@ public class LoginFragment extends Fragment {
      *
      * @return A new instance of fragment LoginFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LoginFragment newInstance() {
         return new LoginFragment();
     }
