@@ -126,15 +126,16 @@ public class Filter {
         if (tag != null){
             result += "Tag: "+tag.getName()+"\n";
         }
-
-        if (merchants.size() > 0){
-            StringBuilder merchantsLine = new StringBuilder();
-            for(Merchant merchant: merchants){
-                merchantsLine.append(merchant.getName()).append(", ");
+        if (merchants != null){
+            if (merchants.size() > 0){
+                StringBuilder merchantsLine = new StringBuilder();
+                for(Merchant merchant: merchants){
+                    merchantsLine.append(merchant.getName()).append(", ");
+                }
+                // remove trailing ", "
+                merchantsLine.delete(merchantsLine.length()-2, merchantsLine.length());
+                result += context.getString(R.string.filter_tostring_merchants_format, merchantsLine.toString()+"\n");
             }
-            // remove trailing ", "
-            merchantsLine.delete(merchantsLine.length()-2, merchantsLine.length());
-            result += context.getString(R.string.filter_tostring_merchants_format, merchantsLine.toString()+"\n");
         }
 
         String dateLine = "";
@@ -153,7 +154,7 @@ public class Filter {
         result += dateLine;
 
 
-        return result;
+        return result.trim();
     }
 
     public String getSearchQuery() {
