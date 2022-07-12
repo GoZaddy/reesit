@@ -35,7 +35,6 @@ import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
 import com.example.reesit.utils.FileUtils;
 import com.example.reesit.utils.CameraUtils;
-import com.example.reesit.utils.ReceiptParseCallback;
 import com.example.reesit.utils.ReceiptTextParser;
 import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.RuntimePermissions;
