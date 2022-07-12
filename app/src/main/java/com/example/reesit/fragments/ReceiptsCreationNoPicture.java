@@ -66,7 +66,6 @@ public class ReceiptsCreationNoPicture extends Fragment {
      *
      * @return A new instance of fragment ReceiptsPictureNoPicture.
      */
-    // TODO: Rename and change types and number of parameters
     public static ReceiptsCreationNoPicture newInstance() {
         ReceiptsCreationNoPicture fragment = new ReceiptsCreationNoPicture();
         return fragment;

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.reesit.exceptions.ReceiptParsingException;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +25,18 @@ import java.util.Locale;
 
 public class ReceiptTextParser {
     private static final String TAG = "ReceiptTextParser";
+
+    public static class ReceiptParsingException extends Exception{
+        public ReceiptParsingException(String message, Throwable err){
+            super(message, err);
+        }
+    }
+
+    public interface ReceiptParseCallback{
+        public void onSuccess(Receipt receipt);
+
+        public void onFailure(ReceiptParsingException e);
+    }
 
     public static void parseReceiptText(Text receiptText, ReceiptParseCallback callback) {
         Receipt receipt = new Receipt();
@@ -102,7 +113,7 @@ public class ReceiptTextParser {
                                                 }
 
                                                 // check for total amount
-                                                if (receipt.getAmount() == null || !Validator.isValidFloat(receipt.getAmount())) {
+                                                if (receipt.getAmount() == null || !Validator.isValidFloat(CurrencyUtils.integerToCurrency(receipt.getAmount()))) {
                                                     receipt.setAmount(null);
                                                     // check if block
                                                     String formattedText = lineText.toLowerCase(Locale.ROOT).replaceAll(":", "");
@@ -110,7 +121,11 @@ public class ReceiptTextParser {
                                                     if (RegexHelpers.findWholeWord(formattedText, "total")) {
                                                         String extractedFloat = RegexHelpers.extractFloat(formattedText);
                                                         if (extractedFloat != null) {
-                                                            receipt.setAmount(extractedFloat);
+                                                            try {
+                                                                receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                Log.e(TAG, e.getMessage(), e);
+                                                            }
                                                         } else {
 
                                                             // check previous and next blocks on the same line index
@@ -131,12 +146,20 @@ public class ReceiptTextParser {
                                                             if (matchingLineOnNextBlock != null){
                                                                 extractedFloat = RegexHelpers.extractFloat(matchingLineOnNextBlock.getText().trim());
                                                                 if (extractedFloat != null) {
-                                                                    receipt.setAmount(extractedFloat);
+                                                                    try {
+                                                                        receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                    } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                        Log.e(TAG, e.getMessage(), e);
+                                                                    }
                                                                 } else {
                                                                     if (matchingLineOnPreviousBlock != null){
                                                                         extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
                                                                         if (extractedFloat != null) {
-                                                                            receipt.setAmount(extractedFloat);
+                                                                            try {
+                                                                                receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                            } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                                Log.e(TAG, e.getMessage(), e);
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -144,7 +167,11 @@ public class ReceiptTextParser {
                                                                 if (matchingLineOnPreviousBlock != null){
                                                                     extractedFloat = RegexHelpers.extractFloat(matchingLineOnPreviousBlock.getText().trim());
                                                                     if (extractedFloat != null) {
-                                                                        receipt.setAmount(extractedFloat);
+                                                                        try {
+                                                                            receipt.setAmount(CurrencyUtils.stringToCurrency(extractedFloat));
+                                                                        } catch (CurrencyUtils.CurrencyUtilsException e) {
+                                                                            Log.e(TAG, e.getMessage(), e);
+                                                                        }
                                                                     }
                                                                 }
                                                             }
