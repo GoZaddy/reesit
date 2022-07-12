@@ -7,21 +7,28 @@
         <entry key="app/src/main/res/drawable/ic_gallery.xml" value="0.3085" />
         <entry key="app/src/main/res/drawable/toolbar.xml" value="0.202" />
         <entry key="app/src/main/res/layout/activity_authentication.xml" value="0.17457114026236126" />
+        <entry key="app/src/main/res/layout/activity_filter.xml" value="0.17457114026236126" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.23233695652173914" />
         <entry key="app/src/main/res/layout/activity_receipt_creation.xml" value="0.22554347826086957" />
         <entry key="app/src/main/res/layout/activity_receipt_picture.xml" value="0.27415771484375007" />
         <entry key="app/src/main/res/layout/activity_settings.xml" value="0.23233695652173914" />
+        <entry key="app/src/main/res/layout/fragment_filter_receipts.xml" value="0.21722412109375" />
+        <entry key="app/src/main/res/layout/fragment_item_list_dialog_list_dialog.xml" value="0.26313405797101447" />
+        <entry key="app/src/main/res/layout/fragment_item_list_dialog_list_dialog_item.xml" value="0.26313405797101447" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.29270163342642375" />
         <entry key="app/src/main/res/layout/fragment_receipt_creation_final.xml" value="0.3941458451120477" />
-        <entry key="app/src/main/res/layout/fragment_receipts.xml" value="0.24616088867187502" />
+        <entry key="app/src/main/res/layout/fragment_receipts.xml" value="0.37738342285156257" />
         <entry key="app/src/main/res/layout/fragment_receipts_creation_no_picture.xml" value="0.3113299162491508" />
         <entry key="app/src/main/res/layout/fragment_receipts_picture_taken.xml" value="0.37376765498408565" />
         <entry key="app/src/main/res/layout/fragment_register.xml" value="0.3399871826171875" />
         <entry key="app/src/main/res/layout/fragment_user_settings.xml" value="0.30326232910156253" />
         <entry key="app/src/main/res/layout/item_receipt.xml" value="0.3682424130647079" />
+        <entry key="app/src/main/res/layout/modal_filter_receipts_bottom_sheet.xml" value="0.39891815185546875" />
+        <entry key="app/src/main/res/layout/modal_sort_receipts_bottom_sheet.xml" value="0.34479166666666666" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.23233695652173914" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.359375" />
         <entry key="app/src/main/res/menu/menu_drawer_list_receipts.xml" value="0.4331253051757813" />
+        <entry key="app/src/main/res/menu/menu_filter_activity.xml" value="0.3101851851851852" />
         <entry key="app/src/main/res/xml/file_paths.xml" value="0.16203703703703703" />
       </map>
     </option>

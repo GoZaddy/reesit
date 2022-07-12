@@ -2,6 +2,9 @@ package com.example.reesit.models;
 
 import androidx.annotation.NonNull;
 
+import com.example.reesit.utils.CurrencyUtils;
+import com.example.reesit.utils.DateTimeUtils;
+import com.example.reesit.utils.Utils;
 import com.parse.Parse;
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
@@ -10,6 +13,7 @@ import com.parse.ParseObject;
 import org.parceler.Parcel;
 
 import java.util.Date;
+import java.util.Locale;
 
 
 @Parcel
@@ -19,7 +23,7 @@ public class Receipt {
     private Merchant merchant;
     private String receiptImage;
     private String receiptText;
-    private String amount;
+    private Integer amount;
     private String referenceNumber;
     private String dateTimestamp;
     private ParseObject parseObject;
@@ -37,7 +41,7 @@ public class Receipt {
     public Receipt() {
     }
 
-    public Receipt(Merchant merchant, String receiptText, String amount, String referenceNumber, String dateTimestamp) {
+    public Receipt(Merchant merchant, String receiptText, Integer amount, String referenceNumber, String dateTimestamp) {
         this.id = null;
         this.merchant = merchant;
         this.receiptText = receiptText;
@@ -50,8 +54,8 @@ public class Receipt {
         // todo: write this
         Receipt receipt = new Receipt(
                 Merchant.fromParseObject(object.getParseObject(KEY_MERCHANT)),
-                object.getString(KEY_RECEIPT_TEXT),
-                object.getString(KEY_AMOUNT),
+                object.getString(KEY_RECEIPT_TEXT).toLowerCase(Locale.ROOT),
+                object.getInt(KEY_AMOUNT),
                 object.getString(KEY_REFERENCE_NUMBER),
                 object.getString(KEY_DATE_TIME_STAMP)
         );
@@ -75,14 +79,14 @@ public class Receipt {
     }
 
     public void setReceiptText(String receiptText) {
-        this.receiptText = receiptText;
+        this.receiptText = receiptText.toLowerCase(Locale.ROOT);
     }
 
-    public String getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Integer amount) {
         this.amount = amount;
     }
 
@@ -113,9 +117,8 @@ public class Receipt {
     @NonNull
     @Override
     public String toString() {
-        return "Merchant name: " + merchant.getName() + "\n" + "Amount: " + amount + "\n" + "Ref: "
-                + referenceNumber + "\n" + "DateTime: " + dateTimestamp
-                + "\n" + "Receipt body: " + receiptText;
+        return merchant.getName().toLowerCase(Locale.ROOT) + " " + CurrencyUtils.integerToCurrency(amount) + " "
+                + referenceNumber.toLowerCase(Locale.ROOT) + " " + DateTimeUtils.getDateAndTimeReceiptCard(dateTimestamp).toLowerCase(Locale.ROOT);
     }
 
     public String getReceiptImage(){

@@ -74,4 +74,42 @@
     <string name="receipts_get_receipts_error_message">Error encountered while trying to get receipts. Please try again</string>
     <string name="receipt_card_ref_format">Reference #: %1$s</string>
     <string name="receipts_search_view_hint">Search through receipts</string>
+    <string name="receipts_search_error">Error encountered while getting search results</string>
+    <string name="generic_error_message">An error occurred</string>
+
+
+    <string name="filter_tostring_amount_format"><![CDATA[Amount: >= $ %1$s,  <= $ %2$s]]></string>
+    <string name="filter_tostring_amount_greater_format"><![CDATA[Amount: >= $ %1$s]]></string>
+    <string name="filter_tostring_amount_less_format"><![CDATA[Amount: <= $ %1$s]]></string>
+    <string name="filter_tostring_tags_format">Tags: %1$s</string>
+    <string name="filter_tostring_merchants_format">Merchants: %1$s</string>
+    <string name="filter_tostring_date_format">After: %1$s, Before: %2$s</string>
+    <string name="filter_tostring_date_after_format">After: %1$s</string>
+    <string name="filter_tostring_date_before_format">Before: %1$s</string>
+    <string name="receipts_no_receipts_message">No receipts!</string>
+    <string name="receipts_no_receipt_matching_filter_message">You have no receipts containing the search query: %1$s</string>
+    <string name="sort_modal_bottom_sheet_reset_button">Reset</string>
+    <string name="receipt_creation_final_amount_edit_text_hint">Total amount on receipt</string>
+    <string name="receipt_creation_final_amount_two_dp_error">Currency values should not have more than two decimal places</string>
+    <string name="filter_modal_edit_before_date">Edit \'before\' date</string>
+    <string name="filter_modal_finish_screen_button_content_desc">Go back to \'receipts\' screen</string>
+    <string name="filter_modal_title">Filter</string>
+    <string name="filter_modal_amount_title">Total amount on receipt</string>
+    <string name="filter_modal_greater_than_label">Greater than:</string>
+    <string name="filter_modal_less_than_label">Less than:</string>
+    <string name="filter_modal_merchants_title">Merchants</string>
+    <string name="filter_modal_merchants_edit_text_hint">CVS Pharmacy</string>
+    <string name="filter_modal_date_title">Date on receipt</string>
+    <string name="filter_modal_date_after_label">After:</string>
+    <string name="filter_modal_date_before_label">Before:</string>
+    <string name="filter_modal_no_date_selected_text">No date selected</string>
+    <string name="filter_modal_edit_after_date_button_content_desc">Edit \'after\' date</string>
+    <string name="filter_modal_save_category_button_text">Save as category</string>
+    <string name="filter_modal_apply_filter_button_text">Apply filter</string>
+    <string name="filter_too_many_merchants_error_message">Cannot have more than %1$d merchants on a filter</string>
+    <string name="filter_invalid_before_after_date_error_message">\'Before\' date cannot be before \'after\' date</string>
+    <string name="filter_invalid_greater_less_amount_error_message">\'Greater than\' value cannot be greater than \'less than\' value</string>
+    <string name="filter_activity_title">Filter receipts</string>
+    <string name="filter_activity_create_category_menu_text">Create category using filter</string>
+    <string name="filter_activity_reset_filters_menu_text">Reset filters</string>
 </resources>
