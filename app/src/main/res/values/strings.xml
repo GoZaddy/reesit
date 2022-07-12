@@ -74,4 +74,19 @@
     <string name="receipts_get_receipts_error_message">Error encountered while trying to get receipts. Please try again</string>
     <string name="receipt_card_ref_format">Reference #: %1$s</string>
     <string name="receipts_search_view_hint">Search through receipts</string>
+    <string name="receipts_search_error">Error encountered while getting search results</string>
+    <string name="generic_error_message">An error occurred</string>
+
+
+    <string name="filter_tostring_amount_format"><![CDATA[Amount: >= $ %1$s,  <= $ %2$s]]></string>
+    <string name="filter_tostring_amount_greater_format"><![CDATA[Amount: >= $ %1$s]]></string>
+    <string name="filter_tostring_amount_less_format"><![CDATA[Amount: <= $ %1$s]]></string>
+    <string name="filter_tostring_tags_format">Tags: %1$s</string>
+    <string name="filter_tostring_merchants_format">Merchants: %1$s</string>
+    <string name="filter_tostring_date_format">After: %1$s, Before: %2$s</string>
+    <string name="filter_tostring_date_after_format">After: %1$s</string>
+    <string name="filter_tostring_date_before_format">Before: %1$s</string>
+    <string name="receipts_no_receipts_message">No receipts!</string>
+    <string name="receipts_no_receipt_matching_filter_message">You have no receipts containing the search query: %1$s</string>
+    <string name="sort_modal_bottom_sheet_reset_button">Reset</string>
 </resources>
