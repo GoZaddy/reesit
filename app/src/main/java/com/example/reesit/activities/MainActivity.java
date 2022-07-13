@@ -19,6 +19,7 @@ import android.view.View;
 import com.example.reesit.R;
 import com.example.reesit.databinding.ActivityMainBinding;
 import com.example.reesit.fragments.ReceiptsFragment;
+import com.example.reesit.misc.Filter;
 import com.example.reesit.services.UserService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
-        final Fragment receiptsFragment = ReceiptsFragment.newInstance(null);
+        final Fragment receiptsFragment = ReceiptsFragment.newInstance(new Filter());
         fragmentManager.beginTransaction().replace(R.id.content, receiptsFragment).commit();
 
         toolbar = activityMainBinding.toolbar.toolbarElement;

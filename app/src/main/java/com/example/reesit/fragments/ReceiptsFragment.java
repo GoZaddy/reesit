@@ -1,8 +1,13 @@
 package com.example.reesit.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,17 +20,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.activities.ReceiptCreationActivity;
 import com.example.reesit.adapters.ReceiptsAdapter;
 import com.example.reesit.databinding.FragmentReceiptsBinding;
+import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.Filter;
+import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
 import com.example.reesit.services.ReceiptService;
-import com.example.reesit.utils.GetReceiptsCallback;
+import com.example.reesit.utils.ReesitCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -48,18 +57,24 @@ public class ReceiptsFragment extends Fragment {
     private Button filterButton;
     private ProgressBar pageProgressBar;
     private Button loadMoreButton;
+    private SearchView searchView;
+    private TextView noReceiptsMessage;
 
     private ReceiptsAdapter adapter;
 
 
     private static final String ARG_PARAM1 = "filter";
     private static final String TAG = "ReceiptsFragment";
+    private static final String DEBOUNCER_SEARCH_QUERY_KEY = "DEBOUNCER_SEARCH_QUERY_KEY";
+    private static final Integer DEBOUNCER_SEARCH_QUERY_INTERVAL = 500;
 
     private List<Receipt> receipts;
 
     private Filter filter;
 
     private FragmentReceiptsBinding fragmentReceiptsBinding;
+
+    private ActivityResultLauncher<Intent> receiptCreationLauncher;
 
     private Integer skip = 0;
 
@@ -103,17 +118,9 @@ public class ReceiptsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
-
-
-        fab = fragmentReceiptsBinding.addReceiptFab;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), ReceiptCreationActivity.class);
-                startActivity(intent);
-            }
-        });
+        noReceiptsMessage = fragmentReceiptsBinding.noReceiptsText;
 
         filterButton = fragmentReceiptsBinding.filterButton;
         sortButton = fragmentReceiptsBinding.sortButton;
@@ -132,10 +139,81 @@ public class ReceiptsFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
+        receiptCreationLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK){
+                    if (result.getData() != null){
+                        Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptCreationFinalFragment.NEW_RECEIPT_RESULT_KEY));
+                        receipts.add(0, newReceipt);
+                        adapter.notifyItemInserted(0);
+                        recyclerView.smoothScrollToPosition(0);
+                        skip += 1;
+                    }
+                }
+            }
+        });
+
+        fab = fragmentReceiptsBinding.addReceiptFab;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                receiptCreationLauncher.launch(new Intent(getContext(), ReceiptCreationActivity.class));
+            }
+        });
+
         fetchReceipts(true);
 
+        searchView = fragmentReceiptsBinding.searchView;
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                Debouncer.call(DEBOUNCER_SEARCH_QUERY_KEY, new ReesitCallback() {
+                    @Override
+                    public void run() {
+                        if (newText.replaceAll("(\\s+)", "").length() == 0){
+                            filter.setSearchQuery(null);
+                        } else {
+                            filter.setSearchQuery(newText);
+                        }
 
+                        skip = 0;
+                        ReceiptService.getReceiptsWithFilter(filter, User.fromParseUser(ParseUser.getCurrentUser()), skip, new ReceiptService.GetReceiptsCallback() {
+                            @Override
+                            public void done(List<Receipt> receiptsResult, Boolean isLastPage, Exception e) {
+                                if (e == null){
+                                    setLoadMoreButtonVisibility(isLastPage);
+                                    receipts.clear();
+                                    receipts.addAll(receiptsResult);
+                                    adapter.notifyDataSetChanged();
+
+                                    if (receipts.size() == 0){
+                                        if (filter.getSearchQuery() == null){
+                                            noReceiptsMessage.setText(getString(R.string.receipts_no_receipts_message));
+                                        } else {
+                                            noReceiptsMessage.setText(getString(R.string.receipts_no_receipt_matching_filter_message, newText));
+                                        }
+                                        noReceiptsMessage.setVisibility(View.VISIBLE);
+                                    } else{
+                                        noReceiptsMessage.setVisibility(View.GONE);
+                                    }
+                                } else {
+                                    Toast.makeText(getContext(), getString(R.string.receipts_search_error), Toast.LENGTH_SHORT).show();
+                                    Log.e(TAG, "Error while getting receipts with filter", e);
+                                }
+
+                            }
+                        });
+                    }
+                }, DEBOUNCER_SEARCH_QUERY_INTERVAL);
+                return true;
+            }
+        });
     }
 
     private void setPageStateLoading(){
@@ -152,9 +230,9 @@ public class ReceiptsFragment extends Fragment {
 
     private void fetchReceipts(Boolean overwrite){
         setPageStateLoading();
-        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, new GetReceiptsCallback() {
+        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, new ReceiptService.GetReceiptsCallback() {
             @Override
-            public void done(List<Receipt> receiptsResult, Boolean isLastPage, ParseException e) {
+            public void done(List<Receipt> receiptsResult, Boolean isLastPage, Exception e) {
                 if (e == null){
                     if (overwrite){
                         receipts.clear();
@@ -168,11 +246,14 @@ public class ReceiptsFragment extends Fragment {
                         skip += receiptsResult.size();
                     }
 
-                    if (!isLastPage){
-                        loadMoreButton.setVisibility(View.VISIBLE);
-                    } else {
-                        loadMoreButton.setVisibility(View.GONE);
+                    if (receipts.size() == 0){
+                        noReceiptsMessage.setText(R.string.receipts_no_receipts_message);
+                        noReceiptsMessage.setVisibility(View.VISIBLE);
+                    } else{
+                        noReceiptsMessage.setVisibility(View.GONE);
                     }
+
+                    setLoadMoreButtonVisibility(isLastPage);
                     setPageStateNotLoading();
                 } else {
                     Toast.makeText(getContext(), R.string.receipts_get_receipts_error_message, Toast.LENGTH_SHORT).show();
@@ -181,4 +262,13 @@ public class ReceiptsFragment extends Fragment {
             }
         });
     }
+
+    private void setLoadMoreButtonVisibility(Boolean isLastPage){
+        if (!isLastPage){
+            loadMoreButton.setVisibility(View.VISIBLE);
+        } else {
+            loadMoreButton.setVisibility(View.GONE);
+        }
+    }
+
 }
