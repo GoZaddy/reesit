@@ -6,19 +6,15 @@ import androidx.annotation.NonNull;
 
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
-import com.example.reesit.utils.Utils;
-import com.parse.Parse;
-import com.parse.ParseClassName;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseObject;
 
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 @Parcel
@@ -60,16 +56,16 @@ public class Receipt {
 
     public static Receipt fromParseObject(ParseObject object) {
         Receipt receipt = new Receipt(
-                Merchant.fromParseObject(object.getParseObject(KEY_MERCHANT)),
+                Merchant.fromParseObject(Objects.requireNonNull(object.getParseObject(KEY_MERCHANT))),
                 object.getString(KEY_RECEIPT_TEXT).toLowerCase(Locale.ROOT),
                 object.getInt(KEY_AMOUNT),
                 object.getString(KEY_REFERENCE_NUMBER),
                 object.getString(KEY_DATE_TIME_STAMP)
         );
         receipt.parseObject = object;
-        receipt.userID = object.getParseUser(KEY_USER).getObjectId();
+        receipt.userID = Objects.requireNonNull(object.getParseUser(KEY_USER)).getObjectId();
         receipt.id = object.getObjectId();
-        receipt.receiptImage = object.getParseFile(KEY_RECEIPT_IMAGE).getUrl();
+        receipt.receiptImage = Objects.requireNonNull(object.getParseFile(KEY_RECEIPT_IMAGE)).getUrl();
         List<ParseObject> tagsParseObject = object.getList(KEY_TAGS);
         if (tagsParseObject != null){
             for(ParseObject tagParseObject: tagsParseObject){
