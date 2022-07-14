@@ -149,7 +149,7 @@ public class ReceiptsPictureTaken extends Fragment {
                                                     if (receipt != null){
                                                         setPageStateNotLoading();
                                                         getParentFragmentManager().beginTransaction().
-                                                                replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(new ReceiptWithImage(receipt, takenPictureURI))).commit();
+                                                                replace(R.id.receiptsCreationFragmentContainer, ReceiptCreationFinalFragment.newInstance(receipt, takenPictureURI)).commit();
                                                     }
                                                 }
 

@@ -96,7 +96,7 @@
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sub_title">
+            app:layout_constraintTop_toBottomOf="@+id/barrier5">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -146,11 +146,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:ems="10"
+            android:hint="@string/receipt_creation_final_amount_edit_text_hint"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="@+id/ref_number_edittext"
             app:layout_constraintStart_toStartOf="@+id/ref_number_edittext"
             app:layout_constraintTop_toBottomOf="@+id/ref_number_edittext"
-            android:hint="@string/receipt_creation_final_amount_edit_text_hint"
             app:startIconDrawable="@drawable/ic_baseline_attach_money_24"
             tools:text="10">
 
@@ -200,22 +200,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/receipt_creation_final_edit_receipt_date_content_desc"
             android:src="@drawable/ic_baseline_edit_24"
             app:layout_constraintBottom_toBottomOf="@+id/date_text_view"
             app:layout_constraintStart_toEndOf="@+id/date_text_view"
-            app:layout_constraintTop_toTopOf="@+id/date_text_view"
-            android:contentDescription="@string/receipt_creation_final_edit_receipt_date_content_desc" />
+            app:layout_constraintTop_toTopOf="@+id/date_text_view" />
 
         <ImageButton
             android:id="@+id/edit_time_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/transparent"
+            android:contentDescription="@string/receipt_creation_edit_receipt_time_content_desc"
             android:src="@drawable/ic_baseline_edit_24"
             app:layout_constraintBottom_toBottomOf="@+id/time_text_view"
             app:layout_constraintStart_toStartOf="@+id/edit_date_button"
-            app:layout_constraintTop_toTopOf="@+id/time_text_view"
-            android:contentDescription="@string/receipt_creation_edit_receipt_time_content_desc" />
+            app:layout_constraintTop_toTopOf="@+id/time_text_view" />
 
         <Button
             android:id="@+id/add_receipt_button"
@@ -272,6 +272,14 @@
             app:layout_constraintTop_toBottomOf="@+id/tags_suggestions_chip_group">
 
         </com.google.android.material.chip.ChipGroup>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="sub_title"
+            tools:layout_editor_absoluteY="56dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

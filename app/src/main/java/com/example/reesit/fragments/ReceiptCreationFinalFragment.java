@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,7 @@ import android.text.TextWatcher;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -25,9 +27,11 @@ import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.activities.ReceiptCreationActivity;
+import com.example.reesit.activities.ReceiptDetailsActivity;
 import com.example.reesit.databinding.FragmentReceiptCreationFinalBinding;
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.ReceiptWithImage;
+import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
@@ -61,13 +65,17 @@ import java.util.Objects;
 public class ReceiptCreationFinalFragment extends Fragment{
     public static final String NEW_RECEIPT_RESULT_KEY = "NEW_RECEIPT";
     private static final String ARG_PARAM1 = "param1";
+    private static final String FRAGMENT_TASK = "FRAGMENT_TASK";
+    private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "ReceiptCreationFinalFragment";
     private static final String DEBOUNCE_MERCHANT_NAME_KEY = "DEBOUNCE_MERCHANT_NAME";
     private static final String DEBOUNCE_TAG_NAME_KEY = "DEBOUNCE_TAG_NAME_KEY";
     private static final int DEBOUNCE_MERCHANT_NAME_INTERVAL = 1000;
     private static final int MAX_NUMBER_OF_TAGS = 10;
 
-    private ReceiptWithImage receiptWithImage;
+
+    private Receipt receipt;
+    private UriAndSource imageFile;
 
     private FragmentReceiptCreationFinalBinding binding;
 
@@ -89,6 +97,14 @@ public class ReceiptCreationFinalFragment extends Fragment{
     private ProgressBar progressBarSuggestedTags;
     private TextView suggestedTagsLoadingMessage;
     private TextInputLayout tagsTextField;
+    private TextView subTitle;
+
+    private enum Task{
+        CREATE_RECEIPT,
+        UPDATE_RECEIPT
+    }
+
+    private Task task;
 
     private boolean triggerMerchantSuggestionsSearch = true;
 
@@ -102,13 +118,25 @@ public class ReceiptCreationFinalFragment extends Fragment{
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param receiptWithImage ReceiptWithImage object.
+     * @param receipt Receipt object.
+     * @param uriAndSource UriAndSource
      * @return A new instance of fragment ReceiptCreationFinalFragment.
      */
-    public static ReceiptCreationFinalFragment newInstance(ReceiptWithImage receiptWithImage) {
+    public static ReceiptCreationFinalFragment newInstance(Receipt receipt, UriAndSource uriAndSource) {
         ReceiptCreationFinalFragment fragment = new ReceiptCreationFinalFragment();
         Bundle args = new Bundle();
-        args.putParcelable(ARG_PARAM1, Parcels.wrap(receiptWithImage));
+        args.putParcelable(ARG_PARAM1, Parcels.wrap(receipt));
+        args.putParcelable(ARG_PARAM2, Parcels.wrap(uriAndSource));
+        args.putSerializable(FRAGMENT_TASK, Task.CREATE_RECEIPT);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ReceiptCreationFinalFragment newInstance(Receipt receipt){
+        ReceiptCreationFinalFragment fragment = new ReceiptCreationFinalFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_PARAM1, Parcels.wrap(receipt));
+        args.putSerializable(FRAGMENT_TASK, Task.UPDATE_RECEIPT);
         fragment.setArguments(args);
         return fragment;
     }
@@ -120,17 +148,61 @@ public class ReceiptCreationFinalFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            receiptWithImage = (ReceiptWithImage) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
+            task = (Task) getArguments().getSerializable(FRAGMENT_TASK);
+            if (task == Task.CREATE_RECEIPT){
+                receipt = (Receipt) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
+                imageFile = (UriAndSource) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM2));
+            } else {
+                receipt = (Receipt) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
+            }
+
         }
+
+        if (requireActivity() instanceof ReceiptDetailsActivity){
+            setHasOptionsMenu(true);
+            requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+                @Override
+                public void handleOnBackPressed() {
+                    getParentFragmentManager().beginTransaction().replace(R.id.receipt_details_fragment_container, ReceiptDetailsFragment.newInstance(receipt))
+                            .setReorderingAllowed(true)
+                            .commit();
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (requireActivity() instanceof ReceiptDetailsActivity){
+            switch(item.getItemId()){
+                case android.R.id.home:
+                    getParentFragmentManager().beginTransaction().replace(R.id.receipt_details_fragment_container, ReceiptDetailsFragment.newInstance(receipt))
+                            .setReorderingAllowed(true)
+                            .commit();
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        ReceiptCreationActivity parentActivity = ((ReceiptCreationActivity) getActivity());
-        if (parentActivity != null){
-            parentActivity.changeToolbarTitle(getString(R.string.receipt_creation_final_fragment_toolbar_title));
+        if (task == Task.CREATE_RECEIPT){
+            if (requireActivity() instanceof ReceiptCreationActivity){
+                ReceiptCreationActivity parentActivity = ((ReceiptCreationActivity) requireActivity());
+                parentActivity.changeToolbarTitle(getString(R.string.receipt_creation_final_fragment_toolbar_title));
+            }
+        } else {
+            if (requireActivity() instanceof ReceiptDetailsActivity){
+                // remove options menu from toolbar
+                requireActivity().invalidateOptionsMenu();
+                // set title
+                Objects.requireNonNull(((ReceiptDetailsActivity) requireActivity()).getSupportActionBar()).setTitle(getString(R.string.update_receipt_toolbar_title));
+            }
         }
 
         binding = FragmentReceiptCreationFinalBinding.inflate(inflater, container, false);
@@ -141,7 +213,6 @@ public class ReceiptCreationFinalFragment extends Fragment{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Receipt receipt = receiptWithImage.getReceipt();
 
         merchantTextField = binding.merchantNameEdittext;
         refTextField = binding.refNumberEdittext;
@@ -160,11 +231,13 @@ public class ReceiptCreationFinalFragment extends Fragment{
         selectedTagsChipGroup = binding.selectedTagsChipGroup;
         progressBarSuggestedTags = binding.progressBarTagsSuggestions;
         tagsTextField = binding.tagsEdittext;
+        subTitle = binding.subTitle;
 
 
-
-
-
+        // set visibility for sub title
+        if (task == Task.UPDATE_RECEIPT){
+            subTitle.setVisibility(View.GONE);
+        }
 
         // set field values
         if (receipt.getMerchant() != null && merchantTextField.getEditText() != null){
@@ -190,6 +263,35 @@ public class ReceiptCreationFinalFragment extends Fragment{
             dateTextView.setText(R.string.receipt_creation_final_date_text_default);
             timeTextView.setText(R.string.receipt_creation_final_time_text_default);
         }
+
+        if (receipt.getTags() != null && receipt.getTags().size() > 0){
+            for(int index = 0; index < receipt.getTags().size(); ++index){
+                Tag tag = receipt.getTags().get(index);
+                Chip chip  = new Chip(requireContext());
+                chip.setText(tag.getName());
+                chip.setCheckable(true);
+                int finalIndex = index;
+                chip.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        unselectTag(finalIndex);
+                    }
+                });
+
+                chip.setChecked(true);
+                selectedTagsChipGroup.addView(chip);
+            }
+        }
+
+
+
+        // set button text if needed
+        if (task == Task.UPDATE_RECEIPT){
+            addReceiptButton.setText(getString(R.string.receipt_creation_final_update_button_text));
+        }
+
+
+
 
         // set listener for merchant field
         Objects.requireNonNull(merchantTextField.getEditText()).addTextChangedListener(new TextWatcher() {
@@ -331,9 +433,9 @@ public class ReceiptCreationFinalFragment extends Fragment{
                 }
 
 
-                if (receiptWithImage.getImageFile() != null){
+                if (imageFile != null && task == Task.CREATE_RECEIPT){
                     setPageStateLoading();
-                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), receiptWithImage.getImageFile(), TAG)), new ReceiptService.AddReceiptCallback() {
+                    ReceiptService.addReceipt(receipt, new File(FileUtils.getImagePathFromURI(getContext(), imageFile, TAG)), Objects.requireNonNull(User.getCurrentUser()), new ReceiptService.AddReceiptCallback() {
                         @Override
                         public void done(Receipt newReceipt, Exception e) {
                             setPageStateNotLoading();
@@ -356,10 +458,23 @@ public class ReceiptCreationFinalFragment extends Fragment{
                             }
                         }
                     });
+                } else {
+                    setPageStateLoading();
+                    ReceiptService.updateReceipt(receipt, Objects.requireNonNull(User.getCurrentUser()), new ReceiptService.UpdateReceiptCallback() {
+                        @Override
+                        public void done(Receipt newReceipt, Exception e) {
+                            setPageStateNotLoading();
+                            if (e == null){
+                                getParentFragmentManager().beginTransaction().replace(R.id.receipt_details_fragment_container, ReceiptDetailsFragment.newInstance(newReceipt))
+                                        .setReorderingAllowed(true)
+                                        .commit();
+                            } else {
+                                Toast.makeText(getContext(), getText(R.string.receipt_creation_final_update_receipt_error_message), Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Error saving receipt", e);
+                            }
+                        }
+                    });
                 }
-
-
-
             }
         });
     }
@@ -378,7 +493,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
                                 triggerMerchantSuggestionsSearch = false;
                                 merchantTextField.getEditText().setText(suggestedMerchant.getName());
                                 merchantTextField.getEditText().setSelection(suggestedMerchant.getName().length());
-                                receiptWithImage.getReceipt().setMerchant(suggestedMerchant);
+                                receipt.setMerchant(suggestedMerchant);
                             }
                         });
                         chipGroup.addView(chip);
@@ -465,10 +580,10 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
     private void selectTag(Tag tag){
         // add merchant
-        if (receiptWithImage.getReceipt().getTags() == null){
-            receiptWithImage.getReceipt().setTags(new ArrayList<>());
+        if (receipt.getTags() == null){
+            receipt.setTags(new ArrayList<>());
         } else {
-            if (receiptWithImage.getReceipt().getTags().size() >= MAX_NUMBER_OF_TAGS){
+            if (receipt.getTags().size() >= MAX_NUMBER_OF_TAGS){
                 tagsTextField.setError(getString(R.string.receipt_creation_final_too_many_tags_error_message, MAX_NUMBER_OF_TAGS));
                 return;
             }
@@ -476,14 +591,14 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
 
         if (tag.getId() == null || !isTagInList(tag.getId())){
-            receiptWithImage.getReceipt().getTags().add(tag);
-            Chip chip  = new Chip(requireContext());
+            receipt.getTags().add(tag);
+            Chip chip = new Chip(requireContext());
             chip.setText(tag.getName());
             chip.setCheckable(true);
             chip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    unselectTag(receiptWithImage.getReceipt().getTags().size()-1);
+                    unselectTag(receipt.getTags().size()-1);
                 }
             });
 
@@ -492,14 +607,15 @@ public class ReceiptCreationFinalFragment extends Fragment{
         }
     }
 
+
     private void unselectTag(Integer index){
-        receiptWithImage.getReceipt().getTags().remove(index.intValue());
+        receipt.getTags().remove(index.intValue());
         selectedTagsChipGroup.removeViewAt(index);
     }
 
     private boolean isTagInList(String tagID){
-        if (receiptWithImage.getReceipt().getTags() != null){
-            for(Tag tag: receiptWithImage.getReceipt().getTags()){
+        if (receipt.getTags() != null){
+            for(Tag tag: receipt.getTags()){
                 if (Objects.equals(tag.getId(), tagID)){
                     return true;
                 }

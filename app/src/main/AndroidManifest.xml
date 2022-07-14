@@ -28,6 +28,9 @@
         android:theme="@style/Theme.Reesit"
         tools:targetApi="31">
         <activity
+            android:name=".activities.ReceiptDetailsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FilterActivity"
             android:exported="false" />
 

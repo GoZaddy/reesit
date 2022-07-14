@@ -237,6 +237,23 @@ public class ReceiptsFragment extends Fragment {
         recyclerView = fragmentReceiptsBinding.recyclerView;
         receipts = new ArrayList<>();
 
+        ActivityResultLauncher<Intent> updateReceiptLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK){
+                        if (result.getData() != null){
+                            Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptDetailsFragment.UPDATED_RECEIPT_RESULT_KEY));
+                            int position = result.getData().getIntExtra(ReceiptDetailsFragment.RECYCLER_VIEW_RECEIPT_POSITION_RESULT_KEY, -1);
+                            if (position != -1){
+                                receipts.set(position, newReceipt);
+
+                                adapter.notifyItemChanged(position);
+                            }
+                        }
+                    }
+                }
+            });
+
         adapter = new ReceiptsAdapter(getContext(), receipts, new ReceiptsAdapter.FilterByTagCallback() {
             @Override
             public void onSelectTag(Tag tag) {
@@ -244,7 +261,7 @@ public class ReceiptsFragment extends Fragment {
                 tagFilter.setTag(tag);
                 getParentFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(tagFilter)).commit();
             }
-        });
+        }, updateReceiptLauncher);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
