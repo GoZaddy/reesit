@@ -135,4 +135,13 @@
     <string name="add_new_category_loading_text">Creating category...</string>
     <string name="add_category_category_name_title">Category name:</string>
     <string name="drawer_all_receipts_menu_item_title">All receipts</string>
+    <string name="menu_receipt_details_delete_menu_item_title">Delete</string>
+    <string name="menu_receipt_details_share_menu_item_title">Share</string>
+    <string name="menu_receipt_details_download_menu_item_title">Download</string>
+    <string name="not_applicable">N/A</string>
+    <string name="receipt_details_datetime_format">%1$s\n%2$s</string>
+    <string name="receipt_details_info_update_receipt_button_text">Update receipt</string>
+    <string name="update_receipt_toolbar_title">Update receipt</string>
+    <string name="receipt_creation_final_update_button_text">Update receipt</string>
+    <string name="receipt_creation_final_update_receipt_error_message">Erro encountered while updating receipt. Please try agin</string>
 </resources>
