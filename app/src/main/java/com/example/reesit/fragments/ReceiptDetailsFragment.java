@@ -10,6 +10,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -63,6 +64,7 @@ public class ReceiptDetailsFragment extends Fragment {
     private TextView tagsTV;
     private TextView referenceNumTV;
     private Button updateReceipt;
+    private ConstraintLayout root;
 
     public static final String RECEIPT_UPDATE_INFORMATION_RESULT_KEY = "RECEIPT_UPDATE_INFORMATION_RESULT_KEY";
 
@@ -198,13 +200,20 @@ public class ReceiptDetailsFragment extends Fragment {
         tagsTV = binding.tagsTextView;
         dateTimeTV = binding.dateTimeTextView;
         updateReceipt = binding.updateReceiptInfoBtn;
+        root = binding.fragmentReceiptDetailsRoot;
+
 
 
         // bind data to view
+        root.setTransitionName(getString(R.string.container_transition_name_format, receipt.getId()));
+
         merchantNameTV.setText(receipt.getMerchant().getName());
+        merchantNameTV.setTransitionName(getString(R.string.merchant_transition_name_format, receipt.getId()));
         amountTV.setText(getString(R.string.dollar_sign_format, CurrencyUtils.integerToCurrency(receipt.getAmount())));
+        amountTV.setTransitionName(getString(R.string.amount_transition_name_format, receipt.getId()));
         if (receipt.getReferenceNumber() != null && receipt.getReferenceNumber().trim().length() != 0){
             referenceNumTV.setText(receipt.getReferenceNumber());
+            referenceNumTV.setTransitionName(getString(R.string.ref_transition_name_format, receipt.getId()));
         }else {
             referenceNumTV.setText(getString(R.string.not_applicable));
         }
@@ -220,6 +229,7 @@ public class ReceiptDetailsFragment extends Fragment {
         }
 
         dateTimeTV.setText(getString(R.string.receipt_details_datetime_format, DateTimeUtils.getDateLongDayLongMonth(receipt.getDateTimestamp()), DateTimeUtils.getTimeString(receipt.getDateTimestamp())));
+        dateTimeTV.setTransitionName(getString(R.string.date_transition_name_format, receipt.getId()));
 
 
         // set listeners
@@ -241,7 +251,7 @@ public class ReceiptDetailsFragment extends Fragment {
 
         intent.putExtra(RECEIPT_UPDATE_INFORMATION_RESULT_KEY, Parcels.wrap(receiptUpdateInformation));
         requireActivity().setResult(Activity.RESULT_OK, intent);
-        requireActivity().finish();
+        requireActivity().finishAfterTransition();
     }
 
     // informs the calling activity that the receipt has been deleted
@@ -253,7 +263,7 @@ public class ReceiptDetailsFragment extends Fragment {
         }
         intent.putExtra(RECEIPT_UPDATE_INFORMATION_RESULT_KEY, Parcels.wrap(receiptUpdateInformation));
         requireActivity().setResult(Activity.RESULT_OK, intent);
-        requireActivity().finish();
+        requireActivity().finishAfterTransition();
     }
 
     private void deleteReceipt(){

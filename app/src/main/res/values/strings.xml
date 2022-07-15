@@ -151,4 +151,10 @@
     <string name="delete_receipt_success_message">Receipt successfully deleted!</string>
     <string name="delete_receipt_failure_message">Error encountered while deleting receipt</string>
     <string name="delete_receipt_failure_retry_action_text">Retry</string>
+
+    <string name="merchant_transition_name_format">receipt_merchant_%1$s</string>
+    <string name="ref_transition_name_format">receipt_ref_%1$s</string>
+    <string name="amount_transition_name_format">receipt_amount_%1$s</string>
+    <string name="date_transition_name_format">receipt_date_%1$s</string>
+    <string name="container_transition_name_format">receipt_container_%1$s</string>
 </resources>

@@ -1,11 +1,14 @@
 package com.example.reesit.adapters;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
+import androidx.core.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reesit.R;
@@ -96,13 +100,42 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
         }
 
         public void bind(Receipt receipt){
+            cardView.setTransitionName(context.getString(R.string.container_transition_name_format, receipt.getId()));
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, ReceiptDetailsActivity.class);
                     intent.putExtra(ReceiptDetailsActivity.RECEIPT_INTENT_KEY, Parcels.wrap(receipt));
                     intent.putExtra(ReceiptDetailsActivity.RECEIPT_POSITION_INTENT_KEY, getBindingAdapterPosition());
-                    updateReceiptLauncher.launch(intent);
+                    // Check if we're running on Android 5.0 or higher
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        // Apply activity transition
+                        ActivityOptionsCompat options;
+                        if (receipt.getReferenceNumber() != null){
+                            options = ActivityOptionsCompat
+                                    .makeSceneTransitionAnimation(
+                                            (Activity) context,
+                                            Pair.create((View) receiptMerchant, context.getString(R.string.merchant_transition_name_format, receipt.getId())),
+                                            Pair.create((View) receiptAmount, context.getString(R.string.amount_transition_name_format, receipt.getId())),
+//                                            Pair.create((View) referenceNumber, context.getString(R.string.ref_transition_name_format, receipt.getId())),
+                                            Pair.create((View) receiptDate, context.getString(R.string.date_transition_name_format, receipt.getId()))
+                                    );
+                        } else {
+                            options = ActivityOptionsCompat
+                                    .makeSceneTransitionAnimation(
+                                            (Activity) context,
+                                            Pair.create((View) receiptMerchant, context.getString(R.string.merchant_transition_name_format, receipt.getId())),
+                                            Pair.create((View) receiptAmount, context.getString(R.string.amount_transition_name_format, receipt.getId())),
+                                            Pair.create((View) receiptDate, context.getString(R.string.date_transition_name_format, receipt.getId()))
+                                    );
+                        }
+
+                        updateReceiptLauncher.launch(intent, options);
+                    } else {
+                        // Swap without transition
+                        updateReceiptLauncher.launch(intent);
+                    }
+
                 }
             });
 
@@ -128,15 +161,21 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
                     return true;
                 }
             });
+
             receiptMerchant.setText(receipt.getMerchant().getName());
+            receiptMerchant.setTransitionName(context.getString(R.string.merchant_transition_name_format, receipt.getId()));
+
             receiptAmount.setText(context.getString(R.string.dollar_sign_format, CurrencyUtils.integerToCurrency(receipt.getAmount())));
+            receiptAmount.setTransitionName(context.getString(R.string.amount_transition_name_format, receipt.getId()));
             if (receipt.getReferenceNumber().length() > 0){
                 referenceNumber.setVisibility(View.VISIBLE);
                 referenceNumber.setText(context.getString(R.string.receipt_card_ref_format, receipt.getReferenceNumber()));
+                referenceNumber.setTransitionName(context.getString(R.string.ref_transition_name_format, receipt.getId()));
             } else{
                 referenceNumber.setVisibility(View.GONE);
             }
             receiptDate.setText(DateTimeUtils.getDateAndTimeReceiptCard(receipt.getDateTimestamp()));
+            receiptDate.setTransitionName(context.getString(R.string.date_transition_name_format, receipt.getId()));
             if (receipt.getTags() != null && receipt.getTags().size() > 0){
                 tagsChipGroup.removeAllViews();
                 tagsChipGroup.setVisibility(View.VISIBLE);
