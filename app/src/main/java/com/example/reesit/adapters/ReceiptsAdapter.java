@@ -11,19 +11,30 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.ItemReceiptBinding;
+import com.example.reesit.fragments.ReceiptsFragment;
+import com.example.reesit.misc.Filter;
 import com.example.reesit.models.Receipt;
+import com.example.reesit.models.Tag;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
 public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHolder> {
     private Context context;
     private List<Receipt> receipts;
+    private FilterByTagCallback callback;
 
-    public ReceiptsAdapter(Context context, List<Receipt> receipts){
+    public interface FilterByTagCallback{
+        public void onSelectTag(Tag tag);
+    }
+
+    public ReceiptsAdapter(Context context, List<Receipt> receipts, FilterByTagCallback callback){
         this.context = context;
         this.receipts = receipts;
+        this.callback = callback;
     }
 
     @NonNull
@@ -49,6 +60,7 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
         private TextView receiptAmount;
         private TextView referenceNumber;
         private TextView receiptDate;
+        private ChipGroup tagsChipGroup;
 
         public ViewHolder(@NonNull ItemReceiptBinding binding) {
             super(binding.getRoot());
@@ -56,6 +68,7 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
             receiptAmount = binding.receiptAmount;
             referenceNumber = binding.receiptRef;
             receiptDate = binding.receiptDate;
+            tagsChipGroup = binding.tagsChipGroup;
         }
 
         public void bind(Receipt receipt){
@@ -67,6 +80,25 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
                 referenceNumber.setVisibility(View.GONE);
             }
             receiptDate.setText(DateTimeUtils.getDateAndTimeReceiptCard(receipt.getDateTimestamp()));
+            if (receipt.getTags() != null && receipt.getTags().size() > 0){
+                tagsChipGroup.setVisibility(View.VISIBLE);
+
+                for(Tag tag: receipt.getTags()){
+                    Chip chip = new Chip(context);
+                    chip.setText(tag.getName());
+                    chip.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            callback.onSelectTag(tag);
+                        }
+                    });
+                    tagsChipGroup.addView(chip);
+                }
+            } else {
+                tagsChipGroup.setVisibility(View.GONE);
+            }
+
+
         }
     }
 }

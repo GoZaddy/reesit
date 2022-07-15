@@ -4,13 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:strokeWidth="1dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#D3D3D3"
+    android:layout_marginBottom="24dp"
     android:clickable="true"
     android:focusable="true"
-    android:layout_marginBottom="24dp"
-    >
+    app:cardElevation="0dp"
+    app:strokeColor="#D3D3D3"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -55,9 +54,34 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textSize="14sp"
+            app:layout_constraintBottom_toTopOf="@+id/barrier4"
             app:layout_constraintStart_toStartOf="@+id/receipt_ref"
             app:layout_constraintTop_toBottomOf="@+id/receipt_ref"
+            app:layout_constraintVertical_bias="0.0"
             tools:text="Mon, June 26. 1:13 PM" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/tags_chip_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/receipt_amount"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/receipt_date"
+            app:layout_constraintTop_toBottomOf="@+id/receipt_date">
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="top"
+            app:constraint_referenced_ids="tags_chip_group"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="91dp" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

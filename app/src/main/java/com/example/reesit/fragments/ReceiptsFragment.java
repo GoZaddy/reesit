@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.activities.FilterActivity;
+import com.example.reesit.activities.MainActivity;
 import com.example.reesit.activities.ReceiptCreationActivity;
 import com.example.reesit.adapters.ReceiptsAdapter;
 import com.example.reesit.databinding.FragmentReceiptsBinding;
@@ -35,6 +37,8 @@ import com.example.reesit.misc.Filter;
 import com.example.reesit.misc.SortReceiptOption;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
+import com.example.reesit.models.ReceiptCategory;
+import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.ReesitCallback;
@@ -56,6 +60,11 @@ import java.util.List;
  */
 public class ReceiptsFragment extends Fragment {
 
+    private enum FilterSource{
+        CATEGORY,
+        RAW_FILTER
+    }
+
     private FloatingActionButton fab;
     private RecyclerView recyclerView;
     private Button sortButton;
@@ -64,11 +73,13 @@ public class ReceiptsFragment extends Fragment {
     private Button loadMoreButton;
     private SearchView searchView;
     private TextView noReceiptsMessage;
+    private TextView filterText;
 
     private ReceiptsAdapter adapter;
 
 
     private static final String ARG_PARAM1 = "filter";
+    private static final String BUNDLE_FILTER_SOURCE_KEY = "BUNDLE_FILTER_SOURCE_KEY";
     private static final String TAG = "ReceiptsFragment";
     private static final String DEBOUNCER_SEARCH_QUERY_KEY = "DEBOUNCER_SEARCH_QUERY_KEY";
     private static final Integer DEBOUNCER_SEARCH_QUERY_INTERVAL = 500;
@@ -77,6 +88,7 @@ public class ReceiptsFragment extends Fragment {
     private List<Receipt> receipts;
 
     private Filter filter;
+    private FilterSource filterSource;
     private SortReceiptOption sortReceiptOption = new SortReceiptOption(Receipt.KEY_DATE_TIME_STAMP, SortReceiptOption.SortOrder.DESCENDING, null);
     private ArrayList<SortReceiptOption> sortOptions;
 
@@ -103,7 +115,17 @@ public class ReceiptsFragment extends Fragment {
     public static ReceiptsFragment newInstance(Filter filter) {
         ReceiptsFragment fragment = new ReceiptsFragment();
         Bundle args = new Bundle();
+        args.putSerializable(BUNDLE_FILTER_SOURCE_KEY, FilterSource.RAW_FILTER);
         args.putParcelable(ARG_PARAM1, Parcels.wrap(filter));
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static ReceiptsFragment newInstance(ReceiptCategory receiptCategory) {
+        ReceiptsFragment fragment = new ReceiptsFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(BUNDLE_FILTER_SOURCE_KEY, FilterSource.CATEGORY);
+        args.putParcelable(ARG_PARAM1, Parcels.wrap(receiptCategory));
         fragment.setArguments(args);
         return fragment;
     }
@@ -112,7 +134,14 @@ public class ReceiptsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            filter = (Filter) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
+            filterSource = (FilterSource) getArguments().getSerializable(BUNDLE_FILTER_SOURCE_KEY);
+            if (filterSource == FilterSource.RAW_FILTER){
+                filter = (Filter) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
+            } else {
+                filter = ((ReceiptCategory) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1))).getFilter();
+            }
+
+
         }
     }
 
@@ -150,8 +179,21 @@ public class ReceiptsFragment extends Fragment {
             public void onActivityResult(ActivityResult result) {
                 if (result.getResultCode() == Activity.RESULT_OK){
                     if (result.getData() != null){
-                        filter = (Filter) Parcels.unwrap(result.getData().getParcelableExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY));
-                        fetchReceipts(true);
+                        ArrayList<Parcelable> createdCategoriesParcelables = result.getData().getParcelableArrayListExtra(FilterActivity.CREATED_CATEGORIES_RESULT_INTENT_KEY);
+                        if (createdCategoriesParcelables != null){
+                            ArrayList<ReceiptCategory> createdCategories = new ArrayList<>();
+                            for(Parcelable createdCategoryParcelable: createdCategoriesParcelables){
+                                createdCategories.add(Parcels.unwrap(createdCategoryParcelable));
+                            }
+                            if (requireActivity() instanceof MainActivity){
+                                ((MainActivity) requireActivity()).updateCategories(createdCategories);
+                            }
+                        }
+                        Parcelable filterParcelable = result.getData().getParcelableExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY);
+                        if (filterParcelable != null){
+                            filter = (Filter) Parcels.unwrap(filterParcelable);
+                            fetchReceipts(true);
+                        }
                     }
                 }
             }
@@ -160,16 +202,23 @@ public class ReceiptsFragment extends Fragment {
 
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
         noReceiptsMessage = fragmentReceiptsBinding.noReceiptsText;
+        filterText = fragmentReceiptsBinding.filterInfoText;
 
         filterButton = fragmentReceiptsBinding.filterButton;
-        filterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), FilterActivity.class);
-                intent.putExtra(FilterActivity.FILTER_OBJECT_INTENT_KEY, Parcels.wrap(filter));
-                filterReceiptsLauncher.launch(intent);
-            }
-        });
+        if (filterSource == FilterSource.RAW_FILTER){
+            filterButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getContext(), FilterActivity.class);
+                    intent.putExtra(FilterActivity.FILTER_OBJECT_INTENT_KEY, Parcels.wrap(filter));
+                    filterReceiptsLauncher.launch(intent);
+                }
+            });
+        } else {
+            filterButton.setOnClickListener(null);
+            filterButton.setEnabled(false);
+        }
+
         sortButton = fragmentReceiptsBinding.sortButton;
         sortButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -188,7 +237,14 @@ public class ReceiptsFragment extends Fragment {
         recyclerView = fragmentReceiptsBinding.recyclerView;
         receipts = new ArrayList<>();
 
-        adapter = new ReceiptsAdapter(getContext(), receipts);
+        adapter = new ReceiptsAdapter(getContext(), receipts, new ReceiptsAdapter.FilterByTagCallback() {
+            @Override
+            public void onSelectTag(Tag tag) {
+                Filter tagFilter = new Filter();
+                tagFilter.setTag(tag);
+                getParentFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(tagFilter)).commit();
+            }
+        });
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 1));
 
@@ -271,6 +327,12 @@ public class ReceiptsFragment extends Fragment {
 
         // fetch receipts on initial load
         fetchReceipts(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        filterText.setText(filter.getStringValue(requireContext()));
     }
 
     private void setPageStateLoading(){
