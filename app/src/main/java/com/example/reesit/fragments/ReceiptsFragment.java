@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,7 @@ import com.example.reesit.adapters.ReceiptsAdapter;
 import com.example.reesit.databinding.FragmentReceiptsBinding;
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.Filter;
+import com.example.reesit.misc.SortReceiptOption;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
@@ -39,6 +41,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
+import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -68,15 +71,19 @@ public class ReceiptsFragment extends Fragment {
     private static final String DEBOUNCER_SEARCH_QUERY_KEY = "DEBOUNCER_SEARCH_QUERY_KEY";
     private static final Integer DEBOUNCER_SEARCH_QUERY_INTERVAL = 500;
 
+
     private List<Receipt> receipts;
 
     private Filter filter;
+    private SortReceiptOption sortReceiptOption = new SortReceiptOption(Receipt.KEY_DATE_TIME_STAMP, SortReceiptOption.SortOrder.DESCENDING, null);
+    private ArrayList<SortReceiptOption> sortOptions;
 
     private FragmentReceiptsBinding fragmentReceiptsBinding;
 
     private ActivityResultLauncher<Intent> receiptCreationLauncher;
 
     private Integer skip = 0;
+
 
     public ReceiptsFragment() {
         // Required empty public constructor
@@ -118,12 +125,35 @@ public class ReceiptsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // initialize SortReceiptBottomSheet
+        sortOptions = new ArrayList<>();
+        sortOptions.add(new SortReceiptOption(Receipt.KEY_DATE_TIME_STAMP, SortReceiptOption.SortOrder.DESCENDING, "Date on Receipt - Latest to Earliest"));
+        sortOptions.add(new SortReceiptOption(Receipt.KEY_DATE_TIME_STAMP, SortReceiptOption.SortOrder.ASCENDING, "Date on Receipt - Earliest to Latest"));
+        sortOptions.add(new SortReceiptOption(Receipt.KEY_AMOUNT, SortReceiptOption.SortOrder.DESCENDING, "Total amount on Receipt - Highest to Lowest"));
+        sortOptions.add(new SortReceiptOption(Receipt.KEY_AMOUNT, SortReceiptOption.SortOrder.ASCENDING, "Total amount on Receipt - Lowest to Highest"));
+        SortReceiptsBottomSheet sortReceiptsBottomSheet = SortReceiptsBottomSheet.newInstance(sortOptions, 0);
+        getParentFragmentManager().setFragmentResultListener(SortReceiptsBottomSheet.FRAGMENT_RESULT_KEY, ReceiptsFragment.this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                int indexOfSortOption = result.getInt(SortReceiptsBottomSheet.FRAGMENT_RESULT_CHECKED_OPTION_KEY);
+                sortReceiptOption = sortOptions.get(indexOfSortOption);
+                fetchReceipts(true);
+            }
+        });
+
+
 
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
         noReceiptsMessage = fragmentReceiptsBinding.noReceiptsText;
 
         filterButton = fragmentReceiptsBinding.filterButton;
         sortButton = fragmentReceiptsBinding.sortButton;
+        sortButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sortReceiptsBottomSheet.show(getParentFragmentManager(), SortReceiptsBottomSheet.TAG);
+            }
+        });
         loadMoreButton = fragmentReceiptsBinding.loadMoreButton;
         loadMoreButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,7 +213,7 @@ public class ReceiptsFragment extends Fragment {
                         }
 
                         skip = 0;
-                        ReceiptService.getReceiptsWithFilter(filter, User.fromParseUser(ParseUser.getCurrentUser()), skip, new ReceiptService.GetReceiptsCallback() {
+                        ReceiptService.getReceiptsWithFilter(filter, User.fromParseUser(ParseUser.getCurrentUser()), skip, sortReceiptOption, new ReceiptService.GetReceiptsCallback() {
                             @Override
                             public void done(List<Receipt> receiptsResult, Boolean isLastPage, Exception e) {
                                 if (e == null){
@@ -230,7 +260,10 @@ public class ReceiptsFragment extends Fragment {
 
     private void fetchReceipts(Boolean overwrite){
         setPageStateLoading();
-        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, new ReceiptService.GetReceiptsCallback() {
+        if (overwrite){
+            skip = 0;
+        }
+        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, sortReceiptOption, new ReceiptService.GetReceiptsCallback() {
             @Override
             public void done(List<Receipt> receiptsResult, Boolean isLastPage, Exception e) {
                 if (e == null){
