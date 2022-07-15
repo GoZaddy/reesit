@@ -157,19 +157,6 @@ public class ReceiptsFragment extends Fragment {
             }
         });
 
-        // TODO: REMOVE
-//        FilterReceiptsBottomSheet filterReceiptsBottomSheet = FilterReceiptsBottomSheet.newInstance(filter);
-//
-//        getParentFragmentManager().setFragmentResultListener(FilterReceiptsBottomSheet.FRAGMENT_RESULT_KEY, ReceiptsFragment.this, new FragmentResultListener() {
-//            @Override
-//            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-//                Filter newFilter = (Filter) Parcels.unwrap(result.getParcelable(FilterReceiptsBottomSheet.FRAGMENT_RESULT_NEW_FILTER_KEY));
-//                filter = newFilter;
-//                fetchReceipts(true);
-//            }
-//        });
-
-
 
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
         noReceiptsMessage = fragmentReceiptsBinding.noReceiptsText;

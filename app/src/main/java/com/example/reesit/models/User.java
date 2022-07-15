@@ -17,4 +17,16 @@ public class User {
 
     public ParseUser getParseUser(){ return parseUser; }
 
+    public String getID(){
+        return parseUser.getObjectId();
+    }
+
+    public static User getCurrentUser(){
+        if (ParseUser.getCurrentUser() != null){
+            return User.fromParseUser(ParseUser.getCurrentUser());
+        } else {
+            return null;
+        }
+    }
+
 }

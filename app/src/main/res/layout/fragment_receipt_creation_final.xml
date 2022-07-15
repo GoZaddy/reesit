@@ -14,6 +14,62 @@
         tools:context=".fragments.ReceiptCreationFinalFragment">
 
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/tags_suggestions_chip_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/tags_edittext"
+            app:singleSelection="true">
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <ProgressBar
+            android:id="@+id/progress_bar_tags_suggestions"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/tags_edittext" />
+
+        <TextView
+            android:id="@+id/tags_suggestions_loading_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/receipt_creation_final_tags_loading_message_text"
+            android:textSize="12sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/progress_bar_tags_suggestions"
+            app:layout_constraintStart_toEndOf="@+id/progress_bar_tags_suggestions"
+            app:layout_constraintTop_toTopOf="@+id/progress_bar_tags_suggestions" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tags_edittext"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:ems="10"
+            android:hint="@string/receipt_creation_final_tag_edit_text_hint"
+            android:inputType="text"
+            app:layout_constraintEnd_toEndOf="@+id/amount_edittext"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/amount_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/edit_time_button">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <TextView
             android:id="@+id/sub_title"
             android:layout_width="0dp"
@@ -165,11 +221,11 @@
             android:id="@+id/add_receipt_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="24dp"
             android:text="@string/receipt_creation_final_add_receipt_button_text"
-            app:layout_constraintEnd_toEndOf="@+id/ref_number_edittext"
-            app:layout_constraintStart_toStartOf="@+id/ref_number_edittext"
-            app:layout_constraintTop_toBottomOf="@+id/edit_time_button" />
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/selected_tags_chip_group" />
 
         <ProgressBar
             android:id="@+id/pageProgressBar"
@@ -204,6 +260,18 @@
             app:layout_constraintBottom_toBottomOf="@+id/progressBarSuggestionChips"
             app:layout_constraintStart_toEndOf="@+id/progressBarSuggestionChips"
             app:layout_constraintTop_toTopOf="@+id/progressBarSuggestionChips" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/selected_tags_chip_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/tags_suggestions_chip_group">
+
+        </com.google.android.material.chip.ChipGroup>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

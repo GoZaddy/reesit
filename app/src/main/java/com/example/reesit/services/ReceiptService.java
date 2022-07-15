@@ -9,6 +9,7 @@ import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.misc.SortReceiptOption;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
+import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.parse.CountCallback;
 import com.parse.FindCallback;
@@ -125,7 +126,7 @@ public class ReceiptService {
         // use this to check if there are more pages to be fetched
 
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-        query.whereEqualTo("user", user.getParseUser());
+        query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
         query.include(Receipt.KEY_MERCHANT);
         // add query parameters for sorting
         try{
@@ -148,7 +149,7 @@ public class ReceiptService {
             return;
         }
 
-        query.whereEqualTo("user", user.getParseUser());
+        query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
         // add query parameters for sorting
         try{
             applySortPropertiesToQuery(query, sortReceiptOption);
@@ -166,6 +167,28 @@ public class ReceiptService {
         receiptObj.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
         receiptObj.put(Receipt.KEY_AMOUNT, receipt.getAmount());
         receiptObj.put(Receipt.KEY_RECEIPT_IMAGE, new ParseFile(receiptImage));
+        List<ParseObject> tagsParseObjects = new ArrayList<>();
+        if (receipt.getTags() != null){
+            for(Tag tag: receipt.getTags()){
+                // if the tag has no id - it means it hasn't been stored in the database yet
+                if (tag.getId() == null){
+                    TagService.addTag(tag, User.getCurrentUser(), new TagService.AddTagCallback() {
+                        @Override
+                        public void done(Tag newTag, Exception e) {
+                            if (e == null){
+                                tagsParseObjects.add(newTag.getParseObject());
+                            } else {
+                                callback.done(null, e);
+                            }
+                        }
+                    });
+                } else {
+                    tagsParseObjects.add(tag.getParseObject());
+                }
+
+            }
+        }
+        receiptObj.put(Receipt.KEY_TAGS, tagsParseObjects);
 
         MerchantService.addMerchant(receipt.getMerchant(), new MerchantService.AddMerchantCallback() {
             @Override
