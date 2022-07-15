@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.reesit.R;
+import com.example.reesit.activities.FilterActivity;
 import com.example.reesit.activities.ReceiptCreationActivity;
 import com.example.reesit.adapters.ReceiptsAdapter;
 import com.example.reesit.databinding.FragmentReceiptsBinding;
@@ -37,6 +38,7 @@ import com.example.reesit.models.Receipt;
 import com.example.reesit.models.User;
 import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.ReesitCallback;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -81,6 +83,7 @@ public class ReceiptsFragment extends Fragment {
     private FragmentReceiptsBinding fragmentReceiptsBinding;
 
     private ActivityResultLauncher<Intent> receiptCreationLauncher;
+    private ActivityResultLauncher<Intent> filterReceiptsLauncher;
 
     private Integer skip = 0;
 
@@ -141,12 +144,45 @@ public class ReceiptsFragment extends Fragment {
             }
         });
 
+        // initialize filterReceiptsLauncher
+        filterReceiptsLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+            @Override
+            public void onActivityResult(ActivityResult result) {
+                if (result.getResultCode() == Activity.RESULT_OK){
+                    if (result.getData() != null){
+                        filter = (Filter) Parcels.unwrap(result.getData().getParcelableExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY));
+                        fetchReceipts(true);
+                    }
+                }
+            }
+        });
+
+        // TODO: REMOVE
+//        FilterReceiptsBottomSheet filterReceiptsBottomSheet = FilterReceiptsBottomSheet.newInstance(filter);
+//
+//        getParentFragmentManager().setFragmentResultListener(FilterReceiptsBottomSheet.FRAGMENT_RESULT_KEY, ReceiptsFragment.this, new FragmentResultListener() {
+//            @Override
+//            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+//                Filter newFilter = (Filter) Parcels.unwrap(result.getParcelable(FilterReceiptsBottomSheet.FRAGMENT_RESULT_NEW_FILTER_KEY));
+//                filter = newFilter;
+//                fetchReceipts(true);
+//            }
+//        });
+
 
 
         pageProgressBar = fragmentReceiptsBinding.pageProgressBar;
         noReceiptsMessage = fragmentReceiptsBinding.noReceiptsText;
 
         filterButton = fragmentReceiptsBinding.filterButton;
+        filterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FilterActivity.class);
+                intent.putExtra(FilterActivity.FILTER_OBJECT_INTENT_KEY, Parcels.wrap(filter));
+                filterReceiptsLauncher.launch(intent);
+            }
+        });
         sortButton = fragmentReceiptsBinding.sortButton;
         sortButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +211,7 @@ public class ReceiptsFragment extends Fragment {
                 if (result.getResultCode() == Activity.RESULT_OK){
                     if (result.getData() != null){
                         Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptCreationFinalFragment.NEW_RECEIPT_RESULT_KEY));
+                        noReceiptsMessage.setVisibility(View.GONE);
                         receipts.add(0, newReceipt);
                         adapter.notifyItemInserted(0);
                         recyclerView.smoothScrollToPosition(0);
@@ -192,7 +229,6 @@ public class ReceiptsFragment extends Fragment {
             }
         });
 
-        fetchReceipts(true);
 
         searchView = fragmentReceiptsBinding.searchView;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -244,6 +280,10 @@ public class ReceiptsFragment extends Fragment {
                 return true;
             }
         });
+
+
+        // fetch receipts on initial load
+        fetchReceipts(true);
     }
 
     private void setPageStateLoading(){
@@ -263,7 +303,7 @@ public class ReceiptsFragment extends Fragment {
         if (overwrite){
             skip = 0;
         }
-        ReceiptService.getAllReceipts(User.fromParseUser(ParseUser.getCurrentUser()), skip, sortReceiptOption, new ReceiptService.GetReceiptsCallback() {
+        ReceiptService.getReceiptsWithFilter(filter, User.fromParseUser(ParseUser.getCurrentUser()), skip, sortReceiptOption, new ReceiptService.GetReceiptsCallback() {
             @Override
             public void done(List<Receipt> receiptsResult, Boolean isLastPage, Exception e) {
                 if (e == null){

@@ -32,9 +32,11 @@ import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.services.MerchantService;
 import com.example.reesit.services.ReceiptService;
+import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.example.reesit.utils.FileUtils;
 import com.example.reesit.utils.ReesitCallback;
+import com.example.reesit.utils.Utils;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputLayout;
@@ -64,8 +66,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
     private TextInputLayout merchantTextField;
     private TextInputLayout refTextField;
-    private TextInputLayout characteristicAmountTF;
-    private TextInputLayout mantissaAmountTF;
+    private TextInputLayout amountTF;
     private TextView dateTextView;
     private TextView timeTextView;
     private ImageButton editDateButton;
@@ -133,8 +134,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
 
         merchantTextField = binding.merchantNameEdittext;
         refTextField = binding.refNumberEdittext;
-        characteristicAmountTF = binding.characteristicAmountTextView;
-        mantissaAmountTF = binding.mantissaAmountTextView;
+        amountTF = binding.amountEdittext;
         dateTextView = binding.dateTextView;
         timeTextView = binding.timeTextView;
         editDateButton = binding.editDateButton;
@@ -143,7 +143,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
         progressBar = binding.pageProgressBar;
         progressBarSuggestionChips = binding.progressBarSuggestionChips;
         merchantSuggestionsMessage = binding.merchantSuggestionsMessage;
-        chipGroup = binding.chipGroup;
+        chipGroup = binding.merchantSuggestionsChipGroup;
 
 
 
@@ -185,6 +185,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
         });
 
 
+        // set field values
         if (receipt.getMerchant() != null && merchantTextField.getEditText() != null){
             merchantTextField.getEditText().setText(receipt.getMerchant().getName());
         }
@@ -194,12 +195,8 @@ public class ReceiptCreationFinalFragment extends Fragment{
         }
 
         if (receipt.getAmount() != null){
-            String[] parts = receipt.getAmount().split("\\.");
-            if (characteristicAmountTF.getEditText() != null){
-                characteristicAmountTF.getEditText().setText(parts[0]);
-            }
-            if (mantissaAmountTF.getEditText() != null){
-                mantissaAmountTF.getEditText().setText(parts[1]);
+            if (amountTF.getEditText() != null){
+                amountTF.getEditText().setText(CurrencyUtils.integerToCurrency(receipt.getAmount()));
             }
         }
 
@@ -264,14 +261,16 @@ public class ReceiptCreationFinalFragment extends Fragment{
         addReceiptButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (characteristicAmountTF.getEditText() != null && mantissaAmountTF.getEditText() != null){
-                    String characteristic = characteristicAmountTF.getEditText().getText().toString();
-                    String mantissa = mantissaAmountTF.getEditText().getText().toString();
-                    if (characteristic.length() == 0 || mantissa.length() == 0){
-                        Toast.makeText(getContext(), getText(R.string.receipt_creation_final_invalid_amount_error_message), Toast.LENGTH_SHORT).show();
+                if (amountTF.getEditText() != null){
+                    String amount = amountTF.getEditText().getText().toString();
+                    Integer intValue;
+                    try{
+                        intValue = CurrencyUtils.stringToCurrency(amount);
+                        receipt.setAmount(intValue);
+                    } catch (CurrencyUtils.CurrencyUtilsException e) {
+                        amountTF.setError(e.getMessage());
                         return;
                     }
-                    receipt.setAmount(characteristic + "." + mantissa);
                 }
                 if (merchantTextField.getEditText() != null){
                     String merchant = merchantTextField.getEditText().getText().toString();
@@ -357,8 +356,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
         editTimeButton.setEnabled(false);
         editDateButton.setEnabled(false);
         refTextField.setEnabled(false);
-        characteristicAmountTF.setEnabled(false);
-        mantissaAmountTF.setEnabled(false);
+        amountTF.setEnabled(false);
         addReceiptButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
     }
@@ -368,8 +366,7 @@ public class ReceiptCreationFinalFragment extends Fragment{
         editTimeButton.setEnabled(true);
         editDateButton.setEnabled(true);
         refTextField.setEnabled(true);
-        characteristicAmountTF.setEnabled(true);
-        mantissaAmountTF.setEnabled(true);
+        amountTF.setEnabled(true);
         addReceiptButton.setEnabled(true);
         progressBar.setVisibility(View.INVISIBLE);
     }
