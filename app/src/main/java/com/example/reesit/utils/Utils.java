@@ -33,14 +33,4 @@ public class Utils {
         String stringVal = input.toString();
         return stringVal.substring(0, stringVal.length()-2)+"."+stringVal.substring(stringVal.length()-2);
     }
-
-    public static int convertDPToPixels(Context context, int dpValue){
-        Resources r = context.getResources();
-
-        return (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                dpValue,
-                r.getDisplayMetrics()
-        );
-    }
 }
