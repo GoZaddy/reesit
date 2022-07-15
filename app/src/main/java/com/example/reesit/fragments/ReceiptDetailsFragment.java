@@ -1,6 +1,8 @@
 package com.example.reesit.fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -25,12 +27,18 @@ import com.example.reesit.activities.ReceiptDetailsActivity;
 import com.example.reesit.databinding.FragmentReceiptDetailsBinding;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
+import com.example.reesit.models.User;
+import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
+import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,8 +64,44 @@ public class ReceiptDetailsFragment extends Fragment {
     private TextView referenceNumTV;
     private Button updateReceipt;
 
-    public static final String UPDATED_RECEIPT_RESULT_KEY = "UPDATED_RECEIPT_RESULT_KEY";
-    public static final String RECYCLER_VIEW_RECEIPT_POSITION_RESULT_KEY = "RECYCLER_VIEW_RECEIPT_POSITION_RESULT_KEY";
+    public static final String RECEIPT_UPDATE_INFORMATION_RESULT_KEY = "RECEIPT_UPDATE_INFORMATION_RESULT_KEY";
+
+
+    // defines how the receipt object was changed
+    @Parcel
+    public static class ReceiptUpdateInformation{
+        public enum UpdateType{
+            UPDATE,
+            DELETE
+        }
+        private UpdateType updateType;
+        private int recyclerViewPosition;
+        private Receipt newReceipt;
+
+        public ReceiptUpdateInformation(){}
+
+        public ReceiptUpdateInformation(UpdateType updateType, int recyclerViewPosition, Receipt newReceipt) {
+            this.updateType = updateType;
+            this.recyclerViewPosition = recyclerViewPosition;
+            this.newReceipt = newReceipt;
+        }
+
+        public UpdateType getUpdateType() {
+            return updateType;
+        }
+
+        public int getRecyclerViewPosition() {
+            return recyclerViewPosition;
+        }
+
+        public Receipt getNewReceipt() {
+            return newReceipt;
+        }
+
+        public void setRecyclerViewPosition(int recyclerViewPosition) {
+            this.recyclerViewPosition = recyclerViewPosition;
+        }
+    }
 
     public ReceiptDetailsFragment() {
         // Required empty public constructor
@@ -91,7 +135,7 @@ public class ReceiptDetailsFragment extends Fragment {
             ((ReceiptDetailsActivity) requireActivity()).getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
                 @Override
                 public void handleOnBackPressed() {
-                    finishActivity();
+                    finishActivityAfterUpdate();
                 }
             });
         }
@@ -115,9 +159,25 @@ public class ReceiptDetailsFragment extends Fragment {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
             case android.R.id.home:
-                finishActivity();
+                finishActivityAfterUpdate();
                 return true;
             case R.id.delete_receipt_menu_item:
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireContext());
+                dialogBuilder.setTitle(getString(R.string.delete_receipt_dialog_title));
+                dialogBuilder.setMessage(getString(R.string.delete_receipt_dialog_message));
+                dialogBuilder.setNegativeButton(R.string.delete_receipt_dialog_negative_button_text, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                dialogBuilder.setPositiveButton(R.string.delete_receipt_dialog_positive_button_text, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteReceipt();
+                    }
+                });
+                dialogBuilder.show();
                 return true;
             case R.id.share_receipt_menu_item:
                 return true;
@@ -171,13 +231,48 @@ public class ReceiptDetailsFragment extends Fragment {
         });
     }
 
-    private void finishActivity(){
+    // returns the current value of the receipt object to the calling activity
+    private void finishActivityAfterUpdate(){
         Intent intent = new Intent();
-        intent.putExtra(UPDATED_RECEIPT_RESULT_KEY, Parcels.wrap(receipt));
+        ReceiptUpdateInformation receiptUpdateInformation = new ReceiptUpdateInformation(ReceiptUpdateInformation.UpdateType.UPDATE, -1, receipt);
         if (requireActivity() instanceof ReceiptDetailsActivity){
-            intent.putExtra(RECYCLER_VIEW_RECEIPT_POSITION_RESULT_KEY, ((ReceiptDetailsActivity) requireActivity()).getReceiptPosition());
+            receiptUpdateInformation.setRecyclerViewPosition(((ReceiptDetailsActivity) requireActivity()).getReceiptPosition());
         }
+
+        intent.putExtra(RECEIPT_UPDATE_INFORMATION_RESULT_KEY, Parcels.wrap(receiptUpdateInformation));
         requireActivity().setResult(Activity.RESULT_OK, intent);
         requireActivity().finish();
+    }
+
+    // informs the calling activity that the receipt has been deleted
+    private void finishActivityAfterDelete(){
+        Intent intent = new Intent();
+        ReceiptUpdateInformation receiptUpdateInformation = new ReceiptUpdateInformation(ReceiptUpdateInformation.UpdateType.DELETE, -1, null);
+        if (requireActivity() instanceof ReceiptDetailsActivity){
+            receiptUpdateInformation.setRecyclerViewPosition(((ReceiptDetailsActivity) requireActivity()).getReceiptPosition());
+        }
+        intent.putExtra(RECEIPT_UPDATE_INFORMATION_RESULT_KEY, Parcels.wrap(receiptUpdateInformation));
+        requireActivity().setResult(Activity.RESULT_OK, intent);
+        requireActivity().finish();
+    }
+
+    private void deleteReceipt(){
+        ReceiptService.deleteReceipt(receipt.getId(), Objects.requireNonNull(User.getCurrentUser()), new ReceiptService.DeleteReceiptCallback() {
+            @Override
+            public void done(Exception e) {
+                if (e == null){
+                    finishActivityAfterDelete();
+                } else {
+                    Log.e(TAG, "Error encountered while deleting receipt: "+receipt.getId(), e);
+                    Snackbar.make(binding.getRoot(), R.string.delete_receipt_failure_message, BaseTransientBottomBar.LENGTH_SHORT)
+                            .setAction(R.string.delete_receipt_failure_retry_action_text, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    deleteReceipt();
+                                }
+                            }).show();
+                }
+            }
+        });
     }
 }
