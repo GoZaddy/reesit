@@ -117,7 +117,7 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
                                             (Activity) context,
                                             Pair.create((View) receiptMerchant, context.getString(R.string.merchant_transition_name_format, receipt.getId())),
                                             Pair.create((View) receiptAmount, context.getString(R.string.amount_transition_name_format, receipt.getId())),
-//                                            Pair.create((View) referenceNumber, context.getString(R.string.ref_transition_name_format, receipt.getId())),
+                                            Pair.create((View) referenceNumber, context.getString(R.string.ref_transition_name_format, receipt.getId())),
                                             Pair.create((View) receiptDate, context.getString(R.string.date_transition_name_format, receipt.getId()))
                                     );
                         } else {
