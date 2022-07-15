@@ -1,12 +1,8 @@
 package com.example.reesit.fragments;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -16,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,7 +24,6 @@ import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.databinding.FragmentReceiptsPictureTakenBinding;
-import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.misc.UriAndSource;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.utils.BitmapUtils;
@@ -51,8 +45,6 @@ import org.parceler.Parcels;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 
 /**
