@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -20,6 +23,7 @@ import androidx.fragment.app.Fragment;
 
 import android.os.Environment;
 import android.os.FileUtils;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +45,9 @@ import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.BitmapUtils;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
+import com.example.reesit.utils.ReesitCallback;
+import com.example.reesit.utils.RuntimePermissions;
+import com.example.reesit.utils.Utils;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -49,6 +56,7 @@ import org.parceler.Parcels;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -72,6 +80,8 @@ public class ReceiptDetailsFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String TAG = "ReceiptDetailsFragment";
+    private static final String PUBLIC_IMAGES_DIRECTORY_TITLE = "Reesit";
+    private static final int JPEG_IMAGE_QUALITY = 60;
 
     private Receipt receipt;
 
@@ -84,6 +94,9 @@ public class ReceiptDetailsFragment extends Fragment {
     private TextView tagsTV;
     private TextView referenceNumTV;
     private Button updateReceipt;
+    private MenuItem downloadMenuItem;
+
+    private ActivityResultLauncher<String> requestStoragePermissionLauncher;
 
     public static final String RECEIPT_UPDATE_INFORMATION_RESULT_KEY = "RECEIPT_UPDATE_INFORMATION_RESULT_KEY";
     public static final String FILE_PROVIDER_AUTHORITY = "com.example.reesit.fileprovider";
@@ -128,6 +141,10 @@ public class ReceiptDetailsFragment extends Fragment {
     // callback interface for downloading images to external-files-dir
     private interface DownloadImageToExternalFilesDirCallback{
         void done(Uri localImageUri, Exception e);
+    }
+
+    private interface DownloadReceiptImageCallback{
+        void done(Exception e);
     }
 
     public ReceiptDetailsFragment() {
@@ -180,59 +197,96 @@ public class ReceiptDetailsFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_receipt_details, menu);
+        downloadMenuItem = menu.findItem(R.id.download_receipt_menu_item);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
-            case android.R.id.home:
-                finishActivityAfterUpdate();
-                return true;
-            case R.id.delete_receipt_menu_item:
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireContext());
-                dialogBuilder.setTitle(getString(R.string.delete_receipt_dialog_title));
-                dialogBuilder.setMessage(getString(R.string.delete_receipt_dialog_message));
-                dialogBuilder.setNegativeButton(R.string.delete_receipt_dialog_negative_button_text, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                dialogBuilder.setPositiveButton(R.string.delete_receipt_dialog_positive_button_text, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        deleteReceipt();
-                    }
-                });
-                dialogBuilder.show();
-                return true;
-            case R.id.share_receipt_menu_item:
-                item.setEnabled(false);
-                downloadImageToExternalFilesDir(receipt.getReceiptImage(), "receipt_image_"+receipt.getId(), new DownloadImageToExternalFilesDirCallback() {
-                    @Override
-                    public void done(Uri localImageUri, Exception e) {
-                        item.setEnabled(true);
-                        if (e == null){
-                            Intent shareIntent = new Intent();
-                            shareIntent.setAction(Intent.ACTION_SEND);
-                            shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, localImageUri);
-
-                            shareIntent.setType("image/*");
-                            startActivity(Intent.createChooser(shareIntent, null));
-                        } else {
-                            Toast.makeText(requireContext(), R.string.share_receipt_load_receipt_image_error, Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "Error downloading receipt image to external-files-dir", e);
-                        }
-                    }
-                });
-                return true;
-            case R.id.download_receipt_menu_item:
-                return true;
-            default:
-                return false;
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            finishActivityAfterUpdate();
+            return true;
         }
+        else if (itemId == R.id.delete_receipt_menu_item) {
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireContext());
+            dialogBuilder.setTitle(getString(R.string.delete_receipt_dialog_title));
+            dialogBuilder.setMessage(getString(R.string.delete_receipt_dialog_message));
+            dialogBuilder.setNegativeButton(R.string.delete_receipt_dialog_negative_button_text, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            dialogBuilder.setPositiveButton(R.string.delete_receipt_dialog_positive_button_text, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteReceipt();
+                }
+            });
+            dialogBuilder.show();
+            return true;
+        }
+        else if (itemId == R.id.share_receipt_menu_item) {
+            item.setEnabled(false);
+
+            downloadImageToExternalFilesDir(receipt.getReceiptImage(), getReceiptImageFilename(receipt), new DownloadImageToExternalFilesDirCallback() {
+                @Override
+                public void done(Uri localImageUri, Exception e) {
+                    item.setEnabled(true);
+                    if (e == null) {
+                        Intent shareIntent = new Intent();
+                        shareIntent.setAction(Intent.ACTION_SEND);
+                        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, localImageUri);
+
+                        shareIntent.setType("image/*");
+                        startActivity(Intent.createChooser(shareIntent, null));
+                    } else {
+                        Toast.makeText(requireContext(), R.string.share_receipt_load_receipt_image_error, Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error downloading receipt image to external-files-dir", e);
+                    }
+                }
+            });
+            return true;
+        }
+        else if (itemId == R.id.download_receipt_menu_item) {
+            item.setEnabled(false);
+            Snackbar.make(binding.getRoot(), R.string.download_receipt_loading_message, BaseTransientBottomBar.LENGTH_INDEFINITE).show();
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    RuntimePermissions.requestWriteStoragePermissions(ReceiptDetailsFragment.this, requireContext(), requestStoragePermissionLauncher, new ReesitCallback() {
+                        @Override
+                        public void run() {
+                            downloadReceiptImage(new DownloadReceiptImageCallback() {
+                                @Override
+                                public void done(Exception e) {
+                                    requireActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            item.setEnabled(true);
+                                            if (e == null){
+                                                Snackbar.make(binding.getRoot(), R.string.download_receipt_image_successful, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                            } else {
+                                                Snackbar.make(binding.getRoot(), R.string.download_receipt_image_error, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                                Log.e(TAG, "Error downloading receipt image", e);
+                                            }
+                                        }
+                                    });
+//                            executorService.shutdown();
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
+
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -245,6 +299,27 @@ public class ReceiptDetailsFragment extends Fragment {
         tagsTV = binding.tagsTextView;
         dateTimeTV = binding.dateTimeTextView;
         updateReceipt = binding.updateReceiptInfoBtn;
+
+        // initialize launchers
+        requestStoragePermissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                    if (isGranted) {
+                        downloadReceiptImage(new DownloadReceiptImageCallback() {
+                            @Override
+                            public void done(Exception e) {
+                                downloadMenuItem.setEnabled(true);
+                                if (e == null){
+                                    Snackbar.make(binding.getRoot(), R.string.download_receipt_image_successful, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                } else {
+                                    Snackbar.make(binding.getRoot(), R.string.download_receipt_image_error, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                    Log.e(TAG, "Error downloading receipt image", e);
+                                }
+                            }
+                        });
+                    } else {
+                        Toast.makeText(getContext(), getString(R.string.media_access_permissions_message), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
 
         // bind data to view
@@ -323,19 +398,34 @@ public class ReceiptDetailsFragment extends Fragment {
         });
     }
 
+    private String getReceiptImageFilename(Receipt receipt){
+        String[] parts = receipt.getReceiptImage().split("\\.");
+        return "receipt_image_" + receipt.getId() + "." + parts[parts.length-1];
+    }
+
+    private String getReceiptImageFilenameRandomized(Receipt receipt){
+        String[] parts = receipt.getReceiptImage().split("\\.");
+        return "receipt_image_" + receipt.getId() + Long.toString(System.currentTimeMillis() / 1000L) + "." + parts[parts.length-1];
+    }
+
+
+
+    private String getPublicImagesDirectoryPath(){
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+File.separator+PUBLIC_IMAGES_DIRECTORY_TITLE;
+    }
+
 
     private void downloadImageToExternalFilesDir(String imageUrl, String filename, DownloadImageToExternalFilesDirCallback callback){
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         Future<Uri> future = executorService.submit(new Callable<Uri>() {
             @Override
             public Uri call() throws Exception {
-                String[] parts = imageUrl.split("\\.");
-                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename + "." + parts[parts.length-1]);
+                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
                 if (!file.exists()) {
                     URL url = new URL(imageUrl);
 
                     // write url content to temporary file
-                    File tempFile = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),  "receipt_image_temp." + parts[parts.length-1]);
+                    File tempFile = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),  "receipt_image_temp." + Utils.getFileExtensionFromURL(imageUrl));
                     FileOutputStream tempOut = new FileOutputStream(tempFile);
                     InputStream urlInputStream = url.openConnection().getInputStream();
                     FileUtils.copy(urlInputStream, tempOut);
@@ -350,7 +440,7 @@ public class ReceiptDetailsFragment extends Fragment {
 
                     // compress bitmap
                     FileOutputStream out = new FileOutputStream(file);
-                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 60, out);
                     out.close();
 
                     if (!tempFile.delete()){
@@ -364,9 +454,101 @@ public class ReceiptDetailsFragment extends Fragment {
         try{
             callback.done(future.get(), null);
         } catch (Exception e) {
-            Log.e(TAG, "error", e);
             callback.done(null, e);
         }
+    }
+
+    private void downloadReceiptImage(DownloadReceiptImageCallback callback){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Exception> future = executorService.submit(new Callable<Exception>() {
+            @Override
+            public Exception call() throws Exception {
+                File privateFile = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), getReceiptImageFilename(receipt));
+                if (privateFile.exists()){
+                    File publicFile = new File(getPublicImagesDirectoryPath(), getReceiptImageFilenameRandomized(receipt));
+                    FileInputStream inputStream = new FileInputStream(privateFile);
+                    FileOutputStream outputStream;
+
+
+                    if (!publicFile.exists()){
+                        if (!Objects.requireNonNull(publicFile.getParentFile()).exists()){
+                            if (!publicFile.getParentFile().mkdirs()){
+                                return new Exception("could not create directory to hold application's public images");
+                            }
+                        }
+                        if (!publicFile.createNewFile()){
+                            return new Exception("could not create file");
+                        }
+                    }
+
+
+                    outputStream = new FileOutputStream(publicFile);
+
+                    FileUtils.copy(inputStream, outputStream);
+
+                    inputStream.close();
+
+                    outputStream.flush();
+                    outputStream.getFD().sync();
+                    outputStream.close();
+
+                    MediaScannerConnection.scanFile(requireContext(), new String[]{publicFile.getAbsolutePath()}, new String[]{"image/*"}, null);
+                } else {
+                    URL url = new URL(receipt.getReceiptImage());
+
+                    // write url content to temporary file
+                    File tempFile = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),  "receipt_image_temp." + Utils.getFileExtensionFromURL(receipt.getReceiptImage()));
+                    FileOutputStream tempOut = new FileOutputStream(tempFile);
+                    InputStream urlInputStream = url.openConnection().getInputStream();
+                    FileUtils.copy(urlInputStream, tempOut);
+                    tempOut.close();
+                    urlInputStream.close();
+
+                    Bitmap origBitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath());
+
+                    // correct bitmap orientation using exif data from tempFile
+                    ExifInterface exif = new ExifInterface(tempFile);
+                    Bitmap finalBitmap = BitmapUtils.rotateBitmapWithExif(origBitmap, exif);
+
+                    // compress bitmap
+                    File publicFile = new File(getPublicImagesDirectoryPath(), getReceiptImageFilenameRandomized(receipt));
+                    FileOutputStream outputStream;
+                    if (!publicFile.exists()){
+                        // create directory if it doesn't exist
+                        if (!Objects.requireNonNull(publicFile.getParentFile()).exists()){
+                            if (!publicFile.getParentFile().mkdirs()){
+                                return new Exception("could not create directory to hold application's public images");
+                            }
+                        }
+                        // create file
+                        if (!publicFile.createNewFile()){
+                            return new Exception("could not create file");
+                        }
+                    }
+                    outputStream = new FileOutputStream(publicFile);
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_IMAGE_QUALITY, outputStream);
+                    outputStream.flush();
+                    outputStream.getFD().sync();
+                    outputStream.close();
+
+                    MediaScannerConnection.scanFile(requireContext(), new String[]{publicFile.getAbsolutePath()}, new String[]{"image/*"}, null);
+
+                    if (!tempFile.delete()){
+                        Log.e(TAG, "could not delete tempFile");
+                    }
+                }
+                return null;
+            }
+        });
+
+        Exception exception;
+        try{
+            exception = future.get();
+        } catch (Exception e) {
+            exception = e;
+        }
+
+        callback.done(exception);
     }
 
 }
