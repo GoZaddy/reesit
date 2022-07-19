@@ -440,7 +440,7 @@ public class ReceiptDetailsFragment extends Fragment {
 
                     // compress bitmap
                     FileOutputStream out = new FileOutputStream(file);
-                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 60, out);
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_IMAGE_QUALITY, out);
                     out.close();
 
                     if (!tempFile.delete()){
