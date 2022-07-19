@@ -237,7 +237,7 @@ public class ReceiptsPictureTaken extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                RuntimePermissions.requestStoragePermissions(ReceiptsPictureTaken.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
+                RuntimePermissions.requestReadStoragePermissions(ReceiptsPictureTaken.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
                     @Override
                     public void run() {
                         reselectPhotoLauncher.launch("image/*");

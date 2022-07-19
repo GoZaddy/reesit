@@ -128,7 +128,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
             @Override
             public void onClick(View v) {
                 // request storage access permissions
-                RuntimePermissions.requestStoragePermissions(ReceiptsCreationNoPicture.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
+                RuntimePermissions.requestReadStoragePermissions(ReceiptsCreationNoPicture.this, getContext(), requestStoragePermissionLauncher, new ReesitCallback() {
                     @Override
                     public void run() {
                         selectPhotoLauncher.launch("image/*");
