@@ -40,4 +40,9 @@ public class Utils {
                 r.getDisplayMetrics()
         );
     }
+
+    public static String getFileExtensionFromURL(String url){
+        String[] parts = url.split("\\.");
+        return parts[parts.length-1];
+    }
 }
