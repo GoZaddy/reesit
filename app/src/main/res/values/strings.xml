@@ -159,4 +159,5 @@
     <string name="write_storage_permissions_dialog_title">Storage permissions</string>
     <string name="write_storage_permissions_dialog_cancel_text">Cancel</string>
     <string name="write_storage_permissions_dialog_grant_permission_button">Grant permission</string>
+    <string name="receipt_creation_no_picture_unsupported_media_provider_error">Unsupported media provider. Please select your image from the gallery or another supported provider</string>
 </resources>

@@ -136,7 +136,7 @@ public class ReceiptsPictureTaken extends Fragment {
                 try{
 
                     TextRecognizer textRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
-                    InputImage inputImage = InputImage.fromFilePath(getContext(), takenPictureURI.getUri());
+                    InputImage inputImage = InputImage.fromFilePath(requireContext(), takenPictureURI.getUri());
                     Task<Text> result =
                             textRecognizer.process(inputImage)
                                     .addOnSuccessListener(new OnSuccessListener<Text>() {
@@ -198,8 +198,13 @@ public class ReceiptsPictureTaken extends Fragment {
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null){
-                    takenPictureURI = UriAndSource.fromGallery(result);
-                    renderImageOnPreview(getContext(), takenPictureURI);
+                    String host = result.getHost();
+                    if (!host.startsWith("com.android.providers") && !Objects.equals(host, "media")){
+                        Toast.makeText(requireContext(), R.string.receipt_creation_no_picture_unsupported_media_provider_error, Toast.LENGTH_LONG).show();
+                    } else {
+                        takenPictureURI = UriAndSource.fromGallery(result);
+                        renderImageOnPreview(getContext(), takenPictureURI);
+                    }
                 }
             }
         });
@@ -252,6 +257,7 @@ public class ReceiptsPictureTaken extends Fragment {
 
     private void renderImageOnPreview(Context context, UriAndSource photoURI){
         File file = new File(FileUtils.getImagePathFromURI(context, photoURI, TAG));
+        System.out.println("selected photo path: "+file.getAbsolutePath());
         Bitmap bitmap = BitmapUtils.rotateBitmapOrientation(file.getAbsolutePath());
         receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
     }
