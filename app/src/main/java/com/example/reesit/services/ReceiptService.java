@@ -12,6 +12,7 @@ import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.parse.CountCallback;
+import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -39,6 +40,14 @@ public class ReceiptService {
 
     public interface GetReceiptsCallback {
         public void done(List<Receipt> receipts, Boolean isLastPage, Exception e);
+    }
+
+    public interface DeleteReceiptCallback {
+        public void done(Exception e);
+    }
+
+    public interface UpdateReceiptCallback{
+        public void done(Receipt newReceipt, Exception e);
     }
 
     /**
@@ -160,9 +169,9 @@ public class ReceiptService {
     }
 
 
-    public static void addReceipt(Receipt receipt, File receiptImage, AddReceiptCallback callback){
+    public static void addReceipt(Receipt receipt, File receiptImage, User user, AddReceiptCallback callback){
         ParseObject receiptObj = new ParseObject(Receipt.PARSE_CLASS_NAME);
-        receiptObj.put(Receipt.KEY_USER, ParseUser.getCurrentUser());
+        receiptObj.put(Receipt.KEY_USER, user.getParseUser());
         receiptObj.put(Receipt.KEY_DATE_TIME_STAMP, receipt.getDateTimestamp());
         receiptObj.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
         receiptObj.put(Receipt.KEY_AMOUNT, receipt.getAmount());
@@ -217,13 +226,95 @@ public class ReceiptService {
 
 
 
-    public static void deleteReceipt(String receiptID){
-
+    public static void deleteReceipt(String receiptID, User user, DeleteReceiptCallback callback){
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+        query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
+        query.whereEqualTo("objectId", receiptID);
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null){
+                    if (objects.size() == 1){
+                        objects.get(0).deleteInBackground(new DeleteCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                callback.done(e);
+                            }
+                        });
+                    }
+                } else {
+                    callback.done(e);
+                }
+            }
+        });
     }
 
-    // only fields that should be updated should be provided, every other field should be null
-    public static void updateReceipt(ReceiptWithImage receiptWithImage){
 
+    public static void updateReceipt(Receipt receipt, User user, UpdateReceiptCallback callback){
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+        query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
+        query.whereEqualTo("objectId", receipt.getId());
+        query.setLimit(1);
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> objects, ParseException e) {
+                if (e == null){
+                    if (objects.size() == 1){
+                        ParseObject parseObject = objects.get(0);
+                        MerchantService.addMerchant(receipt.getMerchant(), new MerchantService.AddMerchantCallback() {
+                            @Override
+                            public void done(Merchant newMerchant, Exception e) {
+                                if (e == null){
+                                    parseObject.put(Receipt.KEY_MERCHANT, newMerchant.getParseObject());
+                                    parseObject.put(Receipt.KEY_AMOUNT, receipt.getAmount());
+                                    parseObject.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
+                                    parseObject.put(Receipt.KEY_DATE_TIME_STAMP, receipt.getDateTimestamp());
+                                    if (receipt.getTags() != null){
+                                        List<ParseObject> tagsParseObjects = new ArrayList<>();
+                                        for(Tag tag: receipt.getTags()){
+                                            // if the tag has no id - it means it hasn't been stored in the database yet
+                                            if (tag.getId() == null){
+                                                TagService.addTag(tag, User.getCurrentUser(), new TagService.AddTagCallback() {
+                                                    @Override
+                                                    public void done(Tag newTag, Exception e) {
+                                                        if (e == null){
+                                                            tagsParseObjects.add(newTag.getParseObject());
+                                                        } else {
+                                                            callback.done(null, e);
+                                                        }
+                                                    }
+                                                });
+                                            } else {
+                                                tagsParseObjects.add(tag.getParseObject());
+                                            }
+
+                                        }
+                                        parseObject.put(Receipt.KEY_TAGS, tagsParseObjects);
+                                    } else {
+                                        parseObject.put(Receipt.KEY_TAGS, new ArrayList<>());
+                                    }
+                                    parseObject.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null){
+                                                callback.done(Receipt.fromParseObject(parseObject), null);
+                                            } else {
+                                                callback.done(null, e);
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    callback.done(null, e);
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    callback.done(null, e);
+                }
+            }
+        });
     }
 
 }

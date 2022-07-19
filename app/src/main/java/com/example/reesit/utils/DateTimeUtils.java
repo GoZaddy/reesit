@@ -28,11 +28,44 @@ public class DateTimeUtils {
                 + Integer.toString(cal.get(Calendar.YEAR));
     }
 
+    public static String getDateLongDayLongMonth(String unixTimestamp){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(Long.parseLong(unixTimestamp));
+
+        return cal.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+                + ", "
+                + cal.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+                + " " + Utils.padStringLeft(Integer.toString(cal.get(Calendar.DAY_OF_MONTH)), "0", 2)
+                +", "
+                + Integer.toString(cal.get(Calendar.YEAR));
+    }
+
     // returns the hour of day and minute (in that order) in an int array
     public static int[] getTime(String unixTimestamp){
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(Long.parseLong(unixTimestamp));
         return new int[]{cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE)};
+    }
+
+    public static String getTimeString(String unixTimestamp){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(Long.parseLong(unixTimestamp));
+        String hour;
+        if (cal.get(Calendar.HOUR) == 0){
+            if (Objects.equals(cal.getDisplayName(Calendar.AM_PM, Calendar.LONG, Locale.getDefault()), "AM")){
+                hour = "00";
+            } else {
+                hour = "12";
+            }
+        } else {
+            hour = Utils.padStringLeft(Integer.toString(cal.get(Calendar.HOUR)), "0", 2);
+        }
+
+        return hour
+                +" : "
+                + Utils.padStringLeft(Integer.toString(cal.get(Calendar.MINUTE)), "0", 2)
+                + " "
+                + cal.getDisplayName(Calendar.AM_PM, Calendar.LONG, Locale.getDefault());
     }
     public static String getTime(Calendar cal){
         String hour;

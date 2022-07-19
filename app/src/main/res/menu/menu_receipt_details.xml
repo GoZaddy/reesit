@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/delete_receipt_menu_item"
+        android:title="@string/menu_receipt_details_delete_menu_item_title"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/trash_can_outline"
+    />
+    <item
+        android:id="@+id/share_receipt_menu_item"
+        android:title="@string/menu_receipt_details_share_menu_item_title"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/share_variant_outline"
+    />
+    <item
+        android:id="@+id/download_receipt_menu_item"
+        android:title="@string/menu_receipt_details_download_menu_item_title"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/download_outline"
+    />
+</menu>
