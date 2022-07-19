@@ -1,7 +1,11 @@
 package com.example.reesit.adapters;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,15 +20,20 @@ import com.example.reesit.activities.ReceiptDetailsActivity;
 import com.example.reesit.databinding.ItemReceiptBinding;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
+import com.example.reesit.models.User;
+import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.parceler.Parcels;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHolder> {
     private Context context;
@@ -32,7 +41,8 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
     private FilterByTagCallback callback;
     private ActivityResultLauncher<Intent> updateReceiptLauncher;
 
-    private static final String UPDATED_RECEIPT_RESULT_KEY = "UPDATED_RECEIPT_RESULT_KEY";
+    public static final String TAG = "ReceiptsAdapter";
+
 
     public interface FilterByTagCallback{
         public void onSelectTag(Tag tag);
@@ -54,8 +64,8 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
-        holder.bind(position);
+        Receipt receipt = receipts.get(position);
+        holder.bind(receipt);
     }
 
     @Override
@@ -70,11 +80,13 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
         private TextView referenceNumber;
         private TextView receiptDate;
         private ChipGroup tagsChipGroup;
+        private ItemReceiptBinding binding;
 
 
 
         public ViewHolder(@NonNull ItemReceiptBinding binding) {
             super(binding.getRoot());
+            this.binding = binding;
             cardView = binding.getRoot();
             receiptMerchant = binding.receiptMerchant;
             receiptAmount = binding.receiptAmount;
@@ -83,15 +95,37 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
             tagsChipGroup = binding.tagsChipGroup;
         }
 
-        public void bind(int position){
-            Receipt receipt = receipts.get(position);
+        public void bind(Receipt receipt){
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, ReceiptDetailsActivity.class);
                     intent.putExtra(ReceiptDetailsActivity.RECEIPT_INTENT_KEY, Parcels.wrap(receipt));
-                    intent.putExtra(ReceiptDetailsActivity.RECEIPT_POSITION_INTENT_KEY, position);
+                    intent.putExtra(ReceiptDetailsActivity.RECEIPT_POSITION_INTENT_KEY, getBindingAdapterPosition());
                     updateReceiptLauncher.launch(intent);
+                }
+            });
+
+            cardView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(context);
+                    dialogBuilder.setTitle(context.getString(R.string.delete_receipt_dialog_title));
+                    dialogBuilder.setMessage(context.getString(R.string.delete_receipt_dialog_message));
+                    dialogBuilder.setNegativeButton(R.string.delete_receipt_dialog_negative_button_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    dialogBuilder.setPositiveButton(R.string.delete_receipt_dialog_positive_button_text, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            deleteReceipt(receipt);
+                        }
+                    });
+                    dialogBuilder.show();
+                    return true;
                 }
             });
             receiptMerchant.setText(receipt.getMerchant().getName());
@@ -123,6 +157,28 @@ public class ReceiptsAdapter extends RecyclerView.Adapter<ReceiptsAdapter.ViewHo
             }
 
 
+        }
+
+        private void deleteReceipt(Receipt receipt){
+            ReceiptService.deleteReceipt(receipt.getId(), Objects.requireNonNull(User.getCurrentUser()), new ReceiptService.DeleteReceiptCallback() {
+                @Override
+                public void done(Exception e) {
+                    if (e == null){
+                        receipts.remove(getBindingAdapterPosition());
+                        notifyItemRemoved(getBindingAdapterPosition());
+                        Snackbar.make(binding.getRoot(), R.string.delete_receipt_success_message, BaseTransientBottomBar.LENGTH_SHORT).show();
+                    } else {
+                        Log.e(TAG, "Error encountered while deleting receipt: "+receipt.getId(), e);
+                        Snackbar.make(binding.getRoot(), R.string.delete_receipt_failure_message, BaseTransientBottomBar.LENGTH_SHORT)
+                                .setAction(R.string.delete_receipt_failure_retry_action_text, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        deleteReceipt(receipt);
+                                    }
+                                }).show();
+                    }
+                }
+            });
         }
     }
 }

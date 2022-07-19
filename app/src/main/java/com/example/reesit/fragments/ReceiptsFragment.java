@@ -44,6 +44,8 @@ import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.ReesitCallback;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -242,12 +244,21 @@ public class ReceiptsFragment extends Fragment {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == Activity.RESULT_OK){
                         if (result.getData() != null){
-                            Receipt newReceipt = (Receipt) Parcels.unwrap(result.getData().getParcelableExtra(ReceiptDetailsFragment.UPDATED_RECEIPT_RESULT_KEY));
-                            int position = result.getData().getIntExtra(ReceiptDetailsFragment.RECYCLER_VIEW_RECEIPT_POSITION_RESULT_KEY, -1);
-                            if (position != -1){
-                                receipts.set(position, newReceipt);
-
-                                adapter.notifyItemChanged(position);
+                            ReceiptDetailsFragment.ReceiptUpdateInformation receiptUpdateInformation
+                                    = (ReceiptDetailsFragment.ReceiptUpdateInformation)
+                                    Parcels.unwrap(result.getData().getParcelableExtra(ReceiptDetailsFragment.RECEIPT_UPDATE_INFORMATION_RESULT_KEY));
+                            if (receiptUpdateInformation.getUpdateType() == ReceiptDetailsFragment.ReceiptUpdateInformation.UpdateType.UPDATE){
+                                if (receiptUpdateInformation.getRecyclerViewPosition() != -1){
+                                    receipts.set(receiptUpdateInformation.getRecyclerViewPosition(), receiptUpdateInformation.getNewReceipt());
+                                    adapter.notifyItemChanged(receiptUpdateInformation.getRecyclerViewPosition());
+                                }
+                            } else {
+                                // receipt has been deleted
+                                if (receiptUpdateInformation.getRecyclerViewPosition() != -1){
+                                    receipts.remove(receiptUpdateInformation.getRecyclerViewPosition());
+                                    adapter.notifyItemRemoved(receiptUpdateInformation.getRecyclerViewPosition());
+                                    Snackbar.make(fragmentReceiptsBinding.getRoot(), R.string.delete_receipt_success_message, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                }
                             }
                         }
                     }
