@@ -151,4 +151,5 @@
     <string name="delete_receipt_success_message">Receipt successfully deleted!</string>
     <string name="delete_receipt_failure_message">Error encountered while deleting receipt</string>
     <string name="delete_receipt_failure_retry_action_text">Retry</string>
+    <string name="share_receipt_load_receipt_image_error">An error was encountered while loading the receipt image</string>
 </resources>

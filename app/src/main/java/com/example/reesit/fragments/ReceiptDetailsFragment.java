@@ -4,14 +4,22 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ExifInterface;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
+import android.os.FileUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.reesit.R;
 import com.example.reesit.activities.ReceiptDetailsActivity;
@@ -29,6 +38,7 @@ import com.example.reesit.models.Receipt;
 import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.example.reesit.services.ReceiptService;
+import com.example.reesit.utils.BitmapUtils;
 import com.example.reesit.utils.CurrencyUtils;
 import com.example.reesit.utils.DateTimeUtils;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -37,8 +47,19 @@ import com.google.android.material.snackbar.Snackbar;
 import org.parceler.Parcel;
 import org.parceler.Parcels;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,6 +86,7 @@ public class ReceiptDetailsFragment extends Fragment {
     private Button updateReceipt;
 
     public static final String RECEIPT_UPDATE_INFORMATION_RESULT_KEY = "RECEIPT_UPDATE_INFORMATION_RESULT_KEY";
+    public static final String FILE_PROVIDER_AUTHORITY = "com.example.reesit.fileprovider";
 
 
     // defines how the receipt object was changed
@@ -101,6 +123,11 @@ public class ReceiptDetailsFragment extends Fragment {
         public void setRecyclerViewPosition(int recyclerViewPosition) {
             this.recyclerViewPosition = recyclerViewPosition;
         }
+    }
+
+    // callback interface for downloading images to external-files-dir
+    private interface DownloadImageToExternalFilesDirCallback{
+        void done(Uri localImageUri, Exception e);
     }
 
     public ReceiptDetailsFragment() {
@@ -143,7 +170,7 @@ public class ReceiptDetailsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = FragmentReceiptDetailsBinding.inflate(inflater, container, false);
@@ -180,6 +207,44 @@ public class ReceiptDetailsFragment extends Fragment {
                 dialogBuilder.show();
                 return true;
             case R.id.share_receipt_menu_item:
+                item.setEnabled(false);
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        downloadImageToExternalFilesDir(receipt.getReceiptImage(), "receipt_image_"+receipt.getId(), new DownloadImageToExternalFilesDirCallback() {
+                            @Override
+                            public void done(Uri localImageUri, Exception e) {
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        item.setEnabled(true);
+                                    }
+                                });
+                                if (e == null){
+                                    Intent shareIntent = new Intent();
+                                    shareIntent.setAction(Intent.ACTION_SEND);
+                                    shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                    shareIntent.putExtra(Intent.EXTRA_STREAM, localImageUri);
+
+                                    shareIntent.setType("image/*");
+                                    startActivity(Intent.createChooser(shareIntent, null));
+                                } else {
+                                    requireActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(requireContext(), R.string.share_receipt_load_receipt_image_error, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    Log.e(TAG, "Error downloading receipt image to external-files-dir", e);
+                                }
+                                executorService.shutdownNow();
+                            }
+                        });
+                    }
+                });
+
                 return true;
             case R.id.download_receipt_menu_item:
                 return true;
@@ -275,4 +340,51 @@ public class ReceiptDetailsFragment extends Fragment {
             }
         });
     }
+
+
+    private void downloadImageToExternalFilesDir(String imageUrl, String filename, DownloadImageToExternalFilesDirCallback callback){
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Uri> future = executorService.submit(new Callable<Uri>() {
+            @Override
+            public Uri call() throws Exception {
+                String[] parts = imageUrl.split("\\.");
+                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename + "." + parts[parts.length-1]);
+                if (!file.exists()) {
+                    URL url = new URL(imageUrl);
+
+                    // write url content to temporary file
+                    File tempFile = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),  "receipt_image_temp." + parts[parts.length-1]);
+                    FileOutputStream tempOut = new FileOutputStream(tempFile);
+                    InputStream urlInputStream = url.openConnection().getInputStream();
+                    FileUtils.copy(urlInputStream, tempOut);
+                    tempOut.close();
+                    urlInputStream.close();
+
+                    Bitmap origBitmap = BitmapFactory.decodeFile(tempFile.getAbsolutePath());
+
+                    // correct bitmap orientation using exif data from tempFile
+                    ExifInterface exif = new ExifInterface(tempFile);
+                    Bitmap finalBitmap = BitmapUtils.rotateBitmapWithExif(origBitmap, exif);
+
+                    // compress bitmap
+                    FileOutputStream out = new FileOutputStream(file);
+                    finalBitmap.compress(Bitmap.CompressFormat.JPEG, 80, out);
+                    out.close();
+
+                    if (!tempFile.delete()){
+                        Log.e(TAG, "could not delete tempFile");
+                    }
+                }
+                return FileProvider.getUriForFile(requireContext(), FILE_PROVIDER_AUTHORITY, file);
+            }
+        });
+
+        try{
+            callback.done(future.get(), null);
+        } catch (Exception e) {
+            Log.e(TAG, "error", e);
+            callback.done(null, e);
+        }
+    }
+
 }
