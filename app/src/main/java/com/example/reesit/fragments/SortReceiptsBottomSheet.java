@@ -129,9 +129,7 @@ public class SortReceiptsBottomSheet extends BottomSheetDialogFragment {
             RadioButton radioButton = new RadioButton(getContext());
             radioButton.setId(i);
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            if (getContext() != null){
-                params.setMargins(0, Utils.convertDPToPixels(getContext(), 16), 0, 0);
-            }
+            params.setMargins(0, getResources().getDimensionPixelOffset(R.dimen.sort_bottom_sheet_sort_option_radio_button_margin_top), 0, 0);
 
             radioButton.setLayoutParams(params);
             radioButton.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
