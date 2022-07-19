@@ -228,26 +228,44 @@ public class ReceiptDetailsFragment extends Fragment {
         }
         else if (itemId == R.id.share_receipt_menu_item) {
             item.setEnabled(false);
-
-            downloadImageToExternalFilesDir(receipt.getReceiptImage(), getReceiptImageFilename(receipt), new DownloadImageToExternalFilesDirCallback() {
+            
+            ExecutorService executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(new Runnable() {
                 @Override
-                public void done(Uri localImageUri, Exception e) {
-                    item.setEnabled(true);
-                    if (e == null) {
-                        Intent shareIntent = new Intent();
-                        shareIntent.setAction(Intent.ACTION_SEND);
-                        shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                        shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, localImageUri);
+                public void run() {
+                    downloadImageToExternalFilesDir(receipt.getReceiptImage(), "receipt_image_"+receipt.getId(), new DownloadImageToExternalFilesDirCallback() {
+                        @Override
+                        public void done(Uri localImageUri, Exception e) {
+                            requireActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    item.setEnabled(true);
+                                }
+                            });
+                            if (e == null){
+                                Intent shareIntent = new Intent();
+                                shareIntent.setAction(Intent.ACTION_SEND);
+                                shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                                shareIntent.putExtra(Intent.EXTRA_STREAM, localImageUri);
 
-                        shareIntent.setType("image/*");
-                        startActivity(Intent.createChooser(shareIntent, null));
-                    } else {
-                        Toast.makeText(requireContext(), R.string.share_receipt_load_receipt_image_error, Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Error downloading receipt image to external-files-dir", e);
-                    }
+                                shareIntent.setType("image/*");
+                                startActivity(Intent.createChooser(shareIntent, null));
+                            } else {
+                                requireActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(requireContext(), R.string.share_receipt_load_receipt_image_error, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                Log.e(TAG, "Error downloading receipt image to external-files-dir", e);
+                            }
+                            executorService.shutdownNow();
+                        }
+                    });
                 }
             });
+
             return true;
         }
         else if (itemId == R.id.download_receipt_menu_item) {
@@ -282,8 +300,6 @@ public class ReceiptDetailsFragment extends Fragment {
                     });
                 }
             });
-
-
             return true;
         }
         return false;
