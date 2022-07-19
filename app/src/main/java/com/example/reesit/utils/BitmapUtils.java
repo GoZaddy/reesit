@@ -28,8 +28,6 @@ public class BitmapUtils {
     public static Bitmap rotateBitmapWithExif(@NonNull Bitmap sourceBitmap, @NonNull ExifInterface exifInterface){
         String orientString = exifInterface.getAttribute(ExifInterface.TAG_ORIENTATION);
 
-        System.out.println("orientString: "+orientString);
-
         int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
         int rotationAngle = 0;
         if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
