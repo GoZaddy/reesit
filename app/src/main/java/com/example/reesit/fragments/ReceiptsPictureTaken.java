@@ -257,7 +257,6 @@ public class ReceiptsPictureTaken extends Fragment {
 
     private void renderImageOnPreview(Context context, UriAndSource photoURI){
         File file = new File(FileUtils.getImagePathFromURI(context, photoURI, TAG));
-        System.out.println("selected photo path: "+file.getAbsolutePath());
         Bitmap bitmap = BitmapUtils.rotateBitmapOrientation(file.getAbsolutePath());
         receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
     }
