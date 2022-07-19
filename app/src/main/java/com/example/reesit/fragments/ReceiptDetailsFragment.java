@@ -273,9 +273,9 @@ public class ReceiptDetailsFragment extends Fragment {
                                                 Snackbar.make(binding.getRoot(), R.string.download_receipt_image_error, BaseTransientBottomBar.LENGTH_SHORT).show();
                                                 Log.e(TAG, "Error downloading receipt image", e);
                                             }
+                                            executorService.shutdownNow();
                                         }
                                     });
-//                            executorService.shutdown();
                                 }
                             });
                         }
