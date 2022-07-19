@@ -45,7 +45,7 @@
     <string name="receipt_picture_taken_process_receipt_error_message">Error processing receipt. Please try again!</string>
     <string name="settings_page_temp_title">Settings page</string>
     <string name="media_access_permissions_message">This app needs access to your phone\'s media to use receipt pictures from your gallery. Please try again and grant permissions</string>
-    <string name="media_access_permissions_dialog_title">Media access permissions</string>
+    <string name="media_access_permissions_dialog_title">Storage permissions</string>
     <string name="media_access_permissions_dialog_cancel_text">Cancel</string>
     <string name="media_access_permissions_dialog_grant_permission_button">Grant permission</string>
 
@@ -132,7 +132,7 @@
     <string name="add_new_category_error_message_format">An error occurred while creating new category: %1$s</string>
     <string name="add_new_category_success_message">New category \'%1$s\' successfully created!</string>
     <string name="add_new_category_dialog_confirm_negative_button_text">Cancel</string>
-    <string name="add_new_category_loading_text">Creating category...</string>
+    <string name="add_new_category_loading_text">Creating category…</string>
     <string name="add_category_category_name_title">Category name:</string>
     <string name="drawer_all_receipts_menu_item_title">All receipts</string>
     <string name="menu_receipt_details_delete_menu_item_title">Delete</string>
@@ -143,7 +143,7 @@
     <string name="receipt_details_info_update_receipt_button_text">Update receipt</string>
     <string name="update_receipt_toolbar_title">Update receipt</string>
     <string name="receipt_creation_final_update_button_text">Update receipt</string>
-    <string name="receipt_creation_final_update_receipt_error_message">Erro encountered while updating receipt. Please try agin</string>
+    <string name="receipt_creation_final_update_receipt_error_message">Error encountered while updating receipt. Please try again</string>
     <string name="delete_receipt_dialog_title">Delete receipt?</string>
     <string name="delete_receipt_dialog_message">Are you sure you want to delete this receipt?</string>
     <string name="delete_receipt_dialog_negative_button_text">Cancel</string>
@@ -152,4 +152,11 @@
     <string name="delete_receipt_failure_message">Error encountered while deleting receipt</string>
     <string name="delete_receipt_failure_retry_action_text">Retry</string>
     <string name="share_receipt_load_receipt_image_error">An error was encountered while loading the receipt image</string>
+    <string name="download_receipt_loading_message">Downloading receipt…</string>
+    <string name="download_receipt_image_error">Error encountered while downloading receipt</string>
+    <string name="download_receipt_image_successful">Receipt downloaded successfully!</string>
+    <string name="write_store_permissions_message">This app needs permission to write to your device\'s storage. Please grant permissions and try again.</string>
+    <string name="write_storage_permissions_dialog_title">Storage permissions</string>
+    <string name="write_storage_permissions_dialog_cancel_text">Cancel</string>
+    <string name="write_storage_permissions_dialog_grant_permission_button">Grant permission</string>
 </resources>

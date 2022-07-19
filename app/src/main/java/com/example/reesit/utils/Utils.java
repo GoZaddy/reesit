@@ -34,4 +34,9 @@ public class Utils {
         String stringVal = input.toString();
         return stringVal.substring(0, stringVal.length()-2)+"."+stringVal.substring(stringVal.length()-2);
     }
+
+    public static String getFileExtensionFromURL(String url){
+        String[] parts = url.split("\\.");
+        return parts[parts.length-1];
+    }
 }
