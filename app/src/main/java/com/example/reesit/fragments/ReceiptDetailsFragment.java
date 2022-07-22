@@ -436,7 +436,7 @@ public class ReceiptDetailsFragment extends Fragment {
         Future<Uri> future = executorService.submit(new Callable<Uri>() {
             @Override
             public Uri call() throws Exception {
-                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename);
+                File file = new File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename+"."+Utils.getFileExtensionFromURL(imageUrl));
                 if (!file.exists()) {
                     URL url = new URL(imageUrl);
 
