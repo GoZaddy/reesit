@@ -62,7 +62,8 @@ public class OnboardingActivity extends AppCompatActivity {
         }
     }
 
-    private static List<OnboardingPageInfo> onboardingInfo = new ArrayList<>();
+    private List<OnboardingPageInfo> onboardingInfo = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,7 +137,7 @@ public class OnboardingActivity extends AppCompatActivity {
     }
 
 
-    private static class OnboardingPagerAdapter extends FragmentStateAdapter {
+    private class OnboardingPagerAdapter extends FragmentStateAdapter {
         public OnboardingPagerAdapter(FragmentActivity fa) {
             super(fa);
         }
