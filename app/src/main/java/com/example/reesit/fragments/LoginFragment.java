@@ -93,6 +93,7 @@ public class LoginFragment extends Fragment {
                             Intent intent = new Intent(getContext(), MainActivity.class);
                             unsetFormStateLoading();
                             startActivity(intent);
+                            requireActivity().finish();
                         } else {
                             Toast.makeText(getContext(), getString(R.string.login_fragment_error_occurred_during_log_in, e.getMessage()), Toast.LENGTH_SHORT).show();
                             unsetFormStateLoading();
