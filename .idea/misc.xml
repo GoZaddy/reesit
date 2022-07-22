@@ -5,25 +5,33 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.21672661870503598" />
         <entry key="app/src/main/res/drawable/arrow_left.xml" value="0.225" />
+        <entry key="app/src/main/res/drawable/circle.xml" value="0.2575" />
+        <entry key="app/src/main/res/drawable/default_dot.xml" value="0.165" />
         <entry key="app/src/main/res/drawable/download_outline.xml" value="0.225" />
         <entry key="app/src/main/res/drawable/ic_camera.xml" value="0.3085" />
         <entry key="app/src/main/res/drawable/ic_gallery.xml" value="0.3085" />
+        <entry key="app/src/main/res/drawable/selected_dot.xml" value="0.165" />
         <entry key="app/src/main/res/drawable/share_variant_outline.xml" value="0.225" />
         <entry key="app/src/main/res/drawable/toolbar.xml" value="0.202" />
         <entry key="app/src/main/res/drawable/trash_can_outline.xml" value="0.225" />
         <entry key="app/src/main/res/layout/activity_authentication.xml" value="0.17457114026236126" />
         <entry key="app/src/main/res/layout/activity_filter.xml" value="0.17457114026236126" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.23233695652173914" />
+        <entry key="app/src/main/res/layout/activity_onboarding.xml" value="0.35995779797720506" />
         <entry key="app/src/main/res/layout/activity_receipt_creation.xml" value="0.22554347826086957" />
         <entry key="app/src/main/res/layout/activity_receipt_details.xml" value="0.3220580177037675" />
         <entry key="app/src/main/res/layout/activity_receipt_picture.xml" value="0.27415771484375007" />
         <entry key="app/src/main/res/layout/activity_settings.xml" value="0.23233695652173914" />
+        <entry key="app/src/main/res/layout/circle_indicator.xml" value="0.17406659939455096" />
+        <entry key="app/src/main/res/layout/default_dot.xml" value="0.19166666666666668" />
         <entry key="app/src/main/res/layout/dialog_create_category_add_name.xml" value="0.31454624784165536" />
         <entry key="app/src/main/res/layout/dialog_create_category_confirm.xml" value="0.4220184768455616" />
+        <entry key="app/src/main/res/layout/dot.xml" value="0.190625" />
         <entry key="app/src/main/res/layout/fragment_filter_receipts.xml" value="0.3174285888671875" />
         <entry key="app/src/main/res/layout/fragment_item_list_dialog_list_dialog.xml" value="0.26313405797101447" />
         <entry key="app/src/main/res/layout/fragment_item_list_dialog_list_dialog_item.xml" value="0.26313405797101447" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.29270163342642375" />
+        <entry key="app/src/main/res/layout/fragment_onboarding_page.xml" value="0.3277495232181273" />
         <entry key="app/src/main/res/layout/fragment_receipt_creation_final.xml" value="0.38841094970703127" />
         <entry key="app/src/main/res/layout/fragment_receipt_details.xml" value="0.36222686767578127" />
         <entry key="app/src/main/res/layout/fragment_receipts.xml" value="0.37738342285156257" />
@@ -34,6 +42,7 @@
         <entry key="app/src/main/res/layout/item_receipt.xml" value="0.3682424130647079" />
         <entry key="app/src/main/res/layout/modal_filter_receipts_bottom_sheet.xml" value="0.39891815185546875" />
         <entry key="app/src/main/res/layout/modal_sort_receipts_bottom_sheet.xml" value="0.34479166666666666" />
+        <entry key="app/src/main/res/layout/sample_my_view.xml" value="0.15260416666666668" />
         <entry key="app/src/main/res/layout/toolbar.xml" value="0.23233695652173914" />
         <entry key="app/src/main/res/menu/menu_bottom_navigation.xml" value="0.359375" />
         <entry key="app/src/main/res/menu/menu_drawer_list_receipts.xml" value="0.4331253051757813" />

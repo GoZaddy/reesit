@@ -27,6 +27,15 @@
         android:theme="@style/Theme.Reesit"
         tools:targetApi="31">
         <activity
+            android:name=".activities.OnboardingActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".activities.ReceiptDetailsActivity"
             android:exported="false" />
         <activity
@@ -45,12 +54,8 @@
 
         <activity
             android:name=".activities.AuthenticationActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:exported="false">
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".activities.SettingsActivity"
