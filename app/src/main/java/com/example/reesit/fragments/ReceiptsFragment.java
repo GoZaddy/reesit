@@ -208,6 +208,7 @@ public class ReceiptsFragment extends Fragment {
 
         filterButton = fragmentReceiptsBinding.filterButton;
         if (filterSource == FilterSource.RAW_FILTER){
+            filterButton.setEnabled(true);
             filterButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -372,7 +373,11 @@ public class ReceiptsFragment extends Fragment {
     private void setPageStateNotLoading(){
         pageProgressBar.setVisibility(View.INVISIBLE);
         sortButton.setEnabled(true);
-        filterButton.setEnabled(true);
+        if (filterSource == FilterSource.RAW_FILTER){
+            filterButton.setEnabled(true);
+        } else {
+            filterButton.setEnabled(false);
+        }
     }
 
     private void fetchReceipts(Boolean overwrite){
