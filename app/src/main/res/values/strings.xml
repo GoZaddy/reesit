@@ -165,4 +165,5 @@
     <string name="onboarding_2_text">Goodbye  to receipt-infested drawers. Scan your receipt and download them later!</string>
     <string name="onboarding_3_text">No more digging through receipts.\nSort, filter, categorize and search through hundreds of receipts in seconds</string>
     <string name="onboarding_gete_started_button_text">Get started</string>
+    <string name="fragment_receipts_load_more_button_text">Load more</string>
 </resources>
