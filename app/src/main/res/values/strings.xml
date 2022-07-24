@@ -83,7 +83,7 @@
     <string name="filter_tostring_amount_less_format"><![CDATA[Amount: <= $ %1$s]]></string>
     <string name="filter_tostring_tags_format">Tags: %1$s</string>
     <string name="filter_tostring_merchants_format">Merchants: %1$s</string>
-    <string name="filter_tostring_date_format">After: %1$s, Before: %2$s</string>
+    <string name="filter_tostring_date_format">After: %1$s\nBefore: %2$s</string>
     <string name="filter_tostring_date_after_format">After: %1$s</string>
     <string name="filter_tostring_date_before_format">Before: %1$s</string>
     <string name="receipts_no_receipts_message">No receipts!</string>

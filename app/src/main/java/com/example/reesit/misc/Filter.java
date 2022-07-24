@@ -48,12 +48,7 @@ public class Filter {
         }
     }
 
-    public Filter(){
-
-    }
-
-
-
+    public Filter(){}
 
     public ParseQuery<ParseObject> getParseQuery() throws FilterGenerateQueryException {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
@@ -141,14 +136,14 @@ public class Filter {
         String dateLine = "";
         if (beforeDateTimestamp != null && afterDateTimestamp != null){
             dateLine = context.getString(R.string.filter_tostring_date_format,
-                    DateTimeUtils.getDateAndTimeReceiptCard(afterDateTimestamp),
-                    DateTimeUtils.getDateAndTimeReceiptCard(beforeDateTimestamp));
+                    DateTimeUtils.getDateWithLongMonth(afterDateTimestamp),
+                    DateTimeUtils.getDateWithLongMonth(beforeDateTimestamp));
         } else if (beforeDateTimestamp != null){
             dateLine = context.getString(R.string.filter_tostring_date_before_format,
-                    DateTimeUtils.getDateAndTimeReceiptCard(beforeDateTimestamp));
+                    DateTimeUtils.getDateWithLongMonth(beforeDateTimestamp));
         } else if (afterDateTimestamp != null){
             dateLine = context.getString(R.string.filter_tostring_date_after_format,
-                    DateTimeUtils.getDateAndTimeReceiptCard(afterDateTimestamp));
+                    DateTimeUtils.getDateWithLongMonth(afterDateTimestamp));
         }
 
         result += dateLine;
