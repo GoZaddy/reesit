@@ -46,6 +46,9 @@ public class ReceiptDetailsActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Sets toolbar title to null and shows a back button on the toolbar. Adds no functionality for the back button
+     */
     public void enableBackButton(){
         Objects.requireNonNull(getSupportActionBar()).setTitle(null);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
