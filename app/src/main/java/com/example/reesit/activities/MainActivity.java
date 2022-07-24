@@ -3,7 +3,6 @@ package com.example.reesit.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.ActionMenuItem;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -27,13 +26,10 @@ import com.example.reesit.models.ReceiptCategory;
 import com.example.reesit.models.User;
 import com.example.reesit.services.CategoryService;
 import com.example.reesit.services.UserService;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.parse.LogOutCallback;
 import com.parse.ParseException;
-import com.parse.ParseUser;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final Fragment receiptsFragment = ReceiptsFragment.newInstance(new Filter());
-        fragmentManager.beginTransaction().replace(R.id.content, receiptsFragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.main_activity_fragment_container, receiptsFragment).commit();
 
         toolbar = activityMainBinding.toolbar.toolbarElement;
         setSupportActionBar(toolbar);
@@ -102,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         allReceiptsMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(new Filter())).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(new Filter())).commit();
                 drawer.closeDrawer(GravityCompat.START);
                 return false;
             }
@@ -123,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                             categoryItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                 @Override
                                 public boolean onMenuItemClick(MenuItem item) {
-                                    getSupportFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(category)).commit();
+                                    getSupportFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(category)).commit();
                                     drawer.closeDrawer(GravityCompat.START);
                                     return false;
                                 }
@@ -168,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 categoryItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        getSupportFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(category)).commit();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(category)).commit();
                         drawer.closeDrawer(GravityCompat.START);
                         return false;
                     }
@@ -185,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                     categoryItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            getSupportFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(category)).commit();
+                            getSupportFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(category)).commit();
                             drawer.closeDrawer(GravityCompat.START);
                             return false;
                         }
