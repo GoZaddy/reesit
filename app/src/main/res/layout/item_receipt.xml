@@ -21,18 +21,19 @@
             android:id="@+id/receipt_merchant"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="CVS Pharmacy" />
+            tools:text="CVS Pharmacy"
+            android:textColor="?android:textColorPrimary"
+            />
 
         <TextView
             android:id="@+id/receipt_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/black"
+            android:textColor="?android:textColorPrimary"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/receipt_merchant"
             app:layout_constraintEnd_toEndOf="parent"
@@ -47,7 +48,8 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@+id/receipt_merchant"
             app:layout_constraintTop_toBottomOf="@+id/receipt_merchant"
-            tools:text="Reference #: 08678b" />
+            tools:text="Reference #: 08678b"
+            android:textColor="?android:textColorSecondary"/>
 
         <TextView
             android:id="@+id/receipt_date"
@@ -59,7 +61,8 @@
             app:layout_constraintStart_toStartOf="@+id/receipt_ref"
             app:layout_constraintTop_toBottomOf="@+id/receipt_ref"
             app:layout_constraintVertical_bias="0.0"
-            tools:text="Mon, June 26. 1:13 PM" />
+            tools:text="Mon, June 26. 1:13 PM"
+            android:textColor="?android:textColorSecondary"/>
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/tags_chip_group"

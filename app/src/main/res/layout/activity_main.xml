@@ -25,7 +25,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <androidx.fragment.app.FragmentContainerView
+            <FrameLayout
                 android:id="@+id/main_activity_fragment_container"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -35,16 +35,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-            </androidx.fragment.app.FragmentContainerView>
+            </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@android:color/white"
-        app:menu="@menu/menu_drawer_list_receipts"
-        />
+        android:background="?android:colorBackground"
+        app:menu="@menu/menu_drawer_list_receipts" />
 </androidx.drawerlayout.widget.DrawerLayout>

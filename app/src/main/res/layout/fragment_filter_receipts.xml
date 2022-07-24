@@ -135,32 +135,32 @@ android:padding="0dp">
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:text="@string/filter_modal_amount_title"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-<TextView
-    android:id="@+id/textView14"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:labelFor="@id/greater_than_edittext"
-    android:text="@string/filter_modal_greater_than_label"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="@+id/textView13"
-    app:layout_constraintTop_toBottomOf="@+id/textView13" />
+    <TextView
+        android:id="@+id/textView14"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:labelFor="@id/greater_than_edittext"
+        android:text="@string/filter_modal_greater_than_label"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/textView13"
+        app:layout_constraintTop_toBottomOf="@+id/textView13" />
 
-<TextView
-    android:id="@+id/textView16"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:labelFor="@id/less_than_edittext"
-    android:text="@string/filter_modal_less_than_label"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="@+id/textView14"
-    app:layout_constraintTop_toBottomOf="@+id/greater_than_edittext" />
+    <TextView
+        android:id="@+id/textView16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:labelFor="@id/less_than_edittext"
+        android:text="@string/filter_modal_less_than_label"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/textView14"
+        app:layout_constraintTop_toBottomOf="@+id/greater_than_edittext" />
 
 <View
     android:id="@+id/divider"
@@ -192,16 +192,16 @@ android:padding="0dp">
     </com.google.android.material.textfield.TextInputLayout>
 
 
-<TextView
-    android:id="@+id/textView17"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:text="@string/filter_modal_merchants_title"
-    android:textColor="@color/black"
-    android:textStyle="bold"
-    app:layout_constraintStart_toStartOf="@+id/textView13"
-    app:layout_constraintTop_toBottomOf="@+id/divider" />
+    <TextView
+        android:id="@+id/textView17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/filter_modal_merchants_title"
+        android:textColor="?android:textColorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/textView13"
+        app:layout_constraintTop_toBottomOf="@+id/divider" />
 
 <com.google.android.material.textfield.TextInputLayout
     android:id="@+id/merchants_edit_text"
@@ -224,57 +224,57 @@ android:padding="0dp">
 </com.google.android.material.textfield.TextInputLayout>
 
 
-<TextView
-    android:id="@+id/textView18"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:text="@string/filter_modal_date_title"
-    android:textColor="@color/black"
-    android:textStyle="bold"
-    app:layout_constraintStart_toStartOf="@+id/textView17"
-    app:layout_constraintTop_toBottomOf="@+id/divider4" />
+    <TextView
+        android:id="@+id/textView18"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/filter_modal_date_title"
+        android:textColor="?android:textColorPrimary"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/textView17"
+        app:layout_constraintTop_toBottomOf="@+id/divider4" />
 
-<TextView
-    android:id="@+id/textView19"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:text="@string/filter_modal_date_after_label"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="@+id/textView18"
-    app:layout_constraintTop_toBottomOf="@+id/textView18" />
+    <TextView
+        android:id="@+id/textView19"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/filter_modal_date_after_label"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/textView18"
+        app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
-<TextView
-    android:id="@+id/textView20"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="24dp"
-    android:text="@string/filter_modal_date_before_label"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="@+id/textView19"
-    app:layout_constraintTop_toBottomOf="@+id/after_date_button" />
+    <TextView
+        android:id="@+id/textView20"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/filter_modal_date_before_label"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/textView19"
+        app:layout_constraintTop_toBottomOf="@+id/after_date_button" />
 
-<TextView
-    android:id="@+id/after_date_text_view"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="32dp"
-    android:textColor="@color/black"
-    app:layout_constraintBottom_toBottomOf="@+id/textView19"
-    app:layout_constraintStart_toEndOf="@+id/textView19"
-    app:layout_constraintTop_toTopOf="@+id/textView19"
-    tools:text="@string/filter_modal_no_date_selected_text" />
+    <TextView
+        android:id="@+id/after_date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/textView19"
+        app:layout_constraintStart_toEndOf="@+id/textView19"
+        app:layout_constraintTop_toTopOf="@+id/textView19"
+        tools:text="@string/filter_modal_no_date_selected_text" />
 
-<TextView
-    android:id="@+id/before_date_text_view"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textColor="@color/black"
-    app:layout_constraintBottom_toBottomOf="@+id/textView20"
-    app:layout_constraintStart_toStartOf="@+id/after_date_text_view"
-    app:layout_constraintTop_toTopOf="@+id/textView20"
-    tools:text="Dec 10, 2022" />
+    <TextView
+        android:id="@+id/before_date_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/textView20"
+        app:layout_constraintStart_toStartOf="@+id/after_date_text_view"
+        app:layout_constraintTop_toTopOf="@+id/textView20"
+        tools:text="Dec 10, 2022" />
 
 <ImageButton
     android:id="@+id/after_date_button"
@@ -339,7 +339,7 @@ android:padding="0dp">
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="@string/filter_fragment_receipt_tag_section_title"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/textView17"
         app:layout_constraintTop_toBottomOf="@+id/divider2" />
