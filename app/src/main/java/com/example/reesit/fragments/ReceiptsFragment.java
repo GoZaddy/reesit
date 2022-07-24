@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -35,21 +36,17 @@ import com.example.reesit.databinding.FragmentReceiptsBinding;
 import com.example.reesit.misc.Debouncer;
 import com.example.reesit.misc.Filter;
 import com.example.reesit.misc.SortReceiptOption;
-import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
 import com.example.reesit.models.ReceiptCategory;
 import com.example.reesit.models.Tag;
 import com.example.reesit.models.User;
 import com.example.reesit.services.ReceiptService;
 import com.example.reesit.utils.ReesitCallback;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
-import org.parceler.Parcel;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
@@ -143,7 +140,15 @@ public class ReceiptsFragment extends Fragment {
                 filter = ((ReceiptCategory) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1))).getFilter();
             }
 
-
+            if ((requireActivity() instanceof MainActivity) && (filterSource == FilterSource.CATEGORY)){
+                ((MainActivity) requireActivity()).getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        // show all receipts
+                        getParentFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(new Filter())).commit();
+                    }
+                });
+            }
         }
     }
 
@@ -271,7 +276,7 @@ public class ReceiptsFragment extends Fragment {
             public void onSelectTag(Tag tag) {
                 Filter tagFilter = new Filter();
                 tagFilter.setTag(tag);
-                getParentFragmentManager().beginTransaction().replace(R.id.content, ReceiptsFragment.newInstance(tagFilter)).commit();
+                getParentFragmentManager().beginTransaction().replace(R.id.main_activity_fragment_container, ReceiptsFragment.newInstance(tagFilter)).commit();
             }
         }, updateReceiptLauncher);
         recyclerView.setAdapter(adapter);
