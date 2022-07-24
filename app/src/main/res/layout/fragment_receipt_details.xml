@@ -7,11 +7,9 @@
     tools:context=".fragments.ReceiptDetailsFragment">
 
 
-
-
     <TextView
         android:id="@+id/tags_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:lines="3"
@@ -27,7 +25,7 @@
 
     <TextView
         android:id="@+id/textView31"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Tags:"
@@ -39,7 +37,7 @@
 
     <TextView
         android:id="@+id/ref_number_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:textColor="@color/black"
@@ -54,7 +52,7 @@
 
     <TextView
         android:id="@+id/textView30"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Reference number:"
@@ -66,7 +64,7 @@
 
     <TextView
         android:id="@+id/textView26"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="Date:"
@@ -94,7 +92,7 @@
 
     <TextView
         android:id="@+id/textView24"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
@@ -107,7 +105,7 @@
 
     <TextView
         android:id="@+id/amount_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="32dp"
@@ -123,7 +121,7 @@
 
     <TextView
         android:id="@+id/date_time_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:lines="2"
@@ -131,6 +129,7 @@
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView26"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/amount_text_view"
         app:layout_constraintTop_toTopOf="@+id/textView26"
         tools:text="Saturday, June 01, 2022.\n04:11PM" />
