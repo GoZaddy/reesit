@@ -81,8 +81,13 @@ public class ReceiptTextParser {
                                         }
 
                                         receipt.setReceiptText(receiptText.getText());
-                                        Merchant merchant = new Merchant((receiptText.getTextBlocks().get(0)).getLines().get(0).getText());
-                                        receipt.setMerchant(merchant);
+                                        try {
+                                            Merchant merchant = new Merchant((receiptText.getTextBlocks().get(0)).getLines().get(0).getText());
+                                            receipt.setMerchant(merchant);
+                                        } catch (IndexOutOfBoundsException e){
+                                            receipt.setMerchant(null);
+                                        }
+
 
 
                                         for (int blockIndex = 0; blockIndex < receiptText.getTextBlocks().size(); ++blockIndex) {
