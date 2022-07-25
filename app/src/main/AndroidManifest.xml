@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.reesit">
+    package="com.faruq.reesit">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -43,8 +43,8 @@
             android:exported="false" />
 
         <provider
-            android:name="com.example.reesit.providers.ReesitFileProvider"
-            android:authorities="com.example.reesit.fileprovider"
+            android:name="com.faruq.reesit.providers.ReesitFileProvider"
+            android:authorities="com.faruq.reesit.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

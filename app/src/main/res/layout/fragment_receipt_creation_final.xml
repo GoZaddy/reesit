@@ -11,9 +11,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".fragments.ReceiptCreationFinalFragment">
-
-
+    >
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/tags_suggestions_chip_group"
             android:layout_width="0dp"
