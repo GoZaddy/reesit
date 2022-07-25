@@ -1,13 +1,17 @@
 package com.example.reesit.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class BitmapUtils {
     public static Bitmap scaleToFitWidth(Bitmap b, int width)
@@ -23,6 +27,17 @@ public class BitmapUtils {
     {
         float factor = height / (float) b.getHeight();
         return Bitmap.createScaledBitmap(b, (int) (b.getWidth() * factor), height, true);
+    }
+
+    public static Bitmap getBitmapFromURI(Context context, Uri uri) throws IOException {
+        InputStream inputStream = new BufferedInputStream(context.getContentResolver().openInputStream(uri));
+        inputStream.mark(inputStream.available());
+
+        ExifInterface exifInterface = new ExifInterface(inputStream);
+        inputStream.reset();
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+        return BitmapUtils.rotateBitmapWithExif(bitmap, exifInterface);
     }
 
     public static Bitmap rotateBitmapWithExif(@NonNull Bitmap sourceBitmap, @NonNull ExifInterface exifInterface){

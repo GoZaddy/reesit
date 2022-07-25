@@ -1,10 +1,6 @@
 package com.example.reesit.fragments;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -14,8 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +23,6 @@ import com.example.reesit.utils.ReesitCallback;
 import com.example.reesit.utils.CameraUtils;
 import com.example.reesit.utils.RuntimePermissions;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -111,12 +102,7 @@ public class ReceiptsCreationNoPicture extends Fragment {
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null){
-                    String host = result.getHost();
-                    if (!host.startsWith("com.android.providers") && !Objects.equals(host, "media")){
-                        Toast.makeText(requireContext(), R.string.receipt_creation_no_picture_unsupported_media_provider_error, Toast.LENGTH_LONG).show();
-                    } else {
-                        getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
-                    }
+                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
                 }
             }
         });

@@ -190,13 +190,8 @@ public class ReceiptsPictureTaken extends Fragment {
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null){
-                    String host = result.getHost();
-                    if (!host.startsWith("com.android.providers") && !Objects.equals(host, "media")){
-                        Toast.makeText(requireContext(), R.string.receipt_creation_no_picture_unsupported_media_provider_error, Toast.LENGTH_LONG).show();
-                    } else {
-                        takenPictureURI = UriAndSource.fromGallery(result);
-                        renderImageOnPreview(getContext(), takenPictureURI);
-                    }
+                    takenPictureURI = UriAndSource.fromGallery(result);
+                    renderImageOnPreview(getContext(), takenPictureURI);
                 }
             }
         });
@@ -248,9 +243,13 @@ public class ReceiptsPictureTaken extends Fragment {
 
 
     private void renderImageOnPreview(Context context, UriAndSource photoURI){
-        File file = new File(FileUtils.getImagePathFromURI(context, photoURI, TAG));
-        Bitmap bitmap = BitmapUtils.rotateBitmapOrientation(file.getAbsolutePath());
-        receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
+        try{
+            Bitmap bitmap = BitmapUtils.getBitmapFromURI(context, photoURI.getUri());
+            receiptImageView.setImageBitmap(BitmapUtils.scaleToFitHeight(bitmap, 800));
+        } catch (Exception e){
+            Log.e(TAG, "Error getting receipt bitmap from uri", e);
+            Toast.makeText(context, "Error showing receipt", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void setPageStateLoading(){
