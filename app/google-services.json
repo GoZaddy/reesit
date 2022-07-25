@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "774252759419",
+    "firebase_url": "https://fir-auth-article.firebaseio.com",
+    "project_id": "fir-auth-article",
+    "storage_bucket": "fir-auth-article.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:774252759419:android:d196affe6ef99e952a15de",
+        "android_client_info": {
+          "package_name": "com.faruq.reesit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "774252759419-q6bnke0l28piitsgfn0bs2mngucvavtr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCN261-7vq72I_G6q6u5gX9_C6iwQAUjh4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "774252759419-q6bnke0l28piitsgfn0bs2mngucvavtr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
