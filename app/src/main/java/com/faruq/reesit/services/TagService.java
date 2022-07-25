@@ -94,7 +94,6 @@ public class TagService {
                                     callback.done(Tag.fromParseObject(object), e);
                                 }
                             });
-                            object.saveInBackground();
                         } else {
                             callback.done(tags.get(0), null);
                         }
