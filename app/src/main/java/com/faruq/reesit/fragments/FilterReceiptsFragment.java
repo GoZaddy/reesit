@@ -7,6 +7,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.Group;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
 
@@ -18,8 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +33,7 @@ import com.faruq.reesit.activities.FilterActivity;
 import com.faruq.reesit.misc.Debouncer;
 import com.faruq.reesit.misc.Filter;
 import com.faruq.reesit.models.Merchant;
+import com.faruq.reesit.models.Receipt;
 import com.faruq.reesit.models.Tag;
 import com.faruq.reesit.models.User;
 import com.faruq.reesit.services.MerchantService;
@@ -86,6 +91,13 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
     private TextView tagsSuggestionsLoadingMessage;
     private ChipGroup tagsSuggestionsChipGroup;
 
+    private Group reimbursementStatesGroup;
+    private RadioGroup reimbursementStatesRadioGroup;
+    private RadioGroup toBeReimbursedRadioGroup;
+
+    private ArrayList<Receipt.ReimbursementState> reimbursementStateOptions = new ArrayList<>();
+
+
 
 
 
@@ -114,6 +126,11 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             filter = (Filter) Parcels.unwrap(getArguments().getParcelable(ARG_PARAM1));
         }
+
+        reimbursementStateOptions.add(Receipt.ReimbursementState.NOT_SUBMITTED);
+        reimbursementStateOptions.add(Receipt.ReimbursementState.SUBMITTED);
+        reimbursementStateOptions.add(Receipt.ReimbursementState.APPROVED);
+        reimbursementStateOptions.add(Receipt.ReimbursementState.REIMBURSED);
     }
 
     @Override
@@ -150,6 +167,10 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         tagsSuggestionsChipGroup = binding.tagSuggestionsChipGroup;
         tagsEditText = binding.tagEditText;
 
+        reimbursementStatesGroup = binding.filterReimbursementStateGroup;
+        reimbursementStatesRadioGroup = binding.radioGroup;
+        toBeReimbursedRadioGroup = binding.isReimbursedRadioGroup;
+
         tagsSuggestionsChipGroup.setSingleSelection(true);
 
         // listen to changes to the filter object
@@ -165,141 +186,8 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         // set field values
         setFieldValues();
 
-
-        // functionality for merchants section
-        Objects.requireNonNull(merchantsEditText.getEditText()).addTextChangedListener(
-                new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        if (merchantSuggestionsChipGroup.getChildCount() > 0){
-                            merchantSuggestionsChipGroup.removeAllViews();
-                        }
-
-                        setMerchantsSuggestionLoading();
-                        Debouncer.call(DEBOUNCE_MERCHANT_NAME_KEY, new ReesitCallback() {
-                            public void run() {
-                                fetchMerchantSuggestions(s.toString());
-                            }
-                        }, DEBOUNCE_MERCHANT_NAME_INTERVAL);
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                    }
-                }
-        );
-
-        // functionality for tag section
-        Objects.requireNonNull(tagsEditText.getEditText()).addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                tagsSuggestionsChipGroup.clearCheck();
-                if (tagsSuggestionsChipGroup.getChildCount() > 0){
-                    tagsSuggestionsChipGroup.removeAllViews();
-                }
-
-                setTagSuggestionsLoading();
-                Debouncer.call(DEBOUNCE_TAG_NAME_KEY, new ReesitCallback() {
-                    public void run() {
-                        fetchTagSuggestions(s.toString());
-                    }
-                }, DEBOUNCE_TAG_NAME_INTERVAL);
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        // functionality for date-time section
-        editBeforeDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerFragment datePickerFragment = new DatePickerFragment();
-                if (filter.getBeforeDateTimestamp() != null){
-                    int[] receiptDate = DateTimeUtils.getDate(filter.getBeforeDateTimestamp());
-                    datePickerFragment.setDialog(new DatePickerDialog(getContext(), datePickerFragment, receiptDate[2], receiptDate[1], receiptDate[0]));
-                }
-                datePickerFragment.setTimeSetListener((view, year, month, dayOfMonth) -> {
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.YEAR, year);
-                    cal.set(Calendar.MONTH, month);
-                    cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    filter.setBeforeDateTimestamp(Long.toString(cal.getTimeInMillis()));
-
-
-                    // refresh date text view
-                    beforeDateText.setText(DateTimeUtils.getDate(cal));
-                });
-                datePickerFragment.show(getParentFragmentManager(), TAG);
-            }
-        });
-
-        editAfterDateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DatePickerFragment datePickerFragment = new DatePickerFragment();
-                if (filter.getAfterDateTimestamp() != null){
-                    int[] receiptDate = DateTimeUtils.getDate(filter.getAfterDateTimestamp());
-                    datePickerFragment.setDialog(new DatePickerDialog(getContext(), datePickerFragment, receiptDate[2], receiptDate[1], receiptDate[0]));
-                }
-                datePickerFragment.setTimeSetListener((view, year, month, dayOfMonth) -> {
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.YEAR, year);
-                    cal.set(Calendar.MONTH, month);
-                    cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    filter.setAfterDateTimestamp(Long.toString(cal.getTimeInMillis()));
-
-
-                    // refresh date text view
-                    afterDateText.setText(DateTimeUtils.getDate(cal));
-                });
-                datePickerFragment.show(getParentFragmentManager(), TAG);
-            }
-        });
-
-
-        // functionality for 'apply' button
-        applyFilterButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // set greaterThanAmount and lessThanAmount
-                setGreaterThanLessThanInFilter();
-
-                // validate beforeDateTimestamp and afterDateTimestamp
-                try {
-                   filter.validate(getContext());
-                } catch (Filter.FilterValidationException e){
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (getContext() != null){
-                    Intent intent = new Intent();
-                    intent.putExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY, Parcels.wrap(filter));
-                    if (requireActivity() instanceof FilterActivity){
-                        ((FilterActivity) requireActivity()).onApplyFilter(filter);
-                    } else {
-                        requireActivity().setResult(Activity.RESULT_OK, intent);
-                        requireActivity().finish();
-                    }
-                }
-            }
-        });
-
-
+        // set listeners
+        setListeners();
     }
 
     private void setMerchantsSuggestionLoading(){
@@ -460,6 +348,40 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
             setTagSuggestionsLoading();
             fetchTags();
         }
+
+        // set field values for reimbursement section
+        for(int i = 0; i < reimbursementStateOptions.size(); ++i){
+            Receipt.ReimbursementState option = reimbursementStateOptions.get(i);
+            RadioButton radioButton = new RadioButton(getContext());
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, getResources().getDimensionPixelOffset(R.dimen.receipt_creation_final_reimbursement_states_option_radio_button_margin_top), 0, 0);
+            radioButton.setId(i);
+            radioButton.setLayoutParams(params);
+            radioButton.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            radioButton.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+            radioButton.setText(option.getTitle(requireContext()));
+
+            radioButton.setChecked(filter.getReimbursementState() == option);
+            reimbursementStatesRadioGroup.addView(radioButton);
+        }
+
+        if (reimbursementStatesRadioGroup.getCheckedRadioButtonId() == -1){
+            reimbursementStatesRadioGroup.check(R.id.filter_reimbursement_state_all);
+        }
+
+        if (filter.isReimbursement() == null){
+            toBeReimbursedRadioGroup.check(R.id.filter_is_reimbursed_both);
+            reimbursementStatesGroup.setVisibility(View.GONE);
+        } else {
+            if (filter.isReimbursement()){
+                toBeReimbursedRadioGroup.check(R.id.filter_is_reimbursed_yes);
+                reimbursementStatesGroup.setVisibility(View.VISIBLE);
+            } else {
+                toBeReimbursedRadioGroup.check(R.id.filter_is_reimbursed_no);
+                reimbursementStatesGroup.setVisibility(View.GONE);
+            }
+        }
+
     }
 
     private void fetchTags(){
@@ -569,5 +491,177 @@ public class FilterReceiptsFragment extends BottomSheetDialogFragment {
         } else {
             filter.setLessThanAmount(null);
         }
+    }
+
+    private void setListeners(){
+        // functionality for merchants section
+        Objects.requireNonNull(merchantsEditText.getEditText()).addTextChangedListener(
+                new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        if (merchantSuggestionsChipGroup.getChildCount() > 0){
+                            merchantSuggestionsChipGroup.removeAllViews();
+                        }
+
+                        setMerchantsSuggestionLoading();
+                        Debouncer.call(DEBOUNCE_MERCHANT_NAME_KEY, new ReesitCallback() {
+                            public void run() {
+                                fetchMerchantSuggestions(s.toString());
+                            }
+                        }, DEBOUNCE_MERCHANT_NAME_INTERVAL);
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+
+                    }
+                }
+        );
+
+        // functionality for tag section
+        Objects.requireNonNull(tagsEditText.getEditText()).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                tagsSuggestionsChipGroup.clearCheck();
+                if (tagsSuggestionsChipGroup.getChildCount() > 0){
+                    tagsSuggestionsChipGroup.removeAllViews();
+                }
+
+                setTagSuggestionsLoading();
+                Debouncer.call(DEBOUNCE_TAG_NAME_KEY, new ReesitCallback() {
+                    public void run() {
+                        fetchTagSuggestions(s.toString());
+                    }
+                }, DEBOUNCE_TAG_NAME_INTERVAL);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        // functionality for date-time section
+        editBeforeDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment datePickerFragment = new DatePickerFragment();
+                if (filter.getBeforeDateTimestamp() != null){
+                    int[] receiptDate = DateTimeUtils.getDate(filter.getBeforeDateTimestamp());
+                    datePickerFragment.setDialog(new DatePickerDialog(getContext(), datePickerFragment, receiptDate[2], receiptDate[1], receiptDate[0]));
+                }
+                datePickerFragment.setTimeSetListener((view, year, month, dayOfMonth) -> {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.YEAR, year);
+                    cal.set(Calendar.MONTH, month);
+                    cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    filter.setBeforeDateTimestamp(Long.toString(cal.getTimeInMillis()));
+
+
+                    // refresh date text view
+                    beforeDateText.setText(DateTimeUtils.getDate(cal));
+                });
+                datePickerFragment.show(getParentFragmentManager(), TAG);
+            }
+        });
+
+        editAfterDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerFragment datePickerFragment = new DatePickerFragment();
+                if (filter.getAfterDateTimestamp() != null){
+                    int[] receiptDate = DateTimeUtils.getDate(filter.getAfterDateTimestamp());
+                    datePickerFragment.setDialog(new DatePickerDialog(getContext(), datePickerFragment, receiptDate[2], receiptDate[1], receiptDate[0]));
+                }
+                datePickerFragment.setTimeSetListener((view, year, month, dayOfMonth) -> {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.YEAR, year);
+                    cal.set(Calendar.MONTH, month);
+                    cal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    filter.setAfterDateTimestamp(Long.toString(cal.getTimeInMillis()));
+
+
+                    // refresh date text view
+                    afterDateText.setText(DateTimeUtils.getDate(cal));
+                });
+                datePickerFragment.show(getParentFragmentManager(), TAG);
+            }
+        });
+
+
+        // functionality for 'apply' button
+        applyFilterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // set greaterThanAmount and lessThanAmount
+                setGreaterThanLessThanInFilter();
+
+                // validate beforeDateTimestamp and afterDateTimestamp
+                try {
+                    filter.validate(getContext());
+                } catch (Filter.FilterValidationException e){
+                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (getContext() != null){
+                    Intent intent = new Intent();
+                    intent.putExtra(FilterActivity.FILTER_OBJECT_RESULT_INTENT_KEY, Parcels.wrap(filter));
+                    if (requireActivity() instanceof FilterActivity){
+                        ((FilterActivity) requireActivity()).onApplyFilter(filter);
+                    } else {
+                        requireActivity().setResult(Activity.RESULT_OK, intent);
+                        requireActivity().finish();
+                    }
+                }
+            }
+        });
+
+        toBeReimbursedRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.filter_is_reimbursed_yes){
+                    reimbursementStatesGroup.setVisibility(View.VISIBLE);
+                    filter.setReimbursement(true);
+                    int checkedRadioButton = reimbursementStatesRadioGroup.getCheckedRadioButtonId();
+                    if (checkedRadioButton == R.id.filter_reimbursement_state_all){
+                        filter.setReimbursementState(null);
+                    } else {
+                        filter.setReimbursementState(reimbursementStateOptions.get(checkedRadioButton));
+                    }
+
+                } else {
+                    if (checkedId == R.id.filter_is_reimbursed_no){
+                        filter.setReimbursement(false);
+                    } else {
+                        filter.setReimbursement(null);
+                    }
+                    reimbursementStatesGroup.setVisibility(View.GONE);
+                    filter.setReimbursementState(null);
+                }
+            }
+        });
+
+        reimbursementStatesRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == R.id.filter_reimbursement_state_all){
+                    filter.setReimbursementState(null);
+                } else {
+                    filter.setReimbursementState(reimbursementStateOptions.get(checkedId));
+                }
+            }
+        });
+
     }
 }
