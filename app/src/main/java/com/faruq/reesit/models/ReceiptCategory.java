@@ -33,6 +33,8 @@ public class ReceiptCategory {
     public static final String KEY_USER = "user";
     public static final String KEY_NAME = "name";
     public static final String KEY_SLUG = "slug";
+    public static final String KEY_IS_REIMBURSEMENT = "isReimbursement";
+    public static final String KEY_REIMBURSEMENT_STATE = "reimbursementState";
     public static final String PARSE_CLASS_NAME = "Category";
 
     private static final String TAG = "ReceiptCategory";
@@ -59,6 +61,12 @@ public class ReceiptCategory {
         filter.setSearchQuery(parseObject.getString(KEY_FILTER_SEARCH_QUERY));
         filter.setAfterDateTimestamp(parseObject.getString(KEY_FILTER_AFTER_DATE_TIMESTAMP));
         filter.setBeforeDateTimestamp(parseObject.getString(KEY_FILTER_BEFORE_DATE_TIMESTAMP));
+        filter.setReimbursement(parseObject.getBoolean(KEY_IS_REIMBURSEMENT));
+        if (filter.isReimbursement()){
+           filter.setReimbursementState(Receipt.ReimbursementState.fromString(parseObject.getString(KEY_REIMBURSEMENT_STATE)));
+        } else {
+            filter.setReimbursementState(null);
+        }
         if (parseObject.getInt(KEY_FILTER_GREATER_THAN) != 0){
             filter.setGreaterThanAmount(parseObject.getInt(KEY_FILTER_GREATER_THAN));
         }
