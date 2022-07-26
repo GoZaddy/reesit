@@ -83,7 +83,7 @@
     <string name="filter_tostring_amount_less_format"><![CDATA[Amount: <= $ %1$s]]></string>
     <string name="filter_tostring_tags_format">Tags: %1$s</string>
     <string name="filter_tostring_merchants_format">Merchants: %1$s</string>
-    <string name="filter_tostring_date_format">After: %1$s, Before: %2$s</string>
+    <string name="filter_tostring_date_format">After: %1$s\nBefore: %2$s</string>
     <string name="filter_tostring_date_after_format">After: %1$s</string>
     <string name="filter_tostring_date_before_format">Before: %1$s</string>
     <string name="receipts_no_receipts_message">No receipts!</string>
@@ -165,4 +165,32 @@
     <string name="onboarding_2_text">Goodbye  to receipt-infested drawers. Scan your receipt and download them later!</string>
     <string name="onboarding_3_text">No more digging through receipts.\nSort, filter, categorize and search through hundreds of receipts in seconds</string>
     <string name="onboarding_gete_started_button_text">Get started</string>
+    <string name="fragment_receipts_load_more_button_text">Load more</string>
+    <string name="receipt_creation_final_reimbursement_state_section_title">Reimbursement state</string>
+    <string name="receipt_creation_final_reimbursement_section_title">Reimbursement</string>
+    <string name="receipt_creation_final_reimbursement_switch_text">To be reimbursed?</string>
+    <string name="not_submitted_reimbursement_reminder_message">You will get daily notifications to submit this receipt for reimbursment</string>
+    <string name="receipt_details_ref_number_label">Reference number:</string>
+    <string name="receipt_details_is_reimbursement_label">To be reimbursed?</string>
+    <string name="receipt_details_tags_label">Tags:</string>
+    <string name="receipt_details_date_label">Date:</string>
+    <string name="receipt_details_amount_label">Amount:</string>
+    <string name="receipt_details_reimbursement_state_title">Reimbursement state:</string>
+    <string name="true_text">True</string>
+    <string name="false_text">False</string>
+    <string name="not_submitted_reimbursement_title">Receipt has not been submitted for reimbursement</string>
+    <string name="submitted_reimbursement_title">Receipt has been submitted for reimbursement</string>
+    <string name="approved_reimbursement_title">Reimbursement has been approved</string>
+    <string name="reimbursed_reimbursement_title">Reimbursement is complete</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="neither">Neither</string>
+    <string name="filter_tostring_to_be_reimbursed_format">To be reimbursed: %1$s</string>
+    <string name="filter_tostring_reimbursement_state_format">Reimbursement state: %1$s</string>
+    <string name="filter_reimbursement_state_all_radio_button_title">All</string>
+    <string name="not_submitted_reimbursement_short_title">Not submitted</string>
+    <string name="submitted_reimbursement_short_title">Submitted</string>
+    <string name="approved_reimbursement_short_title">Approved</string>
+    <string name="reimbursed_reimbursement_short_title">Complete</string>
+    <string name="both">Both</string>
 </resources>

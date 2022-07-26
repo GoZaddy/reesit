@@ -32,7 +32,7 @@
             android:layout_marginTop="24dp"
             android:labelFor="@id/edit_text_password"
             android:text="@string/authentication_password_field_label"
-            android:textColor="@android:color/black"
+            android:textColor="?android:textColorPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/edit_text_password"
             app:layout_constraintTop_toBottomOf="@+id/edit_text_email_address" />
@@ -59,7 +59,7 @@
             android:layout_marginTop="56dp"
             android:labelFor="@id/edit_text_email_address"
             android:text="@string/authentication_email_field_label"
-            android:textColor="@android:color/black"
+            android:textColor="?android:textColorPrimary"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="@+id/edit_text_email_address"
             app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -81,6 +81,7 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="4dp"
             android:text="@string/authentication_no_account_text"
+            android:textColor="?android:textColorSecondary"
             app:layout_constraintEnd_toStartOf="@+id/sign_up_text"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
@@ -105,6 +106,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="56dp"
             android:text="@string/authentication_log_in_title"
+            android:textColor="?android:textColorPrimary"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

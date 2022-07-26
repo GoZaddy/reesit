@@ -7,42 +7,79 @@
     tools:context=".fragments.ReceiptDetailsFragment">
 
 
-
-
     <TextView
-        android:id="@+id/tags_text_view"
-        android:layout_width="wrap_content"
+        android:id="@+id/reimbursement_state_text_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:lines="3"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="@+id/textView31"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/to_be_reimbursed_text_view"
+        app:layout_constraintTop_toTopOf="@+id/textView25"
+        tools:text="Receipt has been approved for reimbursement" />
+
+    <TextView
+        android:id="@+id/to_be_reimbursed_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView22"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/ref_number_text_view"
-        app:layout_constraintTop_toTopOf="@+id/textView31"
-        app:layout_constraintVertical_bias="0.0"
-        tools:text="Food, Tacos" />
+        app:layout_constraintTop_toTopOf="@+id/textView22"
+        tools:text="True" />
 
     <TextView
-        android:id="@+id/textView31"
-        android:layout_width="wrap_content"
+        android:id="@+id/textView22"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Tags:"
-        android:textColor="@color/black"
+        android:text="@string/receipt_details_is_reimbursement_label"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/textView30"
         app:layout_constraintTop_toBottomOf="@+id/textView30" />
 
     <TextView
-        android:id="@+id/ref_number_text_view"
-        android:layout_width="wrap_content"
+        android:id="@+id/tags_text_view"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:textColor="@color/black"
+        android:lines="3"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="@+id/textView31"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/to_be_reimbursed_text_view"
+        app:layout_constraintTop_toTopOf="@+id/textView31"
+        app:layout_constraintVertical_bias="0.0"
+        tools:text="Food, Tacos" />
+
+    <TextView
+        android:id="@+id/textView31"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/receipt_details_tags_label"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/textView22"
+        app:layout_constraintTop_toBottomOf="@id/reimbursement_state_bottom_barrier" />
+
+    <TextView
+        android:id="@+id/ref_number_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView30"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,11 +91,11 @@
 
     <TextView
         android:id="@+id/textView30"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Reference number:"
-        android:textColor="@color/black"
+        android:text="@string/receipt_details_ref_number_label"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/textView26"
@@ -66,11 +103,11 @@
 
     <TextView
         android:id="@+id/textView26"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Date:"
-        android:textColor="@color/black"
+        android:text="@string/receipt_details_date_label"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/textView24"
@@ -83,7 +120,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -94,12 +131,12 @@
 
     <TextView
         android:id="@+id/textView24"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        android:text="Amount:"
-        android:textColor="@color/black"
+        android:text="@string/receipt_details_amount_label"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -107,11 +144,11 @@
 
     <TextView
         android:id="@+id/amount_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="32dp"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView24"
         app:layout_constraintEnd_toEndOf="parent"
@@ -122,15 +159,28 @@
         tools:text="$ 10.00" />
 
     <TextView
+        android:id="@+id/textView25"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/receipt_details_reimbursement_state_title"
+        android:textColor="?android:textColorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/textView22"
+        app:layout_constraintTop_toBottomOf="@+id/textView22" />
+
+    <TextView
         android:id="@+id/date_time_text_view"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:lines="2"
-        android:textColor="@color/black"
+        android:textColor="?android:textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="@+id/textView26"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/amount_text_view"
         app:layout_constraintTop_toTopOf="@+id/textView26"
         tools:text="Saturday, June 01, 2022.\n04:11PM" />
@@ -140,7 +190,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="end"
-        app:constraint_referenced_ids="textView26,textView24,textView30,textView31"
+        app:constraint_referenced_ids="textView26,textView24,textView30,textView31,textView22,textView25"
         tools:layout_editor_absoluteX="32dp" />
 
     <Button
@@ -152,4 +202,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tags_text_view" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/reimbursement_state_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="textView25,reimbursement_state_text_view" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/reimbursement_state_bottom_barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="textView25,reimbursement_state_text_view"
+        tools:layout_editor_absoluteY="306dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
