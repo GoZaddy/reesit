@@ -17,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.Group;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
@@ -90,6 +91,9 @@ public class ReceiptDetailsFragment extends Fragment {
     private TextView referenceNumTV;
     private Button updateReceipt;
     private MenuItem downloadMenuItem;
+    private Group reimbursementStateGroup;
+    private TextView toBeReimbursedTV;
+    private TextView reimbursementStateTV;
 
     private ActivityResultLauncher<String> requestStoragePermissionLauncher;
 
@@ -310,6 +314,9 @@ public class ReceiptDetailsFragment extends Fragment {
         tagsTV = binding.tagsTextView;
         dateTimeTV = binding.dateTimeTextView;
         updateReceipt = binding.updateReceiptInfoBtn;
+        reimbursementStateGroup = binding.reimbursementStateGroup;
+        toBeReimbursedTV = binding.toBeReimbursedTextView;
+        reimbursementStateTV = binding.reimbursementStateTextView;
 
         // initialize launchers
         requestStoragePermissionLauncher =
@@ -335,6 +342,16 @@ public class ReceiptDetailsFragment extends Fragment {
 
         // bind data to view
         merchantNameTV.setText(receipt.getMerchant().getName());
+        if(receipt.isReimbursement()){
+            toBeReimbursedTV.setText(R.string.true_text);
+            reimbursementStateTV.setText(getReimbursementStateTitle(receipt.getReimbursementState()));
+            reimbursementStateGroup.setVisibility(View.VISIBLE);
+        } else {
+            toBeReimbursedTV.setText(R.string.false_text);
+            reimbursementStateGroup.setVisibility(View.GONE);
+        }
+
+
         amountTV.setText(getString(R.string.dollar_sign_format, CurrencyUtils.integerToCurrency(receipt.getAmount())));
         if (receipt.getReferenceNumber() != null && receipt.getReferenceNumber().trim().length() != 0){
             referenceNumTV.setText(receipt.getReferenceNumber());
@@ -560,6 +577,21 @@ public class ReceiptDetailsFragment extends Fragment {
         }
 
         callback.done(exception);
+    }
+
+    private String getReimbursementStateTitle(Receipt.ReimbursementState reimbursementState){
+        switch (reimbursementState){
+            case NOT_SUBMITTED:
+                return getString(R.string.not_submitted_reimbursement_title);
+            case SUBMITTED:
+                return getString(R.string.submitted_reimbursement_title);
+            case APPROVED:
+                return getString(R.string.approved_reimbursement_title);
+            case REIMBURSED:
+                return getString(R.string.reimbursed_reimbursement_title);
+            default:
+                return null;
+        }
     }
 
 }
