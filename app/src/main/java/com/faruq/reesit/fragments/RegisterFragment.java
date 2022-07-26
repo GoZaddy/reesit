@@ -90,9 +90,9 @@ public class RegisterFragment extends Fragment {
                     // check if email is valid
                     if (Validator.isValidEmail(emailField.getText().toString())){
                         setFormStateLoading();
-                        UserService.signUpNewUser(emailField.getText().toString(), passwordField.getText().toString(), new SignUpCallback() {
+                        UserService.signUpNewUser(emailField.getText().toString(), passwordField.getText().toString(), new UserService.CreateNewUserCallback() {
                             @Override
-                            public void done(ParseException e) {
+                            public void done(Exception e) {
                                 if (e == null){
                                     Intent intent = new Intent(getContext(), MainActivity.class);
                                     unsetFormStateLoading();
