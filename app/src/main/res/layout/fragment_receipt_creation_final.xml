@@ -10,8 +10,32 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    >
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/reimbursement_state_section_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/receipt_creation_final_reimbursement_state_section_title"
+            android:textColor="?android:textColorSecondary"
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/is_reimbursement_switch" />
+
+        <TextView
+            android:id="@+id/reimbursement_section_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/receipt_creation_final_reimbursement_section_title"
+            android:textColor="?android:textColorSecondary"
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tags_edittext"
+            app:layout_constraintTop_toBottomOf="@+id/divider7" />
+
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/tags_suggestions_chip_group"
             android:layout_width="0dp"
@@ -221,11 +245,12 @@
             android:id="@+id/add_receipt_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="48dp"
             android:text="@string/receipt_creation_final_add_receipt_button_text"
             app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="@+id/tags_edittext"
-            app:layout_constraintTop_toBottomOf="@+id/selected_tags_chip_group" />
+            app:layout_constraintTop_toBottomOf="@+id/barrier7" />
 
         <ProgressBar
             android:id="@+id/pageProgressBar"
@@ -233,10 +258,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="48dp"
             android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/add_receipt_button" />
+            app:layout_constraintTop_toBottomOf="@+id/add_receipt_button"
+            app:layout_constraintVertical_bias="0.0" />
 
         <ProgressBar
             android:id="@+id/progressBarSuggestionChips"
@@ -280,6 +308,52 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="sub_title"
             tools:layout_editor_absoluteY="56dp" />
+
+        <View
+            android:id="@+id/divider7"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="?android:attr/listDivider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/selected_tags_chip_group" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/is_reimbursement_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:switchPadding="16dp"
+            android:text="@string/receipt_creation_final_reimbursement_switch_text"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/tags_edittext"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/reimbursement_section_title"
+            app:layout_constraintTop_toBottomOf="@+id/reimbursement_section_title" />
+
+        <RadioGroup
+            android:id="@+id/reimbursement_states_radio_group"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/reimbursement_state_section_title"
+            app:layout_constraintStart_toStartOf="@+id/reimbursement_state_section_title"
+            app:layout_constraintTop_toBottomOf="@+id/reimbursement_state_section_title" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="is_reimbursement_switch,reimbursement_states_radio_group"
+            tools:layout_editor_absoluteY="1524dp" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/reimbursement_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="reimbursement_states_radio_group, reimbursement_state_section_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
