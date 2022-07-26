@@ -693,10 +693,6 @@ public class ReceiptCreationFinalFragment extends Fragment{
                 if (isChecked){
                     reimbursementGroup.setVisibility(View.VISIBLE);
                     int checkedRadioButton = reimbursementStatesRadioGroup.getCheckedRadioButtonId();
-                    // if reimbursementState is NOT_SUBMITTED, tell user that they will get daily reminders to submit reimbursement
-                    if (checkedRadioButton == 0){
-                        alertUserToDailyReminders();
-                    }
                     receipt.setReimbursementState(reimbursementStateOptions.get(checkedRadioButton));
                 } else {
                     reimbursementGroup.setVisibility(View.GONE);
@@ -708,17 +704,9 @@ public class ReceiptCreationFinalFragment extends Fragment{
         reimbursementStatesRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == 0){
-                    alertUserToDailyReminders();
-                }
                 receipt.setReimbursementState(reimbursementStateOptions.get(checkedId));
             }
         });
 
-    }
-
-    // tell user that they will get daily reminders to submit reimbursement
-    private void alertUserToDailyReminders(){
-        Snackbar.make(binding.getRoot(), R.string.not_submitted_reimbursement_reminder_message, BaseTransientBottomBar.LENGTH_SHORT).show();
     }
 }
