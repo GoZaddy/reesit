@@ -26,6 +26,8 @@ public class Filter {
     private List<Merchant> merchants;
     private String beforeDateTimestamp;
     private String afterDateTimestamp;
+    private Boolean isReimbursement;
+    private Receipt.ReimbursementState reimbursementState;
 
     public static class FilterGenerateQueryException extends Exception{
         public FilterGenerateQueryException(String message){
@@ -46,6 +48,13 @@ public class Filter {
     }
 
     public Filter(){}
+
+    public static Filter getReimbursementFilter(){
+        Filter filter = new Filter();
+        filter.reset();
+        filter.isReimbursement = true;
+        return filter;
+    }
 
     public ParseQuery<ParseObject> getParseQuery() throws FilterGenerateQueryException {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
@@ -96,6 +105,13 @@ public class Filter {
             query.whereGreaterThanOrEqualTo(Receipt.KEY_DATE_TIME_STAMP, afterDateTimestamp);
         }
 
+        if (isReimbursement != null){
+            query.whereEqualTo(Receipt.KEY_IS_REIMBURSEMENT, isReimbursement);
+            if (isReimbursement && reimbursementState != null){
+                query.whereEqualTo(Receipt.KEY_REIMBURSEMENT_STATE, reimbursementState.name());
+            }
+        }
+
 
         return query;
     }
@@ -105,7 +121,7 @@ public class Filter {
         if (searchQuery != null){
             result += "Query: "+ "'" + searchQuery+ "'" + "\n";
         }
-        String amountLine = "";
+        String amountLine = null;
         if (greaterThanAmount != null && lessThanAmount != null){
             amountLine = context.getString(R.string.filter_tostring_amount_format, CurrencyUtils.integerToCurrency(greaterThanAmount), CurrencyUtils.integerToCurrency(lessThanAmount));
         } else if (greaterThanAmount != null){
@@ -113,11 +129,15 @@ public class Filter {
         } else if (lessThanAmount != null) {
             amountLine = context.getString(R.string.filter_tostring_amount_less_format, CurrencyUtils.integerToCurrency(lessThanAmount));
         }
-        result += amountLine + "\n";
+
+        if (amountLine != null){
+            result += amountLine + "\n";
+        }
 
         if (tag != null){
             result += "Tag: "+tag.getName()+"\n";
         }
+
         if (merchants != null){
             if (merchants.size() > 0){
                 StringBuilder merchantsLine = new StringBuilder();
@@ -130,7 +150,7 @@ public class Filter {
             }
         }
 
-        String dateLine = "";
+        String dateLine = null;
         if (beforeDateTimestamp != null && afterDateTimestamp != null){
             dateLine = context.getString(R.string.filter_tostring_date_format,
                     DateTimeUtils.getDateWithLongMonth(afterDateTimestamp),
@@ -143,8 +163,22 @@ public class Filter {
                     DateTimeUtils.getDateWithLongMonth(afterDateTimestamp));
         }
 
-        result += dateLine;
+        if (dateLine != null){
+            result += dateLine+"\n";
+        }
 
+
+        String reimbursementLine = null;
+        if (isReimbursement != null){
+            reimbursementLine = context.getString(R.string.filter_tostring_to_be_reimbursed_format, isReimbursement ? "True" : "False");
+            if (isReimbursement && reimbursementState != null){
+                reimbursementLine += "\n"+context.getString(R.string.filter_tostring_reimbursement_state_format, reimbursementState.getShorterTitle(context));
+            }
+        }
+
+        if (reimbursementLine != null){
+            result += reimbursementLine;
+        }
 
         return result.trim();
     }
@@ -205,6 +239,21 @@ public class Filter {
         this.afterDateTimestamp = afterDateTimestamp;
     }
 
+    public Boolean isReimbursement() {
+        return isReimbursement;
+    }
+
+    public Receipt.ReimbursementState getReimbursementState() {
+        return reimbursementState;
+    }
+
+    public void setReimbursement(Boolean reimbursement) {
+        isReimbursement = reimbursement;
+    }
+
+    public void setReimbursementState(Receipt.ReimbursementState reimbursementState) {
+        this.reimbursementState = reimbursementState;
+    }
 
     /** Performs validation on the fields of the Filter object. Can be used to generate user-facing error messages as long as a Context object is passed
      * @param context Context object
@@ -242,5 +291,7 @@ public class Filter {
         merchants = null;
         beforeDateTimestamp = null;
         afterDateTimestamp = null;
+        isReimbursement = null;
+        reimbursementState = null;
     }
 }

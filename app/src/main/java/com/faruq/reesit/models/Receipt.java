@@ -1,11 +1,13 @@
-package com.example.reesit.models;
+package com.faruq.reesit.models;
 
+import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.reesit.utils.CurrencyUtils;
-import com.example.reesit.utils.DateTimeUtils;
+import com.faruq.reesit.R;
+import com.faruq.reesit.utils.CurrencyUtils;
+import com.faruq.reesit.utils.DateTimeUtils;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 
@@ -19,6 +21,59 @@ import java.util.Objects;
 
 @Parcel
 public class Receipt {
+    public enum ReimbursementState {
+        NOT_SUBMITTED,
+        SUBMITTED,
+        APPROVED,
+        REIMBURSED;
+
+        public static ReimbursementState fromString(String stringValue){
+            if (stringValue == null){
+                return null;
+            }
+            if (stringValue.toLowerCase(Locale.ROOT).equals(ReimbursementState.NOT_SUBMITTED.name().toLowerCase(Locale.ROOT))){
+                return NOT_SUBMITTED;
+            } else if (stringValue.toLowerCase(Locale.ROOT).equals(ReimbursementState.SUBMITTED.name().toLowerCase(Locale.ROOT))){
+                return SUBMITTED;
+            } else if (stringValue.toLowerCase(Locale.ROOT).equals(ReimbursementState.APPROVED.name().toLowerCase(Locale.ROOT))){
+                return APPROVED;
+            } else if (stringValue.toLowerCase(Locale.ROOT).equals(ReimbursementState.REIMBURSED.name().toLowerCase(Locale.ROOT))){
+                return REIMBURSED;
+            } else {
+                return null;
+            }
+        }
+
+        public String getTitle(Context context){
+            if (this == NOT_SUBMITTED){
+                return context.getString(R.string.not_submitted_reimbursement_title);
+            } else if (this == SUBMITTED){
+                return context.getString(R.string.submitted_reimbursement_title);
+            } else if (this == APPROVED){
+                return context.getString(R.string.approved_reimbursement_title);
+            } else if (this == REIMBURSED){
+                return context.getString(R.string.reimbursed_reimbursement_title);
+            } else {
+                return null;
+            }
+        }
+
+        public String getShorterTitle(Context context){
+            if (this == NOT_SUBMITTED){
+                return context.getString(R.string.not_submitted_reimbursement_short_title);
+            } else if (this == SUBMITTED){
+                return context.getString(R.string.submitted_reimbursement_short_title);
+            } else if (this == APPROVED){
+                return context.getString(R.string.approved_reimbursement_short_title);
+            } else if (this == REIMBURSED){
+                return context.getString(R.string.reimbursed_reimbursement_short_title);
+            } else {
+                return null;
+            }
+        }
+    }
+
+
     private String id;
     private String userID;
     private Merchant merchant;
@@ -28,7 +83,9 @@ public class Receipt {
     private String referenceNumber;
     private String dateTimestamp;
     private ParseObject parseObject;
+    private boolean isReimbursement;
     private List<Tag> tags;
+    private ReimbursementState reimbursementState;
 
     public static final String KEY_USER = "user";
     public static final String KEY_MERCHANT = "merchant";
@@ -38,8 +95,12 @@ public class Receipt {
     public static final String KEY_REFERENCE_NUMBER = "referenceNumber";
     public static final String KEY_DATE_TIME_STAMP = "dateTimestamp";
     public static final String KEY_TAGS = "tags";
+    public static final String KEY_IS_REIMBURSEMENT = "isReimbursement";
+    public static final String KEY_REIMBURSEMENT_STATE = "reimbursementState";
     public static final String PARSE_CLASS_NAME = "Receipt";
     private static final String TAG = "Receipt";
+
+
 
 
     public Receipt() {
@@ -62,6 +123,10 @@ public class Receipt {
                 object.getString(KEY_REFERENCE_NUMBER),
                 object.getString(KEY_DATE_TIME_STAMP)
         );
+        receipt.isReimbursement = object.getBoolean(KEY_IS_REIMBURSEMENT);
+        if (receipt.isReimbursement){
+            receipt.reimbursementState = ReimbursementState.fromString(object.getString(KEY_REIMBURSEMENT_STATE));
+        }
         receipt.parseObject = object;
         receipt.userID = Objects.requireNonNull(object.getParseUser(KEY_USER)).getObjectId();
         receipt.id = object.getObjectId();
@@ -165,4 +230,22 @@ public class Receipt {
     public ParseObject getParseObject(){
         return this.parseObject;
     }
+
+    public boolean isReimbursement() {
+        return isReimbursement;
+    }
+
+    public void setReimbursement(boolean reimbursement) {
+        isReimbursement = reimbursement;
+    }
+
+    public ReimbursementState getReimbursementState() {
+        return reimbursementState;
+    }
+
+    public void setReimbursementState(ReimbursementState reimbursementState) {
+        this.reimbursementState = reimbursementState;
+    }
+
+
 }
