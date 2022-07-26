@@ -197,6 +197,15 @@ public class ReceiptService {
             }
         }
         receiptObj.put(Receipt.KEY_TAGS, tagsParseObjects);
+        receiptObj.put(Receipt.KEY_IS_REIMBURSEMENT, receipt.isReimbursement());
+        if (receipt.isReimbursement()){
+            if (receipt.getReimbursementState() != null){
+                receiptObj.put(Receipt.KEY_REIMBURSEMENT_STATE, receipt.getReimbursementState().name());
+            } else {
+                receiptObj.put(Receipt.KEY_REIMBURSEMENT_STATE, Receipt.ReimbursementState.NOT_SUBMITTED.name());
+            }
+
+        }
 
         MerchantService.addMerchant(receipt.getMerchant(), new MerchantService.AddMerchantCallback() {
             @Override
@@ -273,12 +282,17 @@ public class ReceiptService {
                                             parseObject.put(Receipt.KEY_AMOUNT, receipt.getAmount());
                                             parseObject.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
                                             parseObject.put(Receipt.KEY_DATE_TIME_STAMP, receipt.getDateTimestamp());
+                                            parseObject.put(Receipt.KEY_IS_REIMBURSEMENT, receipt.isReimbursement());
+                                            if(receipt.isReimbursement()){
+                                                parseObject.put(Receipt.KEY_REIMBURSEMENT_STATE, receipt.getReimbursementState().name());
+                                            } else {
+                                                parseObject.put(Receipt.KEY_REIMBURSEMENT_STATE, "");
+                                            }
                                             if (receipt.getTags() != null){
                                                 List<ParseObject> tagsParseObjects = new ArrayList<>();
                                                 for(Tag tag: receipt.getTags()){
                                                     // if the tag has no id - it means it hasn't been stored in the database yet
                                                     if (tag.getId() == null){
-                                                        // todo: tags are being added to the after the function has finished calling
                                                         try {
                                                             Tag newTag = TagService.addTag(tag, User.getCurrentUser());
                                                             tagsParseObjects.add(newTag.getParseObject());
