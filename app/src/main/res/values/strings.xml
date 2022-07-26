@@ -159,4 +159,10 @@
     <string name="write_storage_permissions_dialog_title">Storage permissions</string>
     <string name="write_storage_permissions_dialog_cancel_text">Cancel</string>
     <string name="write_storage_permissions_dialog_grant_permission_button">Grant permission</string>
+    <string name="receipt_creation_no_picture_unsupported_media_provider_error">Unsupported media provider. Please select your image from the gallery or another supported provider</string>
+    <string name="shared_pref_is_first_time_opened">is_first_time_opened</string>
+    <string name="onboarding_1_text">Reesit  is your new digital store for receipts</string>
+    <string name="onboarding_2_text">Goodbye  to receipt-infested drawers. Scan your receipt and download them later!</string>
+    <string name="onboarding_3_text">No more digging through receipts.\nSort, filter, categorize and search through hundreds of receipts in seconds</string>
+    <string name="onboarding_gete_started_button_text">Get started</string>
 </resources>

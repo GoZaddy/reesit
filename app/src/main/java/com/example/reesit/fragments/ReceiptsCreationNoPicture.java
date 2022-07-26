@@ -31,6 +31,7 @@ import com.example.reesit.utils.RuntimePermissions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -110,7 +111,12 @@ public class ReceiptsCreationNoPicture extends Fragment {
             @Override
             public void onActivityResult(Uri result) {
                 if (result != null){
-                    getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
+                    String host = result.getHost();
+                    if (!host.startsWith("com.android.providers") && !Objects.equals(host, "media")){
+                        Toast.makeText(requireContext(), R.string.receipt_creation_no_picture_unsupported_media_provider_error, Toast.LENGTH_LONG).show();
+                    } else {
+                        getParentFragmentManager().beginTransaction().replace(R.id.receiptsCreationFragmentContainer, ReceiptsPictureTaken.newInstance(UriAndSource.fromGallery(result))).commit();
+                    }
                 }
             }
         });

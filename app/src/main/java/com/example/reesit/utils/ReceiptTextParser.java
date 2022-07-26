@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class ReceiptTextParser {
@@ -93,17 +94,19 @@ public class ReceiptTextParser {
 
 
                                                 // check for reference number
-                                                if (receipt.getReferenceNumber() == null) {
+                                                if (receipt.getReferenceNumber() == null || Objects.equals(receipt.getReferenceNumber(), "")) {
                                                     String trimmedText = lineText.replaceAll(" ", "").toLowerCase(Locale.ROOT);
                                                     List<String> indicators = new ArrayList<String>();
                                                     indicators.add("reference");
-                                                    indicators.add("ref#");
                                                     indicators.add("ref");
                                                     indicators.add("inv#");
                                                     for (String ind : indicators) {
                                                         if (trimmedText.contains(ind)) {
                                                             if (trimmedText.contains(":")) {
-                                                                receipt.setReferenceNumber(trimmedText.split(":")[1]);
+                                                                String[] parts = trimmedText.split(":");
+                                                                if (parts.length > 1){
+                                                                    receipt.setReferenceNumber(trimmedText.split(":")[1]);
+                                                                }
                                                             } else {
                                                                 receipt.setReferenceNumber(trimmedText.replace(ind, ""));
                                                             }

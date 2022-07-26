@@ -18,7 +18,13 @@ public class FileUtils {
             String selection;
             Uri uriToQuery;
             if (Objects.equals(contentUri.getSource(), UriAndSource.GALLERY)){
-                selection = MediaStore.Images.Media._ID + " = " + contentUri.getUri().getLastPathSegment().split(":")[1];
+                String host = contentUri.getUri().getHost();
+                if (host.startsWith("com.android.providers")){
+                    selection = MediaStore.Images.Media._ID + " = " + contentUri.getUri().getLastPathSegment().split(":")[1];
+                } else{
+                    selection = MediaStore.Images.Media._ID + " = " + contentUri.getUri().getLastPathSegment();
+                }
+
                 uriToQuery = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
             } else {
                 selection = null;
