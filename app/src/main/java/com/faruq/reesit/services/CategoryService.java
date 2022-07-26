@@ -15,17 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryService {
+    private static final String REIMBURSEMENT_CATEGORY_NAME = "Reimbursements";
+
     public interface AddCategoryCallback {
-        public void done(ReceiptCategory newCategory, Exception e);
+        void done(ReceiptCategory newCategory, Exception e);
     }
 
     public interface GetCategoriesCallback {
-        public void done(List<ReceiptCategory> categories, Exception e);
+        void done(List<ReceiptCategory> categories, Exception e);
     }
 
     public static class CategoryAlreadyExistsException extends Exception{
         public CategoryAlreadyExistsException(String message){ super(message); }
     }
+
 
 
     /** Gets a receipt category. This method is for internal use only as specific database objects
@@ -35,7 +38,7 @@ public class CategoryService {
      * @param callback Callback function
      */
     public static void getCategoryByName(String categoryName, User user, GetCategoriesCallback callback){
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ReceiptCategory.PARSE_CLASS_NAME);
+        ParseQuery<ParseObject> query = new ParseQuery<>(ReceiptCategory.PARSE_CLASS_NAME);
         query.whereEqualTo(ReceiptCategory.KEY_SLUG, ReceiptCategory.getSlugFromName(categoryName));
         query.whereEqualTo(ReceiptCategory.KEY_USER, user.getParseUser());
         query.setLimit(1);
@@ -56,7 +59,7 @@ public class CategoryService {
     }
 
     public static void getCategories(User user, GetCategoriesCallback callback){
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(ReceiptCategory.PARSE_CLASS_NAME);
+        ParseQuery<ParseObject> query = new ParseQuery<>(ReceiptCategory.PARSE_CLASS_NAME);
         query.whereEqualTo(ReceiptCategory.KEY_USER, user.getParseUser());
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
@@ -115,6 +118,17 @@ public class CategoryService {
                                 object.put(ReceiptCategory.KEY_FILTER_AFTER_DATE_TIMESTAMP, filter.getAfterDateTimestamp());
                             }
 
+                            if (filter.isReimbursement() != null){
+                                object.put(ReceiptCategory.KEY_IS_REIMBURSEMENT, filter.isReimbursement());
+
+                                if (filter.isReimbursement()){
+                                    if (filter.getReimbursementState() != null){
+                                        object.put(ReceiptCategory.KEY_REIMBURSEMENT_STATE, filter.getReimbursementState().name());
+                                    }
+                                }
+                            }
+
+
                             List<ParseObject> merchantsParseObjects = new ArrayList<>();
                             if (filter.getMerchants() != null){
                                 for(Merchant merchant: filter.getMerchants()){
@@ -145,6 +159,25 @@ public class CategoryService {
         } else {
             callback.done(null, new CategoryAlreadyExistsException(category.getName() + " category already exists"));
         }
+    }
+
+    public static void createReimbursementCategoryForUser(User user, AddCategoryCallback callback){
+        ReceiptCategory category = new ReceiptCategory(REIMBURSEMENT_CATEGORY_NAME, Filter.getReimbursementFilter());
+        ParseObject object = new ParseObject(ReceiptCategory.PARSE_CLASS_NAME);
+        object.put(ReceiptCategory.KEY_NAME, category.getName());
+        object.put(ReceiptCategory.KEY_SLUG, category.getSlug());
+        object.put(ReceiptCategory.KEY_USER, user.getParseUser());
+        object.put(ReceiptCategory.KEY_IS_REIMBURSEMENT, category.getFilter().isReimbursement());
+        object.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null){
+                    callback.done(ReceiptCategory.fromParseObject(object), null);
+                } else {
+                    callback.done(null, e);
+                }
+            }
+        });
     }
 
     public static void deleteCategory(User user, ReceiptCategory category){}
