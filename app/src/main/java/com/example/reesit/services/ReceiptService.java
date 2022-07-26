@@ -5,7 +5,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.reesit.misc.Filter;
-import com.example.reesit.misc.ReceiptWithImage;
 import com.example.reesit.misc.SortReceiptOption;
 import com.example.reesit.models.Merchant;
 import com.example.reesit.models.Receipt;
@@ -18,13 +17,13 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ReceiptService {
     private static final Integer GET_PAGE_LIMIT = 20;
@@ -252,69 +251,75 @@ public class ReceiptService {
 
 
     public static void updateReceipt(Receipt receipt, User user, UpdateReceiptCallback callback){
-        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
-        query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
-        query.whereEqualTo("objectId", receipt.getId());
-        query.setLimit(1);
-        query.findInBackground(new FindCallback<ParseObject>() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
             @Override
-            public void done(List<ParseObject> objects, ParseException e) {
-                if (e == null){
-                    if (objects.size() == 1){
-                        ParseObject parseObject = objects.get(0);
-                        MerchantService.addMerchant(receipt.getMerchant(), new MerchantService.AddMerchantCallback() {
-                            @Override
-                            public void done(Merchant newMerchant, Exception e) {
-                                if (e == null){
-                                    parseObject.put(Receipt.KEY_MERCHANT, newMerchant.getParseObject());
-                                    parseObject.put(Receipt.KEY_AMOUNT, receipt.getAmount());
-                                    parseObject.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
-                                    parseObject.put(Receipt.KEY_DATE_TIME_STAMP, receipt.getDateTimestamp());
-                                    if (receipt.getTags() != null){
-                                        List<ParseObject> tagsParseObjects = new ArrayList<>();
-                                        for(Tag tag: receipt.getTags()){
-                                            // if the tag has no id - it means it hasn't been stored in the database yet
-                                            if (tag.getId() == null){
-                                                TagService.addTag(tag, User.getCurrentUser(), new TagService.AddTagCallback() {
-                                                    @Override
-                                                    public void done(Tag newTag, Exception e) {
-                                                        if (e == null){
+            public void run() {
+                ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Receipt.PARSE_CLASS_NAME);
+                query.whereEqualTo(Receipt.KEY_USER, user.getParseUser());
+                query.whereEqualTo("objectId", receipt.getId());
+                query.setLimit(1);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(List<ParseObject> objects, ParseException e) {
+                        if (e == null){
+                            if (objects.size() == 1){
+                                ParseObject parseObject = objects.get(0);
+                                MerchantService.addMerchant(receipt.getMerchant(), new MerchantService.AddMerchantCallback() {
+                                    @Override
+                                    public void done(Merchant newMerchant, Exception e) {
+                                        if (e == null){
+                                            parseObject.put(Receipt.KEY_MERCHANT, newMerchant.getParseObject());
+                                            parseObject.put(Receipt.KEY_AMOUNT, receipt.getAmount());
+                                            parseObject.put(Receipt.KEY_REFERENCE_NUMBER, receipt.getReferenceNumber());
+                                            parseObject.put(Receipt.KEY_DATE_TIME_STAMP, receipt.getDateTimestamp());
+                                            if (receipt.getTags() != null){
+                                                List<ParseObject> tagsParseObjects = new ArrayList<>();
+                                                for(Tag tag: receipt.getTags()){
+                                                    // if the tag has no id - it means it hasn't been stored in the database yet
+                                                    if (tag.getId() == null){
+                                                        // todo: tags are being added to the after the function has finished calling
+                                                        try {
+                                                            Tag newTag = TagService.addTag(tag, User.getCurrentUser());
                                                             tagsParseObjects.add(newTag.getParseObject());
-                                                        } else {
-                                                            callback.done(null, e);
+                                                        } catch (ParseException parseException){
+                                                            callback.done(null, parseException);
                                                         }
+                                                    } else {
+                                                        tagsParseObjects.add(tag.getParseObject());
                                                     }
-                                                });
-                                            } else {
-                                                tagsParseObjects.add(tag.getParseObject());
-                                            }
 
-                                        }
-                                        parseObject.put(Receipt.KEY_TAGS, tagsParseObjects);
-                                    } else {
-                                        parseObject.put(Receipt.KEY_TAGS, new ArrayList<>());
-                                    }
-                                    parseObject.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(ParseException e) {
-                                            if (e == null){
-                                                callback.done(Receipt.fromParseObject(parseObject), null);
+                                                }
+                                                parseObject.put(Receipt.KEY_TAGS, tagsParseObjects);
                                             } else {
-                                                callback.done(null, e);
+                                                parseObject.put(Receipt.KEY_TAGS, new ArrayList<>());
                                             }
+                                            parseObject.saveInBackground(new SaveCallback() {
+                                                @Override
+                                                public void done(ParseException e) {
+                                                    if (e == null){
+                                                        callback.done(Receipt.fromParseObject(parseObject), null);
+                                                    } else {
+                                                        callback.done(null, e);
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            callback.done(null, e);
                                         }
-                                    });
-                                } else {
-                                    callback.done(null, e);
-                                }
+                                    }
+                                });
                             }
-                        });
+                        } else {
+                            callback.done(null, e);
+                        }
                     }
-                } else {
-                    callback.done(null, e);
-                }
+                });
+
+                executorService.shutdown();
             }
         });
+
     }
 
 }

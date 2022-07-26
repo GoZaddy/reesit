@@ -64,6 +64,20 @@ public class TagService {
         });
     }
 
+    public static Tag getTag(String tagName, User user) throws ParseException {
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>(Tag.PARSE_CLASS_NAME);
+        query.whereEqualTo(Tag.KEY_SLUG, Tag.getSlugFromName(tagName));
+        query.whereEqualTo(Tag.KEY_USER, user.getParseUser());
+        query.setLimit(1);
+        List<ParseObject> objects = query.find();
+        List<Tag> tags = new ArrayList<>();
+        if (objects.size() > 0){
+            return Tag.fromParseObject(objects.get(0));
+        } else {
+            return null;
+        }
+    }
+
     public static void addTag(Tag tag, User user, AddTagCallback callback){
         if (tag.getId() == null){
             // check that a tag with the same slug doesn't exist
@@ -82,6 +96,7 @@ public class TagService {
                                     callback.done(Tag.fromParseObject(object), e);
                                 }
                             });
+                            object.saveInBackground();
                         } else {
                             callback.done(tags.get(0), null);
                         }
@@ -94,6 +109,26 @@ public class TagService {
             callback.done(tag, null);
         }
     }
+
+    public static Tag addTag(Tag tag, User user) throws ParseException {
+        if (tag.getId() == null){
+            // check that a tag with the same slug doesn't exist
+            Tag resTag = getTag(tag.getName(), user);
+            if (resTag != null){
+                return resTag;
+            } else {
+                ParseObject object = new ParseObject(Tag.PARSE_CLASS_NAME);
+                object.put(Tag.KEY_NAME, tag.getName());
+                object.put(Tag.KEY_SLUG, tag.getSlug());
+                object.put(Tag.KEY_USER, user.getParseUser());
+                object.save();
+                return Tag.fromParseObject(object);
+            }
+        } else {
+            return tag;
+        }
+    }
+
     public static void getSuggestedTags(String input, User user, GetTagsCallback callback){
         if (input.length() == 0){
             callback.done(new ArrayList<>(), null);

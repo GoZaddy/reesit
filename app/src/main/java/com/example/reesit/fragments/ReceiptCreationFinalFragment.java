@@ -543,18 +543,6 @@ public class ReceiptCreationFinalFragment extends Fragment{
             @Override
             public void done(List<Tag> tags, Exception e) {
                 if (e == null){
-                    for(Tag suggestedTag: tags){
-                        Chip chip = new Chip(requireContext());
-                        chip.setText(suggestedTag.getName());
-                        chip.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                selectTag(suggestedTag);
-                            }
-                        });
-                        suggestedTagsChipGroup.addView(chip);
-                    }
-
                     if (tags.size() == 0){
                         // if there are no suggested tags, give users the option to create their own tag
                         tagsTextField.setEndIconDrawable(R.drawable.ic_baseline_add_circle_outline_24);
@@ -569,6 +557,19 @@ public class ReceiptCreationFinalFragment extends Fragment{
                     } else {
                         tagsTextField.setEndIconVisible(false);
                         tagsTextField.setEndIconOnClickListener(null);
+
+                        for(Tag suggestedTag: tags){
+                            Chip chip = new Chip(requireContext());
+                            chip.setText(suggestedTag.getName());
+                            chip.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    selectTag(suggestedTag);
+                                }
+                            });
+                            suggestedTagsChipGroup.addView(chip);
+                        }
+
                     }
                 } else {
                     Log.e(TAG, "Error getting suggested merchants",e);
