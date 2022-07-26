@@ -3,4 +3,6 @@
     <dimen name="fragment_horizontal_margin">16dp</dimen>
     <dimen name="fragment_vertical_margin">16dp</dimen>
     <dimen name="sort_bottom_sheet_sort_option_radio_button_margin_top">16dp</dimen>
+    <dimen name="receipt_creation_final_reimbursement_states_option_radio_button_margin_top">16dp
+    </dimen>
 </resources>
